@@ -1,0 +1,83 @@
+---
+import { getCollection } from "astro:content";
+import BaseHead from "../../../components/BaseHead.astro";
+import Header from "../../../components/Header.astro";
+import Footer from "../../../components/Footer.astro";
+import "../../../styles/global.css";
+
+// Get all ideas and extract unique tags
+const ideas = await getCollection("mind");
+const tagCounts = new Map<string, number>();
+
+ideas.forEach((idea) => {
+  idea.data.hashtags.forEach((tag) => {
+    tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+  });
+});
+
+// Sort tags by count (descending)
+const sortedTags = Array.from(tagCounts.entries()).sort(
+  (a, b) => b[1] - a[1]
+);
+---
+
+<html lang="en">
+  <head>
+    <BaseHead
+      title="Browse Tags | Mind"
+      description="Explore ideas by topic and category"
+    />
+  </head>
+  <body>
+    <Header />
+    <main class="w-full max-w-[960px] mx-auto p-4">
+      <div class="mb-12 border-b-4 border-black pb-8">
+        <h1
+          class="text-4xl md:text-5xl font-bold font-mono uppercase mb-4 leading-none"
+        >
+          > Browse_Tags_
+        </h1>
+        <p
+          class="font-body text-lg text-gray-dark leading-relaxed max-w-[720px]"
+        >
+          Explore ideas organized by topics and categories.
+        </p>
+      </div>
+
+      {
+        sortedTags.length === 0 ? (
+          <div class="border-2 border-black bg-gray-light/20 p-8 text-center">
+            <p class="font-mono text-gray-dark">
+              > no_tags_yet... <span class="text-accent">_</span>
+            </p>
+          </div>
+        ) : (
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {sortedTags.map(([tag, count]) => (
+              <a
+                href={`/mind/tags/${tag.replace("#", "")}`}
+                class="tag-card group block no-underline"
+              >
+                <div class="border-2 border-black bg-white p-4 shadow-custom transition-all hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none">
+                  <div class="font-mono text-lg font-bold mb-2 group-hover:text-accent transition-colors">
+                    {tag}
+                  </div>
+                  <div class="text-sm font-mono text-gray">
+                    {count} {count === 1 ? "idea" : "ideas"}
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        )
+      }
+    </main>
+    <Footer />
+  </body>
+</html>
+
+<style>
+  .shadow-custom {
+    box-shadow: 4px 4px 0px 0px var(--color-black);
+  }
+</style>
