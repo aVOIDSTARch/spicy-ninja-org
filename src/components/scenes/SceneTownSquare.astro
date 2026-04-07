@@ -1,0 +1,161 @@
+---
+// SceneTownSquare.astro — Community zone
+// Town square: fire pit at center, multiple ninja figures of varied sizes
+// Some seated, some standing, one tending the fire. Copper/warm accent.
+import ParallaxScene from './ParallaxScene.astro'
+---
+<ParallaxScene zone="community">
+  <svg slot="far" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax meet"
+       style="position:absolute;bottom:0;left:0;width:100%;height:100%">
+    <!-- Town square buildings surrounding -->
+    <g fill="var(--sil-far)">
+      <rect x="0"    y="300" width="200" height="500"/>
+      <polygon points="-10,300 210,300 100,240"/>
+      <rect x="210"  y="330" width="160" height="470"/>
+      <polygon points="200,330 380,330 290,275"/>
+      <rect x="380"  y="360" width="130" height="440"/>
+      <polygon points="370,360 520,360 445,308"/>
+      <!-- Gate arch center-back -->
+      <rect x="520"  y="280" width="160" height="520"/>
+      <polygon points="510,280 690,280 600,220"/>
+      <polygon points="520,225 680,225 600,175"/>
+      <!-- Gate opening -->
+      <rect x="550" y="420" width="100" height="180" fill="var(--bg-primary)" opacity="0.4"/>
+      <rect x="620"  y="320" width="140" height="460"/>
+      <polygon points="610,320 770,320 690,264"/>
+      <rect x="770"  y="345" width="150" height="455"/>
+      <polygon points="760,345 930,345 845,290"/>
+      <rect x="930"  y="315" width="140" height="485"/>
+      <polygon points="920,315 1080,315 1000,258"/>
+      <rect x="1080" y="340" width="130" height="460"/>
+      <rect x="1190" y="360" width="20"  height="440"/>
+    </g>
+    <!-- Glowing windows throughout -->
+    <g fill="var(--sil-window)" opacity="0.2">
+      <rect x="20"  y="320" width="40" height="35"/>
+      <rect x="70"  y="320" width="40" height="35"/>
+      <rect x="130" y="320" width="40" height="35"/>
+      <rect x="20"  y="378" width="40" height="35"/>
+      <rect x="70"  y="378" width="40" height="35"/>
+      <rect x="220" y="350" width="38" height="32"/>
+      <rect x="268" y="350" width="38" height="32"/>
+      <rect x="390" y="380" width="35" height="30"/>
+      <rect x="440" y="380" width="35" height="30"/>
+      <rect x="640" y="295" width="42" height="36"/>
+      <rect x="695" y="295" width="42" height="36"/>
+      <rect x="785" y="365" width="40" height="34"/>
+      <rect x="838" y="365" width="40" height="34"/>
+      <rect x="950" y="335" width="40" height="34"/>
+      <rect x="1005" y="335" width="40" height="34"/>
+      <rect x="1095" y="358" width="38" height="32"/>
+      <rect x="1143" y="358" width="38" height="32"/>
+    </g>
+  </svg>
+
+  <svg slot="mid" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax meet"
+       style="position:absolute;bottom:0;left:0;width:100%;height:100%">
+    <!-- Fire pit at center of square -->
+    <g>
+      <!-- Stone ring -->
+      <ellipse cx="600" cy="660" rx="70" ry="28" fill="var(--sil-mid)"/>
+      <ellipse cx="600" cy="655" rx="58" ry="22" fill="var(--sil-far)" opacity="0.8"/>
+      <!-- Fire glow -->
+      <ellipse cx="600" cy="650" rx="30" ry="16" fill="var(--sil-window)" opacity="0.6"/>
+      <!-- Flames -->
+      <path d="M 580 650 Q 585 620 600 610 Q 615 620 620 650 Q 610 640 600 635 Q 590 640 580 650 Z"
+            fill="var(--sil-window)" opacity="0.5"/>
+      <path d="M 590 650 Q 594 628 600 618 Q 606 628 610 650 Z"
+            fill="var(--sil-window)" opacity="0.7"/>
+      <!-- Logs in fire -->
+      <rect x="570" y="650" width="60" height="8" rx="3" fill="var(--sil-mid)"
+            transform="rotate(-20,570,654)"/>
+      <rect x="580" y="648" width="60" height="8" rx="3" fill="var(--sil-mid)"
+            transform="rotate(18,580,652)"/>
+    </g>
+    <!-- Grouped figures around fire — varied sizes, relaxed postures -->
+    <!-- Left group — two seated -->
+    <g fill="var(--sil-mid)" opacity="0.75">
+      <circle cx="350" cy="580" r="20"/>
+      <ellipse cx="350" cy="618" rx="20" ry="24"/>
+      <ellipse cx="320" cy="636" rx="22" ry="12" transform="rotate(10,320,636)"/>
+      <ellipse cx="380" cy="636" rx="22" ry="12" transform="rotate(-10,380,636)"/>
+      <circle cx="290" cy="590" r="16"/>
+      <ellipse cx="290" cy="622" rx="17" ry="20"/>
+      <ellipse cx="268" cy="638" rx="18" ry="10" transform="rotate(12,268,638)"/>
+      <ellipse cx="312" cy="638" rx="18" ry="10" transform="rotate(-12,312,638)"/>
+    </g>
+    <!-- Right group — one standing, one crouching -->
+    <g fill="var(--sil-mid)" opacity="0.75">
+      <circle cx="860" cy="540" r="22"/>
+      <ellipse cx="860" cy="584" rx="20" ry="32"/>
+      <ellipse cx="840" cy="632" rx="12" ry="28" transform="rotate(8,840,632)"/>
+      <ellipse cx="880" cy="628" rx="12" ry="26" transform="rotate(-8,880,628)"/>
+      <!-- Arms at sides relaxed -->
+      <ellipse cx="836" cy="572" rx="8" ry="22" transform="rotate(12,836,572)"/>
+      <ellipse cx="884" cy="572" rx="8" ry="22" transform="rotate(-12,884,572)"/>
+      <!-- Small child-sized figure crouching -->
+      <circle cx="930" cy="598" r="14"/>
+      <ellipse cx="930" cy="624" rx="16" ry="18"/>
+      <ellipse cx="914" cy="638" rx="14" ry="10" transform="rotate(15,914,638)"/>
+      <ellipse cx="946" cy="636" rx="14" ry="10" transform="rotate(-15,946,636)"/>
+    </g>
+    <!-- Figure tending fire — leaning forward with stick -->
+    <g fill="var(--sil-mid)">
+      <circle cx="540" cy="580" r="18"/>
+      <ellipse cx="540" cy="614" rx="18" ry="22" transform="rotate(-10,540,614)"/>
+      <!-- Arm extended forward with poker stick -->
+      <ellipse cx="560" cy="600" rx="7" ry="20" transform="rotate(-40,560,600)"/>
+      <rect x="572" y="600" width="4" height="55" rx="2" transform="rotate(-38,572,600)"/>
+    </g>
+  </svg>
+
+  <svg slot="near" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax meet"
+       style="position:absolute;bottom:0;left:0;width:100%;height:100%">
+    <!-- Square paving stones -->
+    <rect x="0" y="680" width="1200" height="120" fill="var(--sil-near)" opacity="0.7"/>
+    <g stroke="var(--sil-far)" stroke-width="1.5" fill="none" opacity="0.18">
+      <line x1="0"   y1="695" x2="1200" y2="695"/>
+      <line x1="0"   y1="720" x2="1200" y2="720"/>
+      <line x1="0"   y1="748" x2="1200" y2="748"/>
+      <line x1="80"  y1="680" x2="80"  y2="800"/>
+      <line x1="180" y1="680" x2="180" y2="800"/>
+      <line x1="280" y1="680" x2="280" y2="800"/>
+      <line x1="380" y1="680" x2="380" y2="800"/>
+      <line x1="480" y1="680" x2="480" y2="800"/>
+      <line x1="580" y1="680" x2="580" y2="800"/>
+      <line x1="680" y1="680" x2="680" y2="800"/>
+      <line x1="780" y1="680" x2="780" y2="800"/>
+      <line x1="880" y1="680" x2="880" y2="800"/>
+      <line x1="980" y1="680" x2="980" y2="800"/>
+      <line x1="1080" y1="680" x2="1080" y2="800"/>
+      <line x1="1160" y1="680" x2="1160" y2="800"/>
+    </g>
+    <!-- Near foreground figures — anonymous community members -->
+    <g fill="var(--sil-fg)" opacity="0.7">
+      <circle cx="100" cy="630" r="19"/>
+      <ellipse cx="100" cy="664" rx="18" ry="26"/>
+      <circle cx="1100" cy="635" r="17"/>
+      <ellipse cx="1100" cy="667" rx="16" ry="23"/>
+    </g>
+  </svg>
+
+  <svg slot="fg" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax meet"
+       style="position:absolute;bottom:0;left:0;width:100%;height:100%">
+    <!-- Closest figure — back to viewer, seated, watching fire -->
+    <g fill="var(--sil-fg)" transform="translate(590, 550)">
+      <circle cx="0" cy="0" r="24"/>
+      <!-- No mask visible from behind -->
+      <!-- Wide seated torso -->
+      <ellipse cx="0" cy="44" rx="26" ry="30"/>
+      <!-- Arms relaxed at sides resting on knees -->
+      <ellipse cx="-28" cy="52" rx="10" ry="18" transform="rotate(25,-28,52)"/>
+      <ellipse cx="28"  cy="52" rx="10" ry="18" transform="rotate(-25,28,52)"/>
+      <!-- Legs cross-legged from behind -->
+      <ellipse cx="-30" cy="78" rx="28" ry="14" transform="rotate(-5,-30,78)"/>
+      <ellipse cx="30"  cy="78" rx="28" ry="14" transform="rotate(5,30,78)"/>
+      <!-- Cloak wide and draped -->
+      <path d="M -30 15 Q -50 45 -48 82 Q -10 88 0 80 Q 10 88 48 82 Q 50 45 30 15 Z"
+            opacity="0.6"/>
+    </g>
+  </svg>
+</ParallaxScene>
