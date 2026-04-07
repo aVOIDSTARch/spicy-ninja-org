@@ -1,0 +1,124 @@
+---
+/*
+  ParallaxScene.astro
+  ─────────────────────────────────────────────────────────
+  Fixed-position scene container that drives CSS custom
+  properties from the scroll position.
+
+  Each layer reads its own var and translates vertically:
+    --px-far    10% of scrollY  (slowest — sky, mountains)
+    --px-mid    25% of scrollY  (trees, pagodas)
+    --px-near   45% of scrollY  (buildings, close trees)
+    --px-fg     65% of scrollY  (foreground ninja / objects)
+
+  Mobile (≤768px): parallax disabled entirely.
+  Layers render as a static single-image background.
+
+  Usage:
+    <ParallaxScene zone="dojo">
+      <slot />   ← zone-specific SVG layers go here
+    </ParallaxScene>
+*/
+
+interface Props {
+  zone: string
+}
+
+const { zone } = Astro.props
+---
+
+<div class="px-scene" data-zone-scene={zone} aria-hidden="true">
+  <div class="px-layer px-layer--far"  data-layer="far">
+    <slot name="far" />
+  </div>
+  <div class="px-layer px-layer--mid"  data-layer="mid">
+    <slot name="mid" />
+  </div>
+  <div class="px-layer px-layer--near" data-layer="near">
+    <slot name="near" />
+  </div>
+  <div class="px-layer px-layer--fg"   data-layer="fg">
+    <slot name="fg" />
+  </div>
+</div>
+
+<style>
+  /* ── Scene container ── */
+  .px-scene {
+    position: fixed;
+    inset: 0 0 0 52px;   /* offset for the rail nav */
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  /* ── Layers ── */
+  .px-layer {
+    position: absolute;
+    inset: 0;
+    will-change: transform;
+  }
+
+  .px-layer--far  { transform: translateY(calc(var(--px-far,  0px))); }
+  .px-layer--mid  { transform: translateY(calc(var(--px-mid,  0px))); }
+  .px-layer--near { transform: translateY(calc(var(--px-near, 0px))); }
+  .px-layer--fg   { transform: translateY(calc(var(--px-fg,   0px))); }
+
+  /* ── SVG fill via silhouette tokens ── */
+  .px-layer--far  svg { fill: var(--sil-far);  }
+  .px-layer--mid  svg { fill: var(--sil-mid);  }
+  .px-layer--near svg { fill: var(--sil-near); }
+  .px-layer--fg   svg { fill: var(--sil-fg);   }
+
+  /* ── Mobile: disable parallax, single static layer ── */
+  @media (max-width: 768px) {
+    .px-scene {
+      inset: 0;           /* full width on mobile, no rail */
+      position: fixed;
+    }
+    .px-layer {
+      transform: none !important;
+    }
+    /* Hide all but the near layer on mobile */
+    .px-layer--far,
+    .px-layer--mid,
+    .px-layer--fg {
+      opacity: 0;
+    }
+    .px-layer--near {
+      opacity: 0.18;
+    }
+  }
+</style>
+
+<script>
+  const scene = document.querySelector('.px-scene') as HTMLElement | null
+  if (!scene) throw new Error('no scene')
+
+  let ticking = false
+  let lastY = 0
+
+  function updateParallax() {
+    const y = window.scrollY
+    scene.style.setProperty('--px-far',  `${y * 0.10}px`)
+    scene.style.setProperty('--px-mid',  `${y * 0.25}px`)
+    scene.style.setProperty('--px-near', `${y * 0.45}px`)
+    scene.style.setProperty('--px-fg',   `${y * 0.65}px`)
+    ticking = false
+  }
+
+  function onScroll() {
+    lastY = window.scrollY
+    if (!ticking) {
+      requestAnimationFrame(updateParallax)
+      ticking = true
+    }
+  }
+
+  // Only run on desktop
+  const mq = window.matchMedia('(max-width: 768px)')
+  if (!mq.matches) {
+    window.addEventListener('scroll', onScroll, { passive: true })
+    updateParallax()
+  }
+</script>
