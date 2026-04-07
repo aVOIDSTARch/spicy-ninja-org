@@ -1,227 +1,173 @@
+---
+import ZoneLayout from '../../layouts/ZoneLayout.astro'
+import SceneGarden from '../../components/scenes/SceneGarden.astro'
+---
+
+<ZoneLayout zone="journal" title="New Entry — Listening Journal — spicyninja.org">
+  <SceneGarden slot="scene" />
+
+  <div class="jl-shell">
+    <a href="/journal" style="font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.15em;
+       color:var(--text-ghost);text-decoration:none;display:inline-block;margin-bottom:2rem;">← Journal</a>
+
+    <h1 class="jl-title">New Entry</h1>
+    <p class="jl-subtitle">Write in four layers. Autosaves to browser storage.</p>
+
+    <!-- META -->
+    <div class="jl-section">
+      <div class="jl-meta-grid">
+        <div class="jl-field">
+          <label class="jl-label" for="jl-work">Work</label>
+          <input class="jl-input" id="jl-work" type="text" placeholder="e.g. Peter and the Wolf" />
+        </div>
+        <div class="jl-field">
+          <label class="jl-label" for="jl-composer">Composer / Artist</label>
+          <input class="jl-input" id="jl-composer" type="text" placeholder="e.g. Prokofiev" />
+        </div>
+        <div class="jl-field">
+          <label class="jl-label" for="jl-date">Date</label>
+          <input class="jl-input" id="jl-date" type="date" />
+        </div>
+        <div class="jl-field">
+          <label class="jl-label" for="jl-kind">Kind</label>
+          <select class="jl-select" id="jl-kind">
+            <option value="project-track">Project Track</option>
+            <option value="montessori">Montessori</option>
+            <option value="fundamentals">Fundamentals</option>
+            <option value="free">Free listening</option>
+          </select>
+        </div>
+        <div class="jl-field">
+          <label class="jl-label" for="jl-module">Module / Branch (optional)</label>
+          <input class="jl-input" id="jl-module" type="text" placeholder="e.g. Module 1 or bach-math" />
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 LAYERS -->
+    <div class="jl-section">
+      <div class="jl-layers">
+        <div class="jl-layer" data-layer="naked">
+          <div class="jl-layer-header">
+            <span class="jl-layer-num">01</span>
+            <span class="jl-layer-name">Naked</span>
+            <span class="jl-layer-desc">First listen — pure reception. No analysis. Body and sound only.</span>
+          </div>
+          <textarea class="jl-textarea" id="jl-naked" rows="5"
+            placeholder="What happened in your body. What you felt before you understood."></textarea>
+        </div>
+
+        <div class="jl-layer" data-layer="inhabited">
+          <div class="jl-layer-header">
+            <span class="jl-layer-num">02</span>
+            <span class="jl-layer-name">Inhabited</span>
+            <span class="jl-layer-desc">Active listening — what you noticed, what you followed.</span>
+          </div>
+          <textarea class="jl-textarea" id="jl-inhabited" rows="5"
+            placeholder="The flagged elements. What you were listening for. What surprised you."></textarea>
+        </div>
+
+        <div class="jl-layer" data-layer="anatomical">
+          <div class="jl-layer-header">
+            <span class="jl-layer-num">03</span>
+            <span class="jl-layer-name">Anatomical</span>
+            <span class="jl-layer-desc">How it works — structure, technique, mechanism.</span>
+          </div>
+          <textarea class="jl-textarea" id="jl-anatomical" rows="5"
+            placeholder="What compositional or structural observations you can make. What you heard technically."></textarea>
+        </div>
+
+        <div class="jl-layer" data-layer="notebook">
+          <div class="jl-layer-header">
+            <span class="jl-layer-num">04</span>
+            <span class="jl-layer-name">Notebook</span>
+            <span class="jl-layer-desc">Raw notes — ideas, connections, fragments, compositional material.</span>
+          </div>
+          <textarea class="jl-textarea" id="jl-notebook" rows="6"
+            placeholder="Anything this listening kicked loose. Connections to the project. Things to follow up."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="jl-section jl-actions-section">
+      <div class="jl-actions">
+        <button class="jl-btn jl-btn--save"   id="jl-save">Save draft</button>
+        <button class="jl-btn jl-btn--export" id="jl-export">Export .mdx</button>
+        <label  class="jl-btn jl-btn--upload" style="cursor:pointer">
+          Load .mdx
+          <input type="file" id="jl-upload-input" accept=".mdx,.md" style="display:none" />
+        </label>
+        <button class="jl-btn jl-btn--clear"  id="jl-clear">Clear</button>
+      </div>
+      <p class="jl-actions-hint">
+        <strong style="color:var(--text-muted)">Save draft</strong> — stored in browser localStorage.<br/>
+        <strong style="color:var(--text-muted)">Export .mdx</strong> — downloads a file ready to drop into
+        <code>src/content/listening-journal/</code> to publish.<br/>
+        Autosaves every 800ms while you type.
+      </p>
+    </div>
+
+    <!-- SAVED DRAFTS -->
+    <div class="jl-section">
+      <h2 class="jl-section-title">Saved Drafts</h2>
+      <p class="jl-section-desc">All entries stored in this browser. Load to continue editing.</p>
+      <div class="jl-drafts-list" id="jl-drafts-list"></div>
+    </div>
+
+  </div>
+</ZoneLayout>
+
 
 <style>
-/* ── SHELL ── */
-.jl-shell {
-  max-width: 800px;
-  padding: 10vh 3.5rem 8rem;
-}
-
-/* ── HEADER ── */
-.jl-title {
-  font-family: var(--font-display);
-  font-size: clamp(2.5rem, 6vw, 4rem);
-  font-weight: 700;
-  color: var(--text-primary);
-  line-height: 0.95;
-  margin-bottom: 0.6rem;
-}
-.jl-subtitle {
-  font-family: var(--font-body);
-  font-size: 0.95rem;
-  color: var(--text-muted);
-  margin-bottom: 0;
-  line-height: 1.7;
-}
-
-/* ── SECTIONS ── */
-.jl-section {
-  margin-top: 3.5rem;
-  padding-top: 3.5rem;
-  border-top: 1px solid var(--border);
-}
+.jl-shell { max-width: 800px; padding: 10vh 3.5rem 8rem; }
+.jl-title { font-family: var(--font-display); font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 700; color: var(--text-primary); line-height: 0.95; margin-bottom: 0.6rem; }
+.jl-subtitle { font-family: var(--font-body); font-size: 0.95rem; color: var(--text-muted); line-height: 1.7; }
+.jl-section { margin-top: 3.5rem; padding-top: 3.5rem; border-top: 1px solid var(--border); }
 .jl-section:first-of-type { border-top: none; padding-top: 0; margin-top: 2rem; }
-
-.jl-section-title {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: 1.4rem;
-  color: var(--text-primary);
-  margin-bottom: 0.4rem;
-}
-.jl-section-desc {
-  font-family: var(--font-body);
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  line-height: 1.7;
-  margin-bottom: 1.5rem;
-}
-
-/* ── META GRID ── */
-.jl-meta-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-.jl-field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
+.jl-section-title { font-family: var(--font-display); font-weight: 400; font-size: 1.4rem; color: var(--text-primary); margin-bottom: 0.4rem; }
+.jl-section-desc { font-family: var(--font-body); font-size: 0.9rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 1.5rem; }
+.jl-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.jl-field { display: flex; flex-direction: column; gap: 0.35rem; }
 .jl-field:first-child { grid-column: 1 / -1; }
-
-.jl-label {
-  font-family: var(--font-mono);
-  font-size: 0.52rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--text-ghost);
-}
-.jl-input, .jl-select {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  padding: 0.55rem 0.8rem;
-  outline: none;
-  width: 100%;
-  transition: border-color 0.2s;
-}
+.jl-label { font-family: var(--font-mono); font-size: 0.52rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-ghost); }
+.jl-input, .jl-select { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-secondary); font-family: var(--font-mono); font-size: 0.75rem; padding: 0.55rem 0.8rem; outline: none; width: 100%; transition: border-color 0.2s; }
 .jl-input:focus, .jl-select:focus { border-color: var(--border-hi); }
 .jl-input[type="date"] { color-scheme: dark; }
-
-/* ── LAYERS ── */
 .jl-layers { display: flex; flex-direction: column; gap: 1.5rem; }
-
-.jl-layer {
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--gossamer);
-  background: var(--bg-card);
-}
+.jl-layer { border: 1px solid var(--border); border-left: 3px solid var(--gossamer); background: var(--bg-card); }
 .jl-layer[data-layer="naked"]      { border-left-color: #9b6dcc; }
 .jl-layer[data-layer="inhabited"]  { border-left-color: var(--gossamer); }
 .jl-layer[data-layer="anatomical"] { border-left-color: #2a6b9e; }
 .jl-layer[data-layer="notebook"]   { border-left-color: #c8922a; }
-
-.jl-layer-header {
-  display: grid;
-  grid-template-columns: auto auto 1fr;
-  align-items: baseline;
-  gap: 0.6rem;
-  padding: 0.9rem 1.2rem 0.7rem;
-  border-bottom: 1px solid var(--border);
-}
-.jl-layer-num {
-  font-family: var(--font-mono);
-  font-size: 0.5rem;
-  color: var(--text-ghost);
-  letter-spacing: 0.1em;
-}
-.jl-layer-name {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-}
-.jl-layer-desc {
-  font-family: var(--font-body);
-  font-size: 0.78rem;
-  color: var(--text-ghost);
-  line-height: 1.5;
-  font-style: italic;
-}
-.jl-textarea {
-  display: block;
-  width: 100%;
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  line-height: 1.8;
-  padding: 1rem 1.2rem;
-  resize: vertical;
-  outline: none;
-  min-height: 120px;
-}
+.jl-layer-header { display: grid; grid-template-columns: auto auto 1fr; align-items: baseline; gap: 0.6rem; padding: 0.9rem 1.2rem 0.7rem; border-bottom: 1px solid var(--border); }
+.jl-layer-num { font-family: var(--font-mono); font-size: 0.5rem; color: var(--text-ghost); letter-spacing: 0.1em; }
+.jl-layer-name { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-secondary); }
+.jl-layer-desc { font-family: var(--font-body); font-size: 0.78rem; color: var(--text-ghost); line-height: 1.5; font-style: italic; }
+.jl-textarea { display: block; width: 100%; background: transparent; border: none; color: var(--text-secondary); font-family: var(--font-body); font-size: 0.92rem; line-height: 1.8; padding: 1rem 1.2rem; resize: vertical; outline: none; min-height: 120px; }
 .jl-textarea::placeholder { color: var(--text-ghost); font-style: italic; }
-
-/* ── ACTIONS ── */
 .jl-actions-section { padding-bottom: 0; }
-.jl-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 0.8rem;
-}
-.jl-btn {
-  font-family: var(--font-mono);
-  font-size: 0.58rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  padding: 0.5rem 1.1rem;
-  border: 1px solid var(--border);
-  background: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: border-color 0.2s, color 0.2s;
-  display: inline-flex;
-  align-items: center;
-}
+.jl-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.8rem; }
+.jl-btn { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 0.5rem 1.1rem; border: 1px solid var(--border); background: none; color: var(--text-muted); cursor: pointer; transition: border-color 0.2s, color 0.2s; display: inline-flex; align-items: center; }
 .jl-btn--save:hover   { border-color: var(--gossamer); color: var(--gossamer); }
 .jl-btn--export:hover { border-color: #2a6b9e; color: #2a6b9e; }
 .jl-btn--upload:hover { border-color: #9b6dcc; color: #9b6dcc; }
 .jl-btn--clear:hover  { border-color: var(--cinnabar); color: var(--cinnabar); }
-
-.jl-actions-hint {
-  font-family: var(--font-mono);
-  font-size: 0.55rem;
-  color: var(--text-ghost);
-  line-height: 1.6;
-  margin-top: 0.3rem;
-}
-.jl-actions-hint code {
-  color: var(--text-muted);
-  background: var(--bg-raised);
-  padding: 0.1em 0.3em;
-}
-.jl-actions-hint--todo { color: #c8922a; opacity: 0.7; }
-
-/* ── DRAFTS ── */
+.jl-actions-hint { font-family: var(--font-mono); font-size: 0.55rem; color: var(--text-ghost); line-height: 1.6; }
+.jl-actions-hint code { color: var(--text-muted); background: var(--bg-raised); padding: 0.1em 0.3em; }
 .jl-drafts-list { display: flex; flex-direction: column; gap: 0.5rem; }
-.jl-draft-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.7rem 1rem;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-}
-.jl-draft-info {
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  color: var(--text-muted);
-  line-height: 1.4;
-}
+.jl-draft-item { display: flex; align-items: center; justify-content: space-between; padding: 0.7rem 1rem; background: var(--bg-card); border: 1px solid var(--border); }
+.jl-draft-info { font-family: var(--font-mono); font-size: 0.62rem; color: var(--text-muted); line-height: 1.4; }
 .jl-draft-info strong { color: var(--text-secondary); display: block; }
 .jl-draft-actions { display: flex; gap: 0.3rem; }
-.jl-draft-btn {
-  font-family: var(--font-mono);
-  font-size: 0.5rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 0.3rem 0.6rem;
-  border: 1px solid var(--border);
-  background: none;
-  color: var(--text-ghost);
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
-}
+.jl-draft-btn { font-family: var(--font-mono); font-size: 0.5rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.3rem 0.6rem; border: 1px solid var(--border); background: none; color: var(--text-ghost); cursor: pointer; transition: border-color 0.15s, color 0.15s; }
 .jl-draft-btn:hover { border-color: var(--gossamer); color: var(--gossamer); }
 .jl-draft-btn--del:hover { border-color: var(--cinnabar); color: var(--cinnabar); }
-
-@media (max-width: 600px) {
-  .jl-shell { padding: 6vh 1.2rem 5rem; }
-  .jl-meta-grid { grid-template-columns: 1fr; }
-  .jl-field:first-child { grid-column: 1; }
-}
+@media (max-width: 600px) { .jl-shell { padding: 6vh 1.2rem 5rem; } .jl-meta-grid { grid-template-columns: 1fr; } .jl-field:first-child { grid-column: 1; } }
 </style>
 
 <script>
 const STORAGE_PREFIX = 'sn-journal:';
-
-// ── Field refs ────────────────────────────────────────────────
 const fields = {
   work:       document.getElementById('jl-work'),
   composer:   document.getElementById('jl-composer'),
@@ -233,205 +179,77 @@ const fields = {
   anatomical: document.getElementById('jl-anatomical'),
   notebook:   document.getElementById('jl-notebook'),
 };
-
-// Set today's date as default
-if (fields.date && !fields.date.value) {
-  fields.date.value = new Date().toISOString().slice(0, 10);
-}
-
-// ── Current draft ID ─────────────────────────────────────────
+if (fields.date && !fields.date.value) fields.date.value = new Date().toISOString().slice(0, 10);
 let currentDraftId = `draft-${Date.now()}`;
-
 function getDraftId() {
-  const work = fields.work.value.trim();
-  const date = fields.date.value;
-  if (work && date) {
-    return `${date}-${work.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,40)}`;
-  }
-  return currentDraftId;
+  const work = fields.work.value.trim(), date = fields.date.value;
+  return (work && date) ? `${date}-${work.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,40)}` : currentDraftId;
 }
-
-// ── Read / write state ────────────────────────────────────────
 function readState() {
-  return {
-    work:       fields.work.value,
-    composer:   fields.composer.value,
-    date:       fields.date.value,
-    kind:       fields.kind.value,
-    module:     fields.module.value,
-    naked:      fields.naked.value,
-    inhabited:  fields.inhabited.value,
-    anatomical: fields.anatomical.value,
-    notebook:   fields.notebook.value,
-    savedAt:    new Date().toISOString(),
-  };
+  return { work: fields.work.value, composer: fields.composer.value, date: fields.date.value,
+    kind: fields.kind.value, module: fields.module.value, naked: fields.naked.value,
+    inhabited: fields.inhabited.value, anatomical: fields.anatomical.value,
+    notebook: fields.notebook.value, savedAt: new Date().toISOString() };
 }
-
-function loadState(state) {
-  Object.keys(fields).forEach(key => {
-    if (state[key] !== undefined) fields[key].value = state[key];
-  });
-}
-
-// ── Autosave ──────────────────────────────────────────────────
+function loadState(state) { Object.keys(fields).forEach(k => { if (state[k] !== undefined) fields[k].value = state[k]; }); }
 let saveTimer;
-function scheduleAutosave() {
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(saveDraft, 800);
-}
+function scheduleAutosave() { clearTimeout(saveTimer); saveTimer = setTimeout(saveDraft, 800); }
 Object.values(fields).forEach(el => el?.addEventListener('input', scheduleAutosave));
-
-function saveDraft() {
-  const id = getDraftId();
-  currentDraftId = id;
-  localStorage.setItem(STORAGE_PREFIX + id, JSON.stringify(readState()));
-  renderDraftsList();
-}
-
-// ── Manual save ───────────────────────────────────────────────
+function saveDraft() { currentDraftId = getDraftId(); localStorage.setItem(STORAGE_PREFIX + currentDraftId, JSON.stringify(readState())); renderDraftsList(); }
 document.getElementById('jl-save')?.addEventListener('click', () => {
-  saveDraft();
-  const btn = document.getElementById('jl-save');
-  btn.textContent = 'Saved ✓';
-  setTimeout(() => { btn.textContent = 'Save draft'; }, 1500);
+  saveDraft(); const btn = document.getElementById('jl-save');
+  btn.textContent = 'Saved ✓'; setTimeout(() => { btn.textContent = 'Save draft'; }, 1500);
 });
-
-// ── Slugify helper ────────────────────────────────────────────
-function slugify(s) {
-  return s.toLowerCase().trim()
-    .replace(/[^a-z0-9\s-]/g,'')
-    .replace(/\s+/g,'-')
-    .replace(/-+/g,'-')
-    .slice(0, 60);
-}
-
-// ── Export .mdx ───────────────────────────────────────────────
+function slugify(s) { return s.toLowerCase().trim().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-').slice(0,60); }
 document.getElementById('jl-export')?.addEventListener('click', () => {
   const s = readState();
   if (!s.work) { alert('Add a work title before exporting.'); return; }
-
   const slug = `${s.date || new Date().toISOString().slice(0,10)}-${slugify(s.work)}`;
-  const frontmatter = [
-    '---',
-    `title: "${s.work.replace(/"/g,'\\"')}"`,
-    `date: ${s.date || new Date().toISOString().slice(0,10)}`,
-    `work: "${s.work.replace(/"/g,'\\"')}"`,
-    `composer: "${s.composer.replace(/"/g,'\\"')}"`,
-    `kind: "${s.kind}"`,
-    s.module ? `module: "${s.module}"` : `module: null`,
-    'publishedAsPost: null',
-    'draft: true',
-    '---',
-    '',
-  ].join('\n');
-
-  const body = [
-    s.naked      ? `## Naked\n\n${s.naked.trim()}\n` : '',
-    s.inhabited  ? `## Inhabited\n\n${s.inhabited.trim()}\n` : '',
-    s.anatomical ? `## Anatomical\n\n${s.anatomical.trim()}\n` : '',
-    s.notebook   ? `## Notebook\n\n${s.notebook.trim()}\n` : '',
-  ].filter(Boolean).join('\n');
-
-  const blob = new Blob([frontmatter + body], { type: 'text/markdown' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href     = url;
-  a.download = `${slug}.mdx`;
-  a.click();
-  URL.revokeObjectURL(url);
+  const layers = {naked: s.naked, inhabited: s.inhabited, anatomical: s.anatomical, notebook: s.notebook};
+  const layersYaml = Object.entries(layers).filter(([,v])=>v).map(([k,v])=>`  ${k}: |\n    ${v.trim().replace(/\n/g,'\n    ')}`).join('\n');
+  const frontmatter = `---\ntitle: "${s.work.replace(/"/g,'\\"')}"\ndate: ${s.date || new Date().toISOString().slice(0,10)}\nwork: "${s.work.replace(/"/g,'\\"')}"\ncomposer: "${s.composer.replace(/"/g,'\\"')}"\nkind: "${s.kind}"\nmodule: ${s.module ? `"${s.module}"` : 'null'}\nlayers:\n${layersYaml || '  {}'}\npublishedAsPost: null\ndraft: true\n---\n`;
+  const blob = new Blob([frontmatter], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob); const a = document.createElement('a');
+  a.href = url; a.download = `${slug}.mdx`; a.click(); URL.revokeObjectURL(url);
 });
-
-// ── Upload .mdx ───────────────────────────────────────────────
 document.getElementById('jl-upload-input')?.addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+  const file = e.target.files[0]; if (!file) return;
   const reader = new FileReader();
   reader.onload = (ev) => {
     const text = ev.target.result;
-    // Parse frontmatter
     const fmMatch = text.match(/^---\n([\s\S]*?)\n---/);
     if (fmMatch) {
       const fm = fmMatch[1];
-      const get = (key) => {
-        const m = fm.match(new RegExp(`^${key}:\\s*["']?([^"'\\n]+)["']?`, 'm'));
-        return m ? m[1].trim() : '';
-      };
-      fields.work.value     = get('work') || get('title');
-      fields.composer.value = get('composer');
-      fields.date.value     = get('date');
-      fields.module.value   = get('module') === 'null' ? '' : get('module');
+      const get = (key) => { const m = fm.match(new RegExp(`^${key}:\\s*["']?([^"'\\n]+)["']?`, 'm')); return m ? m[1].trim() : ''; };
+      fields.work.value = get('work') || get('title'); fields.composer.value = get('composer');
+      fields.date.value = get('date'); fields.module.value = get('module') === 'null' ? '' : get('module');
       const kindVal = get('kind');
-      if (kindVal && fields.kind) {
-        [...fields.kind.options].forEach(o => { if (o.value === kindVal) o.selected = true; });
-      }
+      if (kindVal && fields.kind) [...fields.kind.options].forEach(o => { if (o.value === kindVal) o.selected = true; });
+      const getSection = (name) => { const m = text.match(new RegExp(`## ${name}\\n\\n([\\s\\S]*?)(?=\\n## |$)`)); return m ? m[1].trim() : ''; };
+      fields.naked.value = getSection('Naked'); fields.inhabited.value = getSection('Inhabited');
+      fields.anatomical.value = getSection('Anatomical'); fields.notebook.value = getSection('Notebook');
     }
-    // Parse body sections
-    const getSection = (name) => {
-      const m = text.match(new RegExp(`## ${name}\\n\\n([\\s\\S]*?)(?=\\n## |$)`));
-      return m ? m[1].trim() : '';
-    };
-    fields.naked.value      = getSection('Naked');
-    fields.inhabited.value  = getSection('Inhabited');
-    fields.anatomical.value = getSection('Anatomical');
-    fields.notebook.value   = getSection('Notebook');
   };
-  reader.readAsText(file);
-  e.target.value = '';
+  reader.readAsText(file); e.target.value = '';
 });
-
-// ── Clear ─────────────────────────────────────────────────────
 document.getElementById('jl-clear')?.addEventListener('click', () => {
   if (!confirm('Clear this entry? Save or export first if you want to keep it.')) return;
   Object.values(fields).forEach(el => { if (el) el.value = ''; });
   fields.date.value = new Date().toISOString().slice(0,10);
   currentDraftId = `draft-${Date.now()}`;
 });
-
-// ── Drafts list ───────────────────────────────────────────────
 function getAllDrafts() {
-  return Object.keys(localStorage)
-    .filter(k => k.startsWith(STORAGE_PREFIX))
+  return Object.keys(localStorage).filter(k => k.startsWith(STORAGE_PREFIX))
     .map(k => ({ id: k.replace(STORAGE_PREFIX,''), ...JSON.parse(localStorage.getItem(k)) }))
     .sort((a,b) => (b.savedAt||'').localeCompare(a.savedAt||''));
 }
-
 function renderDraftsList() {
-  const listEl = document.getElementById('jl-drafts-list');
-  if (!listEl) return;
+  const listEl = document.getElementById('jl-drafts-list'); if (!listEl) return;
   const drafts = getAllDrafts();
-  if (drafts.length === 0) {
-    listEl.innerHTML = '<p style="font-family:var(--font-mono);font-size:0.6rem;color:var(--text-ghost)">No saved drafts.</p>';
-    return;
-  }
-  listEl.innerHTML = drafts.map(d => `
-    <div class="jl-draft-item">
-      <div class="jl-draft-info">
-        <strong>${d.work || '(untitled)'}</strong>
-        ${d.date || ''} · ${d.composer || ''} · ${d.kind || ''}
-      </div>
-      <div class="jl-draft-actions">
-        <button class="jl-draft-btn" data-load="${d.id}">Load</button>
-        <button class="jl-draft-btn jl-draft-btn--del" data-del="${d.id}">Delete</button>
-      </div>
-    </div>
-  `).join('');
-
-  listEl.querySelectorAll('[data-load]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const draft = JSON.parse(localStorage.getItem(STORAGE_PREFIX + btn.dataset.load) || '{}');
-      loadState(draft);
-      currentDraftId = btn.dataset.load;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  });
-  listEl.querySelectorAll('[data-del]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (!confirm('Delete this draft?')) return;
-      localStorage.removeItem(STORAGE_PREFIX + btn.dataset.del);
-      renderDraftsList();
-    });
-  });
+  if (drafts.length === 0) { listEl.innerHTML = '<p style="font-family:var(--font-mono);font-size:0.6rem;color:var(--text-ghost)">No saved drafts.</p>'; return; }
+  listEl.innerHTML = drafts.map(d => `<div class="jl-draft-item"><div class="jl-draft-info"><strong>${d.work||'(untitled)'}</strong>${d.date||''} · ${d.composer||''}</div><div class="jl-draft-actions"><button class="jl-draft-btn" data-load="${d.id}">Load</button><button class="jl-draft-btn jl-draft-btn--del" data-del="${d.id}">Delete</button></div></div>`).join('');
+  listEl.querySelectorAll('[data-load]').forEach(btn => { btn.addEventListener('click', () => { loadState(JSON.parse(localStorage.getItem(STORAGE_PREFIX + btn.dataset.load)||'{}')); currentDraftId = btn.dataset.load; window.scrollTo({top:0,behavior:'smooth'}); }); });
+  listEl.querySelectorAll('[data-del]').forEach(btn => { btn.addEventListener('click', () => { if (!confirm('Delete this draft?')) return; localStorage.removeItem(STORAGE_PREFIX + btn.dataset.del); renderDraftsList(); }); });
 }
-
 renderDraftsList();
 </script>
