@@ -1,5 +1,4 @@
 @import "tailwindcss";
-
 @import url("https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@400;700&family=Shippori+Mincho:wght@400;500;600&family=JetBrains+Mono:wght@300;400&display=swap");
 
 /*
@@ -18,41 +17,31 @@
   --bg-tertiary:     #5c3820;
   --bg-card:         #3d2510;
   --bg-raised:       #5c3820;
-
   --cinnabar:        #E34234;
   --cinnabar-warm:   #E8A020;
   --cinnabar-pale:   #c87840;
-
   --ink:             #0f0804;
   --ink-mid:         #2a1a0a;
   --ink-muted:       #3d2510;
   --ink-ghost:       #6a4828;
   --ink-faint:       #8a6840;
-
   --text-primary:    #F0E8D0;
   --text-secondary:  #c8b490;
   --text-muted:      #a08060;
   --text-ghost:      #6a4828;
-
   --border:          rgba(240,232,208,0.10);
   --border-hi:       rgba(240,232,208,0.25);
-
-  /* Silhouette layer colors */
   --sil-far:         #3d2510;
   --sil-mid:         #5c3820;
   --sil-near:        #E34234;
   --sil-fg:          #0f0804;
   --sil-window:      #E8A020;
-
-  /* Semantic UI */
   --nav-bg:          rgba(42,26,10,0.96);
   --card-hover:      #5c3820;
   --btn-primary-bg:  #E34234;
   --btn-primary-txt: #0f0804;
   --btn-ghost-border: rgba(227,66,52,0.5);
   --btn-ghost-txt:   #E34234;
-
-  /* Node states (Montessori tree) */
   --node-locked:     #3d2510;
   --node-available:  #c8b490;
   --node-complete:   #E8A020;
@@ -66,78 +55,60 @@
   --bg-tertiary:     #c8b49a;
   --bg-card:         #ede0cc;
   --bg-raised:       #e0d0b8;
-
   --cinnabar:        #E34234;
   --cinnabar-warm:   #b87333;
   --cinnabar-pale:   #f0c8a8;
-
   --ink:             #1a0a05;
   --ink-mid:         #3d1a10;
   --ink-muted:       #5a3820;
   --ink-ghost:       #8a7060;
   --ink-faint:       #c8b49a;
-
   --text-primary:    #1a0a05;
   --text-secondary:  #3d1a10;
   --text-muted:      #5a3820;
   --text-ghost:      #8a7060;
-
   --border:          rgba(61,26,16,0.15);
   --border-hi:       rgba(61,26,16,0.35);
-
-  /* Silhouette layer colors */
   --sil-far:         #c8b49a;
   --sil-mid:         #3d1a10;
   --sil-near:        #E34234;
   --sil-fg:          #1a0a05;
   --sil-window:      #b87333;
-
-  /* Semantic UI */
   --nav-bg:          rgba(245,237,224,0.96);
   --card-hover:      #e0d0b8;
   --btn-primary-bg:  #E34234;
   --btn-primary-txt: #f5ede0;
   --btn-ghost-border: rgba(227,66,52,0.5);
   --btn-ghost-txt:   #E34234;
-
-  /* Node states (Montessori tree) */
   --node-locked:     #c8b49a;
   --node-available:  #3d1a10;
   --node-complete:   #E34234;
   --node-complete-glow: rgba(227,66,52,0.25);
 }
 
-/* ---- TAILWIND v4 @theme BLOCK ---- */
-/* Exposes CSS vars as Tailwind utilities */
+/* ---- TAILWIND v4 @theme ---- */
 @theme {
-  --color-cinnabar:      var(--cinnabar);
-  --color-cinnabar-warm: var(--cinnabar-warm);
-  --color-cinnabar-pale: var(--cinnabar-pale);
-  --color-bg-primary:    var(--bg-primary);
-  --color-bg-secondary:  var(--bg-secondary);
-  --color-bg-tertiary:   var(--bg-tertiary);
-  --color-bg-card:       var(--bg-card);
-  --color-text-primary:  var(--text-primary);
-  --color-text-secondary:var(--text-secondary);
-  --color-text-muted:    var(--text-muted);
-  --color-text-ghost:    var(--text-ghost);
-  --color-ink:           var(--ink);
-  --color-node-locked:   var(--node-locked);
-  --color-node-available:var(--node-available);
-  --color-node-complete: var(--node-complete);
-
+  --color-cinnabar:       var(--cinnabar);
+  --color-cinnabar-warm:  var(--cinnabar-warm);
+  --color-cinnabar-pale:  var(--cinnabar-pale);
+  --color-bg-primary:     var(--bg-primary);
+  --color-bg-secondary:   var(--bg-secondary);
+  --color-bg-card:        var(--bg-card);
+  --color-text-primary:   var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted:     var(--text-muted);
+  --color-text-ghost:     var(--text-ghost);
+  --color-ink:            var(--ink);
+  --color-node-locked:    var(--node-locked);
+  --color-node-available: var(--node-available);
+  --color-node-complete:  var(--node-complete);
   --font-display: "Kaisei Decol", serif;
   --font-body:    "Shippori Mincho", serif;
   --font-mono:    "JetBrains Mono", monospace;
 }
 
 /* ---- BASE RESET ---- */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 
 body {
@@ -150,8 +121,7 @@ body {
   transition: background-color 0.35s ease, color 0.35s ease;
 }
 
-/* ---- GRAIN TEXTURE OVERLAY ---- */
-/* Subtle noise — works on both themes */
+/* Grain texture */
 body::after {
   content: '';
   position: fixed;
@@ -162,8 +132,7 @@ body::after {
   opacity: 0.35;
 }
 
-/* ---- THEME TRANSITION ---- */
-/* All themeable properties transition smoothly on toggle */
+/* Smooth theme transitions */
 *, *::before, *::after {
   transition:
     background-color 0.35s ease,
@@ -172,61 +141,36 @@ body::after {
     fill 0.35s ease,
     stroke 0.35s ease;
 }
-
-/* Exclude transitions on elements that shouldn't animate */
-.no-transition,
-.no-transition *,
-svg *[data-no-transition] {
-  transition: none !important;
-}
+.no-transition, .no-transition * { transition: none !important; }
 
 /* ---- ANIMATIONS ---- */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes orbitPulse {
   0%, 100% { opacity: 0.4; transform: scale(1) rotate(0deg); }
   50%       { opacity: 0.8; transform: scale(1.01) rotate(0.8deg); }
 }
-
 @keyframes floatY {
   0%, 100% { transform: translateY(0); }
   50%       { transform: translateY(6px); }
 }
-
-/* Lantern flame flicker */
 @keyframes lanternFlicker {
   0%, 100% { opacity: 1; transform: scale(1); }
   25%       { opacity: 0.85; transform: scale(0.97) rotate(-1deg); }
   75%       { opacity: 0.92; transform: scale(1.02) rotate(0.8deg); }
 }
-
-/* Node glow pulse (Montessori completed nodes) */
 @keyframes nodeGlow {
   0%, 100% { box-shadow: 0 0 8px 2px var(--node-complete-glow); }
   50%       { box-shadow: 0 0 18px 6px var(--node-complete-glow); }
 }
-
-/* Shuriken spin (loading state) */
 @keyframes shurikenSpin {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
 
-/* ---- TYPOGRAPHY UTILITIES ---- */
-.font-display { font-family: var(--font-display); }
-.font-body    { font-family: var(--font-body); }
-.font-mono    { font-family: var(--font-mono); }
-
-.text-cinnabar  { color: var(--cinnabar); }
-.text-primary   { color: var(--text-primary); }
-.text-secondary { color: var(--text-secondary); }
-.text-muted     { color: var(--text-muted); }
-.text-ghost     { color: var(--text-ghost); }
-
-/* Eyebrow label — used above all section headings */
+/* ---- TYPOGRAPHY ---- */
 .eyebrow {
   font-family: var(--font-mono);
   font-size: 0.58rem;
@@ -237,8 +181,6 @@ svg *[data-no-transition] {
   display: block;
   margin-bottom: 0.5rem;
 }
-
-/* Section heading */
 .section-heading {
   font-family: var(--font-display);
   font-weight: 400;
@@ -247,8 +189,6 @@ svg *[data-no-transition] {
   line-height: 1.1;
   margin-bottom: 1rem;
 }
-
-/* Hero heading */
 .hero-heading {
   font-family: var(--font-display);
   font-weight: 700;
@@ -258,29 +198,13 @@ svg *[data-no-transition] {
   letter-spacing: -0.01em;
 }
 
-/* ---- LAYOUT UTILITIES ---- */
-.inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 2.5rem;
-}
+/* ---- LAYOUT ---- */
+.inner        { max-width: 1100px; margin: 0 auto; padding: 0 2.5rem; }
+.inner-narrow { max-width: 720px;  margin: 0 auto; padding: 0 2.5rem; }
 
-.inner-narrow {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 0 2.5rem;
-}
-
-/* ---- CARD BASE ---- */
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  padding: 1.5rem;
-  transition: background 0.2s ease;
-}
+/* ---- CARDS ---- */
+.card { background: var(--bg-card); border: 1px solid var(--border); padding: 1.5rem; }
 .card:hover { background: var(--card-hover); }
-
-/* Colored left accent (module / track theming) */
 .card-accent-cinnabar { border-left: 3px solid var(--cinnabar); }
 .card-accent-warm     { border-left: 3px solid var(--cinnabar-warm); }
 
@@ -291,14 +215,12 @@ svg *[data-no-transition] {
   color: var(--btn-primary-txt);
   font-family: var(--font-mono);
   font-size: 0.7rem;
-  font-weight: 400;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   padding: 0.7rem 2rem;
   text-decoration: none;
   border: none;
   cursor: pointer;
-  transition: opacity 0.2s ease, transform 0.15s ease;
 }
 .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
 
@@ -308,28 +230,18 @@ svg *[data-no-transition] {
   color: var(--btn-ghost-txt);
   font-family: var(--font-mono);
   font-size: 0.7rem;
-  font-weight: 300;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   padding: 0.7rem 2rem;
   text-decoration: none;
   border: 1px solid var(--btn-ghost-border);
   cursor: pointer;
-  transition: border-color 0.2s ease, transform 0.15s ease;
 }
 .btn-ghost:hover { border-color: var(--cinnabar); transform: translateY(-1px); }
 
-/* ---- DIVIDER ---- */
-hr.rule {
-  border: none;
-  height: 1px;
-  background: var(--border);
-  margin: 1.5rem 0;
-}
+hr.rule { border: none; height: 1px; background: var(--border); margin: 1.5rem 0; }
 
-/* ---- THEME TOGGLE LANTERN ---- */
-/* The floating lantern button — positioned fixed, bottom-right */
-/* Shown always (theme toggle is public) */
+/* ---- LANTERN TOGGLE ---- */
 .lantern-toggle {
   position: fixed;
   bottom: 2rem;
@@ -346,7 +258,6 @@ hr.rule {
   justify-content: center;
   animation: floatY 4s ease-in-out infinite;
 }
-
 .lantern-toggle svg {
   width: 36px;
   height: 36px;
@@ -354,7 +265,4 @@ hr.rule {
   filter: drop-shadow(0 0 6px var(--cinnabar-warm));
   transition: filter 0.35s ease;
 }
-
-.lantern-toggle:hover svg {
-  filter: drop-shadow(0 0 12px var(--cinnabar));
-}
+.lantern-toggle:hover svg { filter: drop-shadow(0 0 12px var(--cinnabar)); }
