@@ -1,20 +1,45 @@
 ---
-import Base from '../layouts/Base.astro'
+import ZoneLayout from '../layouts/ZoneLayout.astro'
+import SceneDojo from '../components/scenes/SceneDojo.astro'
 ---
 
-<Base title="spicyninja.org">
-  <div style="min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:0 2rem;">
-    <p style="font-family:var(--font-mono); font-size:0.58rem; letter-spacing:0.35em; text-transform:uppercase; color:var(--text-ghost); margin-bottom:1.5rem;">
-      the education of a composer in public
-    </p>
-    <h1 style="font-family:var(--font-display); font-weight:700; font-size:clamp(3.5rem,9vw,7rem); line-height:0.95; color:var(--text-primary); margin-bottom:0.5rem;">
-      spicyninja.org
+<ZoneLayout zone="project-track" title="spicyninja.org">
+  <SceneDojo slot="scene" />
+
+  <!-- Enough content to scroll and see parallax working -->
+  <div style="padding: 12vh 4rem 0; max-width: 760px;">
+
+    <p class="eyebrow">the education of a composer in public</p>
+
+    <h1 class="hero-heading" style="margin-bottom: 1rem;">
+      spicy<span style="color:var(--zone-accent)">ninja</span>.org
     </h1>
-    <p style="font-family:var(--font-mono); font-size:0.75rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--cinnabar); margin-bottom:2rem;">
-      scaffold running ✦
+
+    <p style="font-family:var(--font-mono); font-size:0.72rem; letter-spacing:0.25em;
+              text-transform:uppercase; color:var(--zone-accent); margin-bottom:3rem;">
+      scaffold running ✦ parallax active
     </p>
-    <p style="font-family:var(--font-body); font-size:1rem; color:var(--text-muted); max-width:480px; line-height:1.8;">
-      Woodblock dark · Red Lacquer light · Toggle the lantern →
+
+    <p style="font-family:var(--font-body); font-size:1.05rem; color:var(--text-secondary);
+              max-width:560px; line-height:1.85; margin-bottom:2rem;">
+      Scroll down to see the dojo scene parallax in action.
+      Far layer (shoji screens) moves slowest. Foreground ninja moves fastest.
+      Toggle the lantern (bottom right) to switch between Woodblock dark and Red Lacquer light.
     </p>
+
+    <!-- Spacer content to allow scrolling -->
+    {Array.from({ length: 6 }).map((_, i) => (
+      <div style="margin-bottom:4rem; padding:2rem; background:var(--bg-card);
+                  border:1px solid var(--border); border-left:3px solid var(--zone-accent);">
+        <p class="eyebrow">section {i + 1}</p>
+        <h2 class="section-heading">Scroll to test parallax depth</h2>
+        <p style="color:var(--text-muted); font-size:0.95rem; line-height:1.8; margin-top:0.8rem;">
+          As you scroll, watch the shoji screens (far), lanterns and weapons rack (mid),
+          tatami and pillars (near), and the training ninja (foreground) move
+          at different rates. The scene has four independent depth layers.
+        </p>
+      </div>
+    ))}
+
   </div>
-</Base>
+</ZoneLayout>
