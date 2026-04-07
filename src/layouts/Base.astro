@@ -1,11 +1,4 @@
 ---
-/*
-  Base.astro — root HTML shell for every page on spicyninja.org.
-  - Anti-flash theme detection runs before paint
-  - Nav and ThemeToggle rendered on every page
-  - Slot for page content
-*/
-
 import '../styles/global.css'
 import Nav from '../components/nav/Nav.astro'
 import ThemeToggle from '../components/ui/ThemeToggle.astro'
@@ -29,12 +22,6 @@ const {
     <meta name="description" content={description} />
     <title>{title}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-
-    <!--
-      Anti-flash theme script — runs synchronously before paint.
-      Reads localStorage and sets data-theme on <html> immediately.
-      Must be inline, must be in <head>, must not be deferred.
-    -->
     <script is:inline>
       (function() {
         var theme = localStorage.getItem('sn-theme') || 'dark'
@@ -44,7 +31,26 @@ const {
   </head>
   <body>
     <Nav />
-    <slot />
+    <!-- Rail offset wrapper: pushes content right of the 52px rail on desktop -->
+    <div class="page-shell">
+      <slot />
+    </div>
     <ThemeToggle />
   </body>
 </html>
+
+<style is:global>
+  /* Desktop: offset content right of the rail */
+  .page-shell {
+    margin-left: 52px;
+    min-height: 100vh;
+  }
+
+  /* Mobile: no offset, topbar handles nav */
+  @media (max-width: 768px) {
+    .page-shell {
+      margin-left: 0;
+      padding-top: 52px;
+    }
+  }
+</style>
