@@ -1,0 +1,148 @@
+---
+// SceneRooftop.astro — Bespoke Journeys zone
+// City below, full moon, wind-bent trees at rooftop edge
+// Ninja mid-leap between rooftops, cloak streaming. Ember-orange accent.
+import ParallaxScene from './ParallaxScene.astro'
+---
+<ParallaxScene zone="journey">
+  <svg slot="far" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax meet"
+       style="position:absolute;bottom:0;left:0;width:100%;height:100%">
+    <!-- City glow horizon -->
+    <ellipse cx="600" cy="800" rx="800" ry="200" fill="var(--sil-window)" opacity="0.08"/>
+    <!-- Full moon -->
+    <circle cx="820" cy="100" r="70" fill="var(--sil-far)"/>
+    <circle cx="820" cy="100" r="60" fill="var(--sil-window)" opacity="0.3"/>
+    <!-- Cloud wisps across moon -->
+    <ellipse cx="780" cy="95"  rx="60" ry="15" fill="var(--sil-far)" opacity="0.6"/>
+    <ellipse cx="860" cy="108" rx="50" ry="12" fill="var(--sil-far)" opacity="0.5"/>
+    <!-- Distant city buildings — irregular skyline -->
+    <g fill="var(--sil-far)">
+      <rect x="0"    y="500" width="80"  height="300"/>
+      <rect x="100"  y="540" width="60"  height="260"/>
+      <rect x="180"  y="480" width="100" height="320"/>
+      <!-- Pagoda top on tall building -->
+      <polygon points="180,480 280,480 230,430"/>
+      <polygon points="195,435 265,435 230,400"/>
+      <rect x="395"  y="520" width="70"  height="280"/>
+      <rect x="480"  y="555" width="55"  height="245"/>
+      <rect x="550"  y="490" width="90"  height="310"/>
+      <rect x="660"  y="530" width="65"  height="270"/>
+      <rect x="740"  y="560" width="50"  height="240"/>
+      <rect x="810"  y="510" width="80"  height="290"/>
+      <polygon points="810,510 890,510 850,465"/>
+      <rect x="910"  y="545" width="60"  height="255"/>
+      <rect x="990"  y="500" width="85"  height="300"/>
+      <rect x="1090" y="530" width="70"  height="270"/>
+      <rect x="1150" y="560" width="50"  height="240"/>
+    </g>
+    <!-- Lit windows scattered across buildings -->
+    <g fill="var(--sil-window)" opacity="0.3">
+      <rect x="20"  y="520" width="10" height="8"/>
+      <rect x="40"  y="545" width="10" height="8"/>
+      <rect x="200" y="500" width="10" height="8"/>
+      <rect x="220" y="530" width="10" height="8"/>
+      <rect x="250" y="510" width="10" height="8"/>
+      <rect x="560" y="510" width="10" height="8"/>
+      <rect x="580" y="535" width="10" height="8"/>
+      <rect x="820" y="530" width="10" height="8"/>
+      <rect x="840" y="515" width="10" height="8"/>
+      <rect x="1010" y="520" width="10" height="8"/>
+      <rect x="1030" y="545" width="10" height="8"/>
+    </g>
+  </svg>
+
+  <svg slot="mid" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax meet"
+       style="position:absolute;bottom:0;left:0;width:100%;height:100%">
+    <!-- Rooftop tiles on both sides — target and origin -->
+    <g fill="var(--sil-mid)">
+      <!-- Left rooftop edge — origin -->
+      <rect x="0" y="560" width="320" height="240"/>
+      <polygon points="-20,560 340,560 160,510"/>
+      <!-- Tile lines -->
+      <g stroke="var(--sil-far)" stroke-width="1.5" fill="none" opacity="0.2">
+        <line x1="0"   y1="580" x2="320" y2="580"/>
+        <line x1="0"   y1="610" x2="320" y2="610"/>
+        <line x1="0"   y1="640" x2="320" y2="640"/>
+        <line x1="60"  y1="560" x2="60"  y2="800"/>
+        <line x1="120" y1="560" x2="120" y2="800"/>
+        <line x1="180" y1="560" x2="180" y2="800"/>
+        <line x1="240" y1="560" x2="240" y2="800"/>
+      </g>
+      <!-- Right rooftop edge — destination -->
+      <rect x="850" y="620" width="350" height="180"/>
+      <polygon points="830,620 1220,620 1025,570"/>
+      <g stroke="var(--sil-far)" stroke-width="1.5" fill="none" opacity="0.2">
+        <line x1="850"  y1="640" x2="1200" y2="640"/>
+        <line x1="850"  y1="668" x2="1200" y2="668"/>
+        <line x1="910"  y1="620" x2="910"  y2="800"/>
+        <line x1="970"  y1="620" x2="970"  y2="800"/>
+        <line x1="1030" y1="620" x2="1030" y2="800"/>
+        <line x1="1090" y1="620" x2="1090" y2="800"/>
+        <line x1="1150" y1="620" x2="1150" y2="800"/>
+      </g>
+    </g>
+    <!-- Wind-bent tree at rooftop edge left -->
+    <g fill="var(--sil-mid)">
+      <rect x="280" y="400" width="10" height="165" transform="rotate(8,280,400)"/>
+      <ellipse cx="310" cy="375" rx="45" ry="30" transform="rotate(-25,310,375)"/>
+      <ellipse cx="340" cy="355" rx="38" ry="22" transform="rotate(-35,340,355)"/>
+      <ellipse cx="270" cy="390" rx="30" ry="18" transform="rotate(-15,270,390)"/>
+    </g>
+    <!-- Wind-bent tree right -->
+    <g fill="var(--sil-mid)">
+      <rect x="890" y="450" width="10" height="175" transform="rotate(-6,890,450)"/>
+      <ellipse cx="860" cy="425" rx="42" ry="28" transform="rotate(20,860,425)"/>
+      <ellipse cx="832" cy="408" rx="35" ry="20" transform="rotate(30,832,408)"/>
+    </g>
+  </svg>
+
+  <svg slot="near" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax meet"
+       style="position:absolute;bottom:0;left:0;width:100%;height:100%">
+    <!-- Near rooftop ridge in foreground -->
+    <rect x="0" y="740" width="1200" height="60" fill="var(--sil-near)" opacity="0.9"/>
+    <polygon points="-10,740 1210,740 600,700" fill="var(--sil-near)" opacity="0.7"/>
+    <!-- Ridge tiles detail -->
+    <g fill="var(--sil-near)">
+      <ellipse cx="100" cy="740" rx="18" ry="8"/>
+      <ellipse cx="200" cy="740" rx="18" ry="8"/>
+      <ellipse cx="300" cy="740" rx="18" ry="8"/>
+      <ellipse cx="400" cy="740" rx="18" ry="8"/>
+      <ellipse cx="500" cy="740" rx="18" ry="8"/>
+      <ellipse cx="600" cy="700" rx="18" ry="8"/>
+      <ellipse cx="700" cy="740" rx="18" ry="8"/>
+      <ellipse cx="800" cy="740" rx="18" ry="8"/>
+      <ellipse cx="900" cy="740" rx="18" ry="8"/>
+      <ellipse cx="1000" cy="740" rx="18" ry="8"/>
+      <ellipse cx="1100" cy="740" rx="18" ry="8"/>
+    </g>
+  </svg>
+
+  <svg slot="fg" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax meet"
+       style="position:absolute;bottom:0;left:0;width:100%;height:100%">
+    <!-- Ninja mid-leap, cloak streaming behind -->
+    <g fill="var(--sil-fg)" transform="translate(520, 360)">
+      <!-- Head -->
+      <circle cx="0" cy="0" r="22"/>
+      <rect x="-13" y="-4" width="26" height="8" rx="3"
+            fill="var(--zone-accent, var(--cinnabar-warm))"/>
+      <!-- Torso angled forward in leap -->
+      <ellipse cx="8" cy="38" rx="22" ry="26" transform="rotate(-20,8,38)"/>
+      <!-- Leading arm reaching forward -->
+      <ellipse cx="40" cy="20" rx="9" ry="28" transform="rotate(-40,40,20)"/>
+      <ellipse cx="62" cy="0"  rx="7" ry="22" transform="rotate(-45,62,0)"/>
+      <!-- Trailing arm back -->
+      <ellipse cx="-32" cy="25" rx="9" ry="24" transform="rotate(30,-32,25)"/>
+      <!-- Lead leg extended forward -->
+      <ellipse cx="38" cy="68" rx="11" ry="30" transform="rotate(-30,38,68)"/>
+      <ellipse cx="56" cy="95" rx="9"  height="24" rx2="24" transform="rotate(-25,56,95)"/>
+      <!-- Trail leg back -->
+      <ellipse cx="-20" cy="70" rx="11" ry="28" transform="rotate(40,-20,70)"/>
+      <ellipse cx="-36" cy="95" rx="9"  ry="22" transform="rotate(35,-36,95)"/>
+      <!-- Cloak streaming behind — large flowing shape -->
+      <path d="M -10 10 Q -80 0 -140 40 Q -120 80 -80 100 Q -40 90 -5 60 Z"
+            opacity="0.75"/>
+      <path d="M -8 20 Q -100 30 -160 90 Q -130 110 -90 105 Q -50 85 -6 50 Z"
+            opacity="0.5"/>
+    </g>
+  </svg>
+</ParallaxScene>
