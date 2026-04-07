@@ -1,9 +1,6 @@
 import { defineCollection, z } from 'astro:content'
 import { glob } from 'astro/loaders'
 
-// ─────────────────────────────────────────────────────────
-//  PROJECT TRACK — 8 works, 4 modules, 4-layer methodology
-// ─────────────────────────────────────────────────────────
 const projectTrack = defineCollection({
   loader: glob({ pattern: '**/*.mdx', base: './src/content/project-track' }),
   schema: z.object({
@@ -25,9 +22,6 @@ const projectTrack = defineCollection({
   }),
 })
 
-// ─────────────────────────────────────────────────────────
-//  MONTESSORI TREE NODES
-// ─────────────────────────────────────────────────────────
 const montessori = defineCollection({
   loader: glob({ pattern: '**/*.mdx', base: './src/content/montessori' }),
   schema: z.object({
@@ -43,9 +37,6 @@ const montessori = defineCollection({
   }),
 })
 
-// ─────────────────────────────────────────────────────────
-//  BESPOKE JOURNEYS — Björk Bodysuit inaugural
-// ─────────────────────────────────────────────────────────
 const journeys = defineCollection({
   loader: glob({ pattern: '**/*.mdx', base: './src/content/journeys' }),
   schema: z.object({
@@ -60,49 +51,11 @@ const journeys = defineCollection({
   }),
 })
 
-// ─────────────────────────────────────────────────────────
-//  MONTESSORI TREE NODES
-// ─────────────────────────────────────────────────────────
-const montessori = defineCollection({
-  loader: glob({ pattern: '**/*.mdx', base: './src/content/montessori' }),
-  schema: z.object({
-    title:              z.string(),
-    type:               z.enum(['root', 'branch', 'leaf', 'seed']),
-    prerequisites:      z.array(z.string()).default([]),
-    unlocks:            z.array(z.string()).default([]),
-    connectsToProject:  z.array(z.string()).default([]),
-    journeySeeds:       z.array(z.string()).default([]),
-    fundamentalsBranch: z.string().nullable().default(null),
-    description:        z.string().optional(),
-    draft:              z.boolean().default(false),
-  }),
-})
-
-// ─────────────────────────────────────────────────────────
-//  BESPOKE JOURNEYS
-// ─────────────────────────────────────────────────────────
-const journeys = defineCollection({
-  loader: glob({ pattern: '**/*.mdx', base: './src/content/journeys' }),
-  schema: z.object({
-    title:       z.string(),
-    journey:     z.string(),
-    phase:       z.number().optional(),
-    isOverview:  z.boolean().default(false),
-    artist:      z.string().optional(),
-    seedsNodes:  z.array(z.string()).default([]),
-    description: z.string().optional(),
-    draft:       z.boolean().default(true),
-  }),
-})
-
-// ─────────────────────────────────────────────────────────
-//  FUNDAMENTALS
-// ─────────────────────────────────────────────────────────
 const fundamentals = defineCollection({
   loader: glob({ pattern: '**/*.mdx', base: './src/content/fundamentals' }),
   schema: z.object({
     title:          z.string(),
-    branch:         z.enum(['bach-math', 'markov-chains', 'music-theory', 'composition', 'characters']),
+    branch:         z.enum(['bach-math','markov-chains','music-theory','composition','characters']),
     order:          z.number(),
     montessoriNode: z.string().optional(),
     description:    z.string().optional(),
@@ -110,9 +63,6 @@ const fundamentals = defineCollection({
   }),
 })
 
-// ─────────────────────────────────────────────────────────
-//  LISTENING JOURNAL
-// ─────────────────────────────────────────────────────────
 const listeningJournal = defineCollection({
   loader: glob({ pattern: '**/*.mdx', base: './src/content/listening-journal' }),
   schema: z.object({
@@ -132,16 +82,13 @@ const listeningJournal = defineCollection({
   }),
 })
 
-// ─────────────────────────────────────────────────────────
-//  BLOG
-// ─────────────────────────────────────────────────────────
 const blog = defineCollection({
   loader: glob({ pattern: '**/*.mdx', base: './src/content/blog' }),
   schema: z.object({
     title:              z.string(),
     date:               z.date(),
     description:        z.string(),
-    format:             z.enum(['reflection', 'session-log', 'breakthrough', 'question', 'reference', 'sketch']),
+    format:             z.enum(['reflection','session-log','breakthrough','question','reference','sketch']),
     derivedFromJournal: z.string().nullable().default(null),
     commentsEnabled:    z.boolean().default(false),
     commentsPublic:     z.boolean().default(false),
@@ -149,27 +96,21 @@ const blog = defineCollection({
   }),
 })
 
-// ─────────────────────────────────────────────────────────
-//  PROJECT DOCS
-// ─────────────────────────────────────────────────────────
 const project = defineCollection({
   loader: glob({ pattern: '**/*.mdx', base: './src/content/project' }),
   schema: z.object({
     title:       z.string(),
     order:       z.number(),
-    status:      z.enum(['core', 'likely', 'explore']).default('core'),
+    status:      z.enum(['core','likely','explore']).default('core'),
     description: z.string().optional(),
     draft:       z.boolean().default(true),
   }),
 })
 
-// ─────────────────────────────────────────────────────────
-//  COMMUNITY SUBMISSIONS
-// ─────────────────────────────────────────────────────────
 const community = defineCollection({
   loader: glob({ pattern: '**/*.json', base: './src/content/community' }),
   schema: z.object({
-    type:        z.enum(['listening', 'question', 'resonance']),
+    type:        z.enum(['listening','question','resonance']),
     content:     z.string(),
     submittedAt: z.string(),
     public:      z.boolean().default(false),
@@ -178,12 +119,12 @@ const community = defineCollection({
 })
 
 export const collections = {
-  'project-track':      projectTrack,
-  'montessori':         montessori,
-  'journeys':           journeys,
-  'fundamentals':       fundamentals,
-  'listening-journal':  listeningJournal,
-  'blog':               blog,
-  'project':            project,
-  'community':          community,
+  'project-track':     projectTrack,
+  'montessori':        montessori,
+  'journeys':          journeys,
+  'fundamentals':      fundamentals,
+  'listening-journal': listeningJournal,
+  'blog':              blog,
+  'project':           project,
+  'community':         community,
 }
