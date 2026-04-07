@@ -1,0 +1,63 @@
+---
+title: "Augmentation and Diminution"
+branch: "bach-math"
+order: 4
+montessoriNode: "branches/bach-math"
+description: "Stretching and compressing a theme's duration. The character moving through time at different speeds."
+draft: false
+---
+
+Augmentation doubles all note durations. The same theme, at half speed. Diminution halves all durations: double speed, compressed, urgent. The pitches don't change. The intervals don't change. Only time changes.
+
+## What This Sounds Like
+
+Augmentation makes a theme sound weighty, inevitable, geological. A melody that felt quick and searching becomes monumental when stretched to twice its length. Diminution suggests a character under pressure — the same ideas moving twice as fast.
+
+## For Jus Pulsus
+
+Pulsus is the BPM — the rhythmic grid itself. Augmentation represents Pulsus exerting steady gravitational pressure. Diminution is Pulsus pressing hard — the ecstatic tempest approaching, the BPM at maximum force.
+
+The Cosmos' theme augmented in Act IV: the same identity, but inhabiting a different timescale. The wound has made everything slower, larger, more deliberate.
+
+## In Sonic Pi
+
+```ruby
+pitches   = [:e4, :g4, :a4, :b4, :d5]
+durations = [0.5, 0.5, 0.25, 0.25, 1.0]
+
+aug_durations = durations.map { |d| d * 2 }    # half speed
+dim_durations = durations.map { |d| d / 2.0 }  # double speed
+
+define :play_with_durs do |pitches, durs|
+  pitches.zip(durs).each do |p, d|
+    play p, sustain: d * 0.85
+    sleep d
+  end
+end
+
+live_loop :original do
+  play_with_durs pitches, durations
+  sleep 2
+end
+
+live_loop :augmented do
+  sleep 8
+  play_with_durs pitches, aug_durations
+  sleep 2
+end
+
+live_loop :diminished do
+  sleep 22
+  play_with_durs pitches, dim_durations
+  sleep 2
+end
+```
+
+## Variable Augmentation
+
+Any multiplier works. 1.5× for 50% slower. 3× for maximum gravity. The Cosmos under maximum Pulsus pressure might be at 4× diminution — its theme recognizable but compressed beyond what feels natural, distorted by the force pressing on it.
+
+```ruby
+partial_aug = durations.map { |d| d * 1.5 }
+heavy_aug   = durations.map { |d| d * 3 }
+```

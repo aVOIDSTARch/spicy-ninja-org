@@ -1,0 +1,67 @@
+---
+title: "Inversion: The Theme Turned Upside Down"
+branch: "bach-math"
+order: 3
+montessoriNode: "branches/bach-math"
+description: "Flipping a theme's intervals to produce its mirror image. The Cosmos seen from Pulsus's perspective."
+draft: false
+---
+
+Inversion flips every interval: a rising step becomes a falling step, a leap upward becomes a leap downward. The theme reflects around a central axis pitch — everything that went up now goes down.
+
+If the original theme moves +3 semitones, then -5, then +1, the inversion moves -3, then +5, then -1.
+
+## The Narrative Meaning
+
+A theme that originally rises — forward-looking, searching — inverted becomes a theme that falls. The same intervals, same rhythm, but the emotional direction reversed.
+
+For *Jus Pulsus*: the Cosmos' viola theme inverted is not a new character. It is the Cosmos from Pulsus's vantage point. Or: the Cosmos after grief — what used to rise now falls.
+
+## In Sonic Pi
+
+```ruby
+root = 64  # :e4 in MIDI
+intervals = [0, 3, 5, 7, 10]   # semitone offsets
+
+original_pitches = intervals.map { |i| root + i }
+inverted_pitches = intervals.map { |i| root - i }
+# → [64, 61, 59, 57, 54]  i.e. e4, db4, b3, a3, f#3
+
+durations = [0.5, 0.5, 0.5, 0.5, 1.0]
+
+live_loop :original do
+  original_pitches.zip(durations).each do |pitch, dur|
+    play pitch, sustain: dur * 0.9
+    sleep dur
+  end
+  sleep 1
+end
+
+live_loop :inverted do
+  sleep 12
+  inverted_pitches.zip(durations).each do |pitch, dur|
+    play pitch, sustain: dur * 0.9
+    sleep dur
+  end
+  sleep 1
+end
+```
+
+## Retrograde Inversion
+
+Backwards AND upside down — the theme's full mirror:
+
+```ruby
+retro_inversion = inverted_pitches.reverse
+retro_durs      = durations.reverse
+```
+
+## The Four Forms
+
+Any theme now has four forms:
+1. **Original** — as written
+2. **Retrograde** — backwards
+3. **Inversion** — upside down
+4. **Retrograde Inversion** — backwards and upside down
+
+These four forms are the complete toolkit. Bach's 14 fugues use all four. Your leitmotifs can use all four across Acts I–IV, each form representing a different emotional state of the character.

@@ -1,0 +1,52 @@
+---
+title: "The Subject: Building a Leitmotif That Can Be Transformed"
+branch: "bach-math"
+order: 1
+montessoriNode: "branches/bach-math"
+description: "What makes a theme mathematically workable. Interval structure, rhythm, and why some themes survive transformation while others collapse."
+draft: false
+---
+
+A fugue subject is not just a catchy melody. It is a mathematical object designed to survive transformation. Not every theme can be inverted and still sound like itself. Not every theme can run backwards and produce something beautiful. Bach's subjects are carefully constructed so that their transformations are as interesting as the originals.
+
+Before you can apply Bach Math to your leitmotifs, you need to understand what makes a theme transformation-ready.
+
+## Interval Structure Is the Foundation
+
+A leitmotif is defined by its **interval structure** — the distances between its notes — more than by its specific pitches. When you invert a theme, the specific pitches change but the interval relationships transform predictably. When you play it backwards, the pitches play in reverse but the rhythm reverses too.
+
+A theme with strong interval character — a distinctive rising fourth, a falling minor second, a leap followed by stepwise motion — survives transformation with its identity intact. A theme that is mostly stepwise and rhythmically bland will transform into something unrecognizable.
+
+**For Jus Pulsus**: Each character's leitmotif needs at least one strong interval anchor. The Cosmos' viola theme should have a distinctive interval (a perfect fifth? a major seventh?) that survives inversion and remains recognizable. The Pulsus brass motif should have a rhythmic signature that persists through augmentation — it should sound like Pulsus moving slowly, not like a different character entirely.
+
+## Rhythm Is the Other Axis
+
+Interval structure handles the pitch dimension. Rhythm handles the time dimension. When you augment a theme (double all durations), the rhythm becomes the main carrier of identity — the pitches are the same, the relationships are the same, but everything breathes more slowly.
+
+A theme with a strong rhythmic identity — a distinctive dotted rhythm, an unexpected rest, a syncopation — survives augmentation recognizably. The Pulsus motif, for example, might open with a short-short-long pattern. Augmented, that becomes long-long-very-long. Still recognizably Pulsus: still arriving late, still insisting on its own time.
+
+## In Sonic Pi: Storing a Theme
+
+Before you can transform a theme, you need to store it as data:
+
+```ruby
+# Store the theme as an array of [pitch, duration] pairs
+pulsus_theme = [
+  [:e4, 0.25], [:e4, 0.25], [:b4, 0.5],
+  [:d4, 0.25], [:c4, 0.75]
+]
+
+# Extract pitches only
+pitches = pulsus_theme.map { |note| note[0] }
+
+# Extract durations only  
+durations = pulsus_theme.map { |note| note[1] }
+```
+
+Once a theme is stored this way, every Bach Math operation becomes a transformation on these arrays. The next lessons build on this structure.
+
+## Exercise
+
+Take the Cosmos' viola theme (or any fragment you have sketched). Write down its interval sequence: the distance in semitones between each successive note. A rising minor third is +3. A falling perfect fifth is -7.
+
+Now answer: if this theme were inverted (every interval flipped in direction), what would the first few notes be? Does it still feel like the Cosmos, or does it feel like something else? If it feels like something else, that is compositionally useful — inversion can represent the Cosmos *seen from Pulsus's perspective*, which is not the same Cosmos at all.

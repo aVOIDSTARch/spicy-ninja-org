@@ -1,0 +1,66 @@
+---
+title: "Retrograde: The Theme Played Backwards"
+branch: "bach-math"
+order: 2
+montessoriNode: "branches/bach-math"
+description: "Reversing a musical theme as a compositional operation. What retrograde sounds like and how to implement it in Sonic Pi."
+draft: false
+---
+
+Retrograde is the simplest Bach Math operation: play the notes of a theme in reverse order. The last note becomes first. The rhythm reverses too — if the original is long-short-short, the retrograde is short-short-long.
+
+## Why It Matters
+
+Retrograde makes a theme sound like the same identity moving in the opposite direction through time. A character walking toward the camera, then the same character walking away. Same person, reversed trajectory.
+
+For *Jus Pulsus*: the Cosmos' theme played backwards in Act IV is not a new theme. It is the Cosmos having passed through the wound — the same identity, but time is now working differently for it.
+
+## In Sonic Pi
+
+```ruby
+# Store the theme as [pitch, duration] pairs
+theme = [[:e4, 0.5], [:g4, 0.25], [:a4, 0.25], [:b4, 1.0]]
+
+# Retrograde: reverse the array
+theme_retro = theme.reverse
+# → [[:b4, 1.0], [:a4, 0.25], [:g4, 0.25], [:e4, 0.5]]
+
+define :play_theme do |t|
+  t.each do |pitch, dur|
+    play pitch, sustain: dur * 0.9
+    sleep dur
+  end
+end
+
+live_loop :original do
+  play_theme theme
+  sleep 0.5
+end
+
+live_loop :retrograde do
+  sleep 8
+  play_theme theme_retro
+  sleep 0.5
+end
+```
+
+## Rhythm-Only Retrograde
+
+You can also retrograde just the rhythm while keeping the pitches:
+
+```ruby
+pitches   = [:e4, :g4, :a4, :b4]
+durations = [0.5, 0.25, 0.25, 1.0]
+retro_durs = durations.reverse   # → [1.0, 0.25, 0.25, 0.5]
+
+retro_durs.each_with_index do |dur, i|
+  play pitches[i], sustain: dur * 0.9
+  sleep dur
+end
+```
+
+Same pitches, reversed time feel — useful for a character in a changed emotional state without altering their harmonic vocabulary.
+
+## Exercise
+
+Play your Cosmos theme forward, then backwards. Does the retrograde feel like the Cosmos going somewhere, or arriving from somewhere? Does it feel like the future or the past? Could it represent the Cosmos in Act IV — moving toward resolution from the other direction?

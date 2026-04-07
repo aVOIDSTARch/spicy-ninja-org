@@ -1,0 +1,80 @@
+---
+title: "First-Order Chains: Personality as Probability"
+branch: "markov-chains"
+order: 1
+montessoriNode: "branches/markov-chains"
+description: "Building a probability table for a character's melodic decisions. Weights encode personality."
+draft: false
+---
+
+A first-order Markov chain: you are currently on note X. You have a table of probabilities for where to go next. You roll weighted dice. The weights are the character's personality encoded mathematically.
+
+## Building a Table for the Bell
+
+The Bell has a pentatonic tendency and favors the *yun* principle — sparse, weighted toward silence and repetition:
+
+| Current | Stay | Step up | Leap up | Step down | Rest |
+|---|---|---|---|---|---|
+| Low C | 10% | 40% | 15% | 5% | 30% |
+| Mid E | 15% | 25% | 10% | 25% | 25% |
+| High G | 20% | 5% | 5% | 35% | 35% |
+
+This table encodes: the Bell is more likely to rest than a typical melodic instrument; it has a preference for stepwise motion; it is comfortable with long silences.
+
+## In Sonic Pi: `wrand`
+
+`wrand` picks from a list with weights — higher weight means more likely:
+
+```ruby
+bell_pitches = [:c5, :e5, :g5, :a5, :c6]
+
+# Weights: g5 and a5 most common (weight 4 and 3)
+live_loop :bell do
+  next_pitch = bell_pitches.wrand([1, 3, 4, 3, 1])
+
+  # Sparse timing: weighted toward longer gaps
+  gap = [0.5, 1.0, 1.5, 2.0, 3.0].wrand([1, 2, 4, 3, 2])
+
+  play next_pitch,
+       attack:  0.01,
+       decay:   0.1,
+       sustain: 0.3,
+       release: gap * 0.7,
+       amp: rrand(0.3, 0.6)
+
+  sleep gap
+end
+```
+
+This Bell sounds different every run. But it always sounds like itself — sparse, high, pentatonic. The weights are the character.
+
+## Building a Table for the Protagonist
+
+The Protagonist is searching, harmonically wide, drawn to resolution but capable of delay. Its table would have higher weights on stepwise motion, lower weights on rests, and include the full Dorian scale rather than just pentatonic notes:
+
+```ruby
+protagonist_scale = scale(:d3, :dorian).to_a
+
+live_loop :protagonist do
+  # Weight middle of the scale more than extremes
+  weights = protagonist_scale.length.times.map do |i|
+    mid = protagonist_scale.length / 2.0
+    4 - (i - mid).abs.round  # bell curve centered on middle
+  end.map { |w| [w, 1].max }
+
+  n = protagonist_scale.wrand(weights)
+  play n, sustain: rrand(0.3, 1.2), amp: rrand(0.4, 0.8)
+  sleep rrand(0.25, 1.5)
+end
+```
+
+## The Character Design Questions
+
+Before writing a Markov table:
+- What notes does this character favor? (Pitch weights)
+- Does it like to stay in place or move? (Repetition weight)
+- Does it prefer steps or leaps? (Interval weights)
+- How does it feel about silence? (Rest weight)
+- Does it resolve or evade? (Direction toward or away from tonic)
+
+Answering these in terms of probabilities forces decisions specific enough to produce a distinct sonic personality.
