@@ -1,0 +1,30 @@
+---
+import { getCollection, getEntry } from "astro:content"
+import ProjectTrackLayout from "../../layouts/ProjectTrackLayout.astro"
+
+export async function getStaticPaths() {
+  const works = await getCollection("project-track", ({ data }) => !data.draft)
+  return works.map(work => ({ params: { slug: work.slug } }))
+}
+
+const { slug } = Astro.params
+const entry = await getEntry("project-track", slug)
+
+if (!entry) return Astro.redirect("/project-track")
+
+const { Content } = await entry.render()
+const { title, composer, year, module, recording, youtubeQuery, listenFor, teaches } = entry.data
+---
+
+<ProjectTrackLayout
+  title={title}
+  composer={composer}
+  year={year}
+  module={module}
+  recording={recording}
+  youtubeQuery={youtubeQuery}
+  listenFor={listenFor}
+  teaches={teaches}
+>
+  <Content />
+</ProjectTrackLayout>

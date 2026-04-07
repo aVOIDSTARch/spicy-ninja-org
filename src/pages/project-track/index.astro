@@ -1,0 +1,77 @@
+---
+import { getCollection } from 'astro:content'
+import ZoneLayout from '../../layouts/ZoneLayout.astro'
+import SceneDojo from '../../components/scenes/SceneDojo.astro'
+
+const works = await getCollection('project-track', ({ data }) => !data.draft)
+works.sort((a, b) => (a.data.module * 100 + a.data.order) - (b.data.module * 100 + b.data.order))
+
+const moduleLabels: Record<number, string> = {
+  1: 'The Architecture of Narrative Music',
+  2: 'Rhythm as Primary Reality',
+  3: 'Sound as Architecture and Cosmos',
+  4: 'The Indian Classical System',
+}
+---
+
+<ZoneLayout zone="project-track" title="Project Track — spicyninja.org">
+  <SceneDojo slot="scene" />
+
+  <div style="padding: 5rem 3rem 8rem; max-width: 900px;">
+    <p class="eyebrow">listening curriculum</p>
+    <h1 class="hero-heading" style="margin-bottom:1rem">
+      Project Track
+    </h1>
+    <p style="font-family:var(--font-body); font-size:1.05rem; color:var(--text-secondary);
+              max-width:560px; line-height:1.85; margin-bottom:3rem;">
+      Not music history. Not genre tourism. Each work is chosen because it teaches something
+      irreplaceable and load-bearing for <em>Jus Pulsus</em> specifically. Sequence matters.
+    </p>
+
+    {works.length === 0 ? (
+      <p style="font-family:var(--font-mono); font-size:0.72rem; color:var(--text-ghost);
+                letter-spacing:0.15em;">
+        Works are being prepared — check back soon.
+      </p>
+    ) : (
+      <div>
+        {[1, 2, 3, 4].map(mod => {
+          const modWorks = works.filter(w => w.data.module === mod)
+          if (modWorks.length === 0) return null
+          return (
+            <div style="margin-bottom:3rem;">
+              <p style="font-family:var(--font-mono); font-size:0.58rem; letter-spacing:0.28em;
+                        text-transform:uppercase; color:var(--cinnabar); margin-bottom:0.6rem;">
+                Module {mod}
+              </p>
+              <h2 style="font-family:var(--font-display); font-weight:700; font-size:1.2rem;
+                         color:var(--text-primary); margin-bottom:1.5rem;">
+                {moduleLabels[mod]}
+              </h2>
+              {modWorks.map(work => (
+                <a href={`/project-track/${work.slug}`}
+                   style="display:flex; align-items:baseline; gap:1rem; padding:1rem 1.2rem;
+                          background:var(--bg-card); border:1px solid var(--border);
+                          border-left:3px solid var(--cinnabar); text-decoration:none;
+                          margin-bottom:2px; transition:background 0.2s;">
+                  <span style="font-family:var(--font-mono); font-size:0.58rem; color:var(--text-ghost);
+                               letter-spacing:0.15em; flex-shrink:0;">
+                    W{String(work.data.order).padStart(2,'0')}
+                  </span>
+                  <span style="font-family:var(--font-display); font-weight:700; font-size:1.05rem;
+                               color:var(--text-primary);">
+                    {work.data.title}
+                  </span>
+                  <span style="font-family:var(--font-mono); font-size:0.62rem; color:var(--text-ghost);
+                               margin-left:auto;">
+                    {work.data.composer} · {work.data.year}
+                  </span>
+                </a>
+              ))}
+            </div>
+          )
+        })}
+      </div>
+    )}
+  </div>
+</ZoneLayout>
