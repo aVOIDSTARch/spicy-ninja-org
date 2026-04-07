@@ -1,15 +1,13 @@
 ---
 /*
-  Base.astro
-  Root HTML shell for every page on spicyninja.org.
-
-  - Inlines theme detection script before <body> to prevent flash
-  - Imports global CSS
-  - Renders ThemeToggle lantern (fixed position, visible on all pages)
+  Base.astro — root HTML shell for every page on spicyninja.org.
+  - Anti-flash theme detection runs before paint
+  - Nav and ThemeToggle rendered on every page
   - Slot for page content
 */
 
 import '../styles/global.css'
+import Nav from '../components/nav/Nav.astro'
 import ThemeToggle from '../components/ui/ThemeToggle.astro'
 
 interface Props {
@@ -45,6 +43,7 @@ const {
     </script>
   </head>
   <body>
+    <Nav />
     <slot />
     <ThemeToggle />
   </body>
