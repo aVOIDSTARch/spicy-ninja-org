@@ -1,0 +1,65 @@
+---
+title: "Emergence and Simultaneous Voices"
+branch: "composition"
+order: 3
+montessoriNode: "branches/composition"
+description: "How independent simultaneous voices produce emergent complexity. Orbital mechanics, LCM, and designing systems that generate music rather than specifying it."
+draft: false
+---
+
+Emergence in music: the combination of simple independent elements produces something more complex than any element contains. Nobody played the emergent pattern. It arose from the mathematics of the combination.
+
+This is one of the most powerful compositional tools available — and one of the least taught, because Western music education focuses almost entirely on sequential composition (what comes next) rather than simultaneous composition (what happens when multiple things run at the same time).
+
+## The Phase Relationship
+
+Steve Reich's *Drumming* demonstrates the principle in its purest form. A single 12-beat pattern: `X . X X . X . X X . X .` Two musicians play this pattern simultaneously. One gradually pulls ahead. The emergent patterns between them — the rhythms arising from their offset relationship — were never played by anyone.
+
+The emergent patterns are as real as the composed pattern. They have pitch content, rhythmic identity, and emotional character. And they shift continuously as the offset changes. One composed pattern, infinite emergent variations.
+
+## LCM as Compositional Tool
+
+When multiple loops of different lengths run simultaneously, their combined pattern does not repeat until all loops have completed an integer number of cycles simultaneously. The Least Common Multiple (LCM) of their lengths determines this.
+
+| Loop A | Loop B | Loop C | LCM | Full cycle |
+|---|---|---|---|---|
+| 3 beats | 4 beats | — | 12 | Every 12 beats |
+| 3 beats | 4 beats | 7 beats | 84 | Every 84 beats |
+| 4 beats | 5 beats | 7 beats | 140 | Every 140 beats |
+| 3 beats | 4 beats | 5 beats | 60 | Every 60 beats |
+
+Choosing coprime values (no shared factors) maximizes the LCM and therefore the complexity and length of the emergent cycle.
+
+```ruby
+# Three loops producing an 84-beat emergent cycle
+# LCM(3, 4, 7) = 84
+
+live_loop :voice_a do  # 3-beat
+  play :e3; sleep 1
+  play :g3; sleep 1
+  play :b3; sleep 1
+end
+
+live_loop :voice_b do  # 4-beat
+  play :d4; sleep 0.75
+  play :f4; sleep 0.75
+  play :a4; sleep 0.75
+  play :c5; sleep 0.75
+end
+
+live_loop :voice_c do  # 7-beat
+  [:b2,:d3,:e3,:g3,:a3,:c4,:e4].each { |p| play p; sleep 1 }
+end
+```
+
+Listen at beat 84. That is the first full orbital completion — the first time all three voices are simultaneously at the beginning of their cycles. The listener hears it as arrival because it is arrival.
+
+## Designing the System vs. Composing the Notes
+
+The shift this technique requires is profound. Instead of asking "what note comes next," you ask "what system produces the emotional arc I want?"
+
+This is how Terry Riley wrote *In C*: 53 short fragments, each performer plays each as many times as they choose before moving on. The density curve — sparse at the start, dense in the middle, sparse again at the end — is not composed. It is statistically inevitable given the system's rules. Riley designed the container. The music filled it.
+
+The same principle applies to any work built on simultaneous independent voices. You compose the character of each voice. You choose the loop lengths. You set the tempo arc. The emergent whole — the music the combination produces — is what you discover when you run the system.
+
+*Project connection: The orbital mechanics of Jus Pulsus are an explicit application of this principle. Character pairs orbit each other with periods determined by LCM. The ecstatic tempest is maximum stretto — all characters simultaneously mid-statement, producing emergent density that exceeds any individual contribution.*

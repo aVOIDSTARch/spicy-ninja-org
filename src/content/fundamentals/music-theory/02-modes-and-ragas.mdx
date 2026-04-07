@@ -1,0 +1,69 @@
+---
+title: "Modes and Ragas: Harmonic Containers"
+branch: "music-theory"
+order: 2
+montessoriNode: "branches/music-theory"
+description: "What modes and ragas are, how they differ from scales, and which ones are load-bearing for Jus Pulsus."
+draft: false
+---
+
+A scale is a set of pitches. A mode is a scale with rules about how you move through it. A raga is a mode with additional rules about which pitches you emphasize, how you approach and leave certain notes, what time of day it belongs to, and what emotional state it is designed to produce.
+
+Knowing a scale tells you which notes are available. Knowing a mode or raga tells you how a character thinks.
+
+## The Western Modes
+
+All generated from the same pitches (white keys on a piano) but starting on different notes:
+
+| Mode | Start | Character |
+|---|---|---|
+| Ionian | C | Major — bright, conclusive, Western default |
+| **Dorian** | D | Minor with raised 6th — searching, bittersweet |
+| Phrygian | E | Minor with flattened 2nd — Spanish, ancient |
+| **Lydian** | F | Major with raised 4th — floating, otherworldly |
+| Mixolydian | G | Major with flattened 7th — unresolved, rock/folk |
+| Aeolian | A | Natural minor — sad, inward |
+| Locrian | B | Diminished — unstable, maximum dissonance |
+
+**For Jus Pulsus**: Dorian is the Protagonist's home territory — minor but not hopeless, searching but not lost. Lydian is a candidate for the Bell's floating, raised-fourth quality. Phrygian is the Indian intrusion's Western analog.
+
+In Sonic Pi:
+
+```ruby
+play_pattern_timed scale(:d3, :dorian), [0.5, 0.5, 0.5, 0.5, 1, 1]
+play_pattern_timed scale(:f3, :lydian), [0.25, 0.25, 0.5, 0.5, 0.5, 0.5, 1]
+```
+
+## Raga Bhairav
+
+The Indian raga most relevant to the Indian intrusion moment. Uses a flattened second and sixth:
+
+- Scale degrees: 1, ♭2, 3, 4, 5, ♭6, 7
+- In C: C, D♭, E, F, G, A♭, B
+- Character: simultaneously ancient, meditative, and emotionally raw — something from before music had a genre
+
+In Sonic Pi (built manually from semitone intervals):
+
+```ruby
+root = :c3
+bhairav_offsets = [0, 1, 4, 5, 7, 8, 11]
+bhairav = bhairav_offsets.map { |i| root.to_i + i }
+
+# The Indian intrusion
+live_loop :indian_intrusion do
+  sleep 64  # wait for the right moment
+  bhairav.each do |p|
+    play p, sustain: rrand(0.5, 2.0), amp: rrand(0.3, 0.6)
+    sleep rrand(0.5, 1.5)
+  end
+end
+```
+
+## Choosing a Mode Per Character
+
+The mode decision is a character decision. Ask:
+- Does this character seek resolution (Ionian/Aeolian) or evade it (Dorian/Lydian)?
+- Does it sound ancient (Phrygian) or contemporary (Mixolydian)?
+- When the Rhythm Antagonist touches it, which mode does it briefly adopt — and why does that mode feel foreign to its natural habitat?
+
+That last question defines the world music intrusion moment with precision.

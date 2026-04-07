@@ -1,0 +1,82 @@
+---
+title: "Higher-Order Chains and Musical Memory"
+branch: "markov-chains"
+order: 2
+montessoriNode: "branches/markov-chains"
+description: "When the next note depends on the last two or three. How memory creates the impression of intention."
+draft: false
+---
+
+A first-order chain has no memory beyond the immediately previous note. A second-order chain remembers the last two. A third-order chain remembers the last three.
+
+First-order chains produce note-to-note coherence. Higher-order chains produce phrase-level coherence — the music starts to sound like it is going somewhere over a span of 4–8 notes, not just making local decisions.
+
+## Why Memory Matters
+
+The Protagonist *searches*. Searching is not random — it involves moving toward something, backing off, trying another direction. That behavior requires memory. A first-order chain doesn't search; it wanders. A second-order chain can search.
+
+The Third Fate (the archivist) *quotes* past material. That behavior requires a form of memory — not just what note came last, but what happened earlier.
+
+## Second-Order Chain in Sonic Pi
+
+```ruby
+# Track the last two notes
+last_two = [:e4, :g4]
+
+define :next_note do |prev_two|
+  a, b = prev_two
+  interval = (note(b) - note(a))  # direction of last move
+
+  if interval > 0
+    # Was moving up: slightly more likely to continue up or reverse
+    candidates = [:c4,:d4,:e4,:f4,:g4,:a4,:b4,:c5,:d5,:e5]
+    weights    = [1,  2,  3,  2,  4,  4,  3,  3,  2,  2]
+  else
+    # Was moving down: slightly more likely to continue down or reverse
+    candidates = [:c4,:d4,:e4,:f4,:g4,:a4,:b4,:c5,:d5,:e5]
+    weights    = [2,  2,  4,  3,  4,  3,  2,  2,  1,  1]
+  end
+
+  candidates.wrand(weights)
+end
+
+live_loop :protagonist do
+  n = next_note(last_two)
+  play n, sustain: 0.4, amp: 0.6
+  last_two = [last_two[1], n]
+  sleep rrand(0.3, 0.8)
+end
+```
+
+Now the Protagonist tends to continue a direction it was already moving — but not always. It searches with momentum.
+
+## Cued Memory: Responding to Events
+
+The most powerful form of memory is event-triggered behavior. A character can remember specific narrative events and alter its probability table in response:
+
+```ruby
+$kintsugi_wound_has_occurred = false
+
+live_loop :fates do
+  if $kintsugi_wound_has_occurred
+    # After the wound: First Fate's minor seconds dominate
+    pitches = [:e5, :f5, :e5, :eb5]
+    pitches.each do |p|
+      play p, sustain: 0.8, amp: rrand(0.3, 0.5)
+      sleep 1
+    end
+  else
+    # Before: normal Fates behavior
+    play choose([:g5, :a5, :b5, :d6]), sustain: rrand(0.3, 0.8)
+    sleep rrand(0.5, 1.5)
+  end
+end
+```
+
+The Fates literally change their probability distribution when the wound occurs. They are *responding* to the narrative, not running their pattern.
+
+## The Character Design Implication
+
+Higher-order chains and event-triggered memory let characters have what sounds like emotional continuity — behavior that reflects what has happened to them. This is how you make a character sound traumatized, or joyful, or distracted, without writing out every note explicitly.
+
+The wound changes the table. That is the kintsugi, encoded as mathematics.

@@ -1,0 +1,64 @@
+---
+title: "Intervals: Distance, Name, and Emotional Character"
+branch: "music-theory"
+order: 1
+montessoriNode: "branches/music-theory"
+description: "The twelve intervals, graph-distance values, traditional names, and emotional weight. The Three Fates defined in intervals."
+draft: false
+---
+
+An interval is the distance between two pitches measured in semitones — graph-distance steps on the pitch grid.
+
+## The Twelve Intervals
+
+| Semitones | Name | Character |
+|---|---|---|
+| 0 | Unison (P1) | Identity, stillness |
+| 1 | Minor second (m2) | Maximum tension, anxiety — the **First Fate** |
+| 2 | Major second (M2) | Mild tension, stepwise motion |
+| 3 | Minor third (m3) | Melancholy, interiority |
+| 4 | Major third (M3) | Openness, the major mode |
+| 5 | Perfect fourth (P4) | Open, ancient, modal — the **Second Fate** |
+| 6 | Tritone (TT) | Maximum instability, unresolvable — the **Third Fate** |
+| 7 | Perfect fifth (P5) | Power, openness, the overtone relationship |
+| 8 | Minor sixth (m6) | Bittersweet, longing |
+| 9 | Major sixth (M6) | Warmth |
+| 10 | Minor seventh (m7) | The blues note, tension seeking resolution |
+| 11 | Major seventh (M7) | One step from resolution — maximum suspended tension |
+| 12 | Octave (P8) | Same note, doubled — identity at a new level |
+
+## The Three Fates in Intervals
+
+The Three Fates are defined entirely by their interval signatures:
+
+- **First Fate** (m2, distance=1): The most tense interval in Western harmony. Everything she says creates anxiety.
+- **Second Fate** (P4, distance=5): Open, ancient, the sound of modal music before major/minor tonality existed. Everything she says sounds old.
+- **Third Fate** (TT, distance=6): Divides the octave exactly in half. Maximally unstable. Every statement she makes is a question that cannot resolve itself.
+
+```ruby
+root = 60  # middle C
+
+live_loop :first_fate do
+  n = root + (1 * rrand_i(-3, 3))
+  play n, sustain: rrand(0.3, 0.8), amp: 0.4
+  sleep rrand(0.5, 2.0)
+end
+
+live_loop :second_fate do
+  n = root + (5 * rrand_i(-2, 2))
+  play n, sustain: rrand(0.5, 1.5), amp: 0.35
+  sleep rrand(1.0, 3.0)
+end
+
+live_loop :third_fate do
+  n = root + (6 * rrand_i(-2, 2))
+  play n, sustain: rrand(0.2, 0.6), amp: 0.3
+  sleep rrand(0.75, 2.5)
+end
+```
+
+## Intervals and Your Characters
+
+Every character has interval preferences. The Bell favors pentatonic intervals (distances 2, 3, 5, 7). The Cosmos favors wider intervals — string quartet leaps of sixths and sevenths. Pulsus uses compressed near-unison intervals — the brass ensemble pressing inward.
+
+Before sketching any leitmotif, decide: what is this character's interval vocabulary? That decision will make them sound like themselves under transformation.

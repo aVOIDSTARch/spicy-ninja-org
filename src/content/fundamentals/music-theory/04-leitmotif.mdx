@@ -1,0 +1,76 @@
+---
+title: "Leitmotif: Identity as Interval"
+branch: "music-theory"
+order: 4
+montessoriNode: "branches/music-theory"
+description: "What a leitmotif is, how it works psychologically, and how to build one that survives the transformations Jus Pulsus requires."
+draft: false
+---
+
+A leitmotif is a short musical idea — a melodic fragment, a rhythmic pattern, a harmonic colour, or any combination — that the listener comes to associate with a specific character, place, emotional state, or idea. When it returns, the association returns with it. When it is transformed, the character is perceived as transformed.
+
+This is not a clever compositional technique. It is a description of how musical memory works. Prokofiev's duck-in-the-wolf is leitmotif doing its deepest work: the duck is gone but the leitmotif survives inside the predator, and the listener hears the loss and its persistence simultaneously.
+
+## What Makes a Leitmotif Functional
+
+A leitmotif that works must be:
+
+**Memorable on first hearing.** It should lodge immediately. Four to eight notes is usually sufficient. The Cosmos' viola theme, the Pulsus brass motif, the bell's single sustained pitch followed by silence — each needs to be recognisable after one encounter.
+
+**Interval-defined, not pitch-defined.** The Cosmos' theme should sound like the Cosmos whether it is played by the viola in D minor or the strings in F. The specific pitches are a performance choice. The interval relationships are the identity. A rising minor sixth followed by a falling half-step is that character regardless of transposition.
+
+**Transformation-ready.** (See Bach Math branch.) At minimum, the leitmotif should survive inversion and remain recognisable. Ideally it should also survive retrograde — hearing the character moving backwards through time.
+
+**Timbrally anchored.** In *Jus Pulsus*, each character's leitmotif is inseparable from their instrumental voice. Pulsus played on strings is not Pulsus — it is something that sounds like Pulsus, which is a different thing. The timbre is part of the identity.
+
+## The Graph-Distance Approach
+
+Your perception of pitch as graph-distance is an advantage for leitmotif construction. Where most composers think in terms of note names, you think in terms of distances — which means you naturally think in interval relationships rather than specific pitches.
+
+Build leitmotifs by distance, not by name:
+
+```
+Cosmos' searching motif: +7, -2, +5, -1
+(up a fifth, down a step, up a fourth, down a half-step)
+```
+
+At any transposition, starting on any note, this interval sequence produces the Cosmos. The absolute pitch is irrelevant. The distance pattern is the character.
+
+## The Three Fates as Interval Clusters
+
+The Three Fates are defined not by melodic motifs but by **interval clusters** — the specific harmonic intervals they favour:
+
+- **Fate 1** (witness): Perfect fourths and fifths — stable, ancient, the observing voice
+- **Fate 2** (commentator): Minor thirds and sixths — warm, questioning, slightly melancholic
+- **Fate 3** (instigator): Tritones and minor seconds — unstable, pushing, the voice that will not let things settle
+
+When all three sound together, their cluster contains a complete emotional argument: stability, warmth, and unrest simultaneously. This is the Three Fates in full presence — they do not resolve into one another, they coexist in productive tension.
+
+## In Sonic Pi: Defining a Character by Interval
+
+```ruby
+# Define Pulsus's motif as an interval sequence
+pulsus_intervals = [0, 1, -2, 3, -1, 0]  # semitones from root
+
+# Generate the motif from any starting pitch
+def play_pulsus_motif(root_note, durations: [0.25, 0.25, 0.5, 0.25, 0.25, 0.5])
+  pulsus_intervals.each_with_index do |interval, i|
+    play root_note + interval, release: durations[i] * 0.8
+    sleep durations[i]
+  end
+end
+
+# Call from a live_loop, transposing as the piece develops
+live_loop :pulsus_voice do
+  play_pulsus_motif(:e3)
+  sleep 0.5
+  play_pulsus_motif(:f3)  # half-step up — Pulsus pressing
+  sleep 1
+end
+```
+
+## The Ouroboros Leitmotif Problem
+
+*Jus Pulsus* has an ouroboros structure — Act IV becomes the origin of Act I. This means the leitmotifs at the end of the piece must be compatible with the leitmotifs at the beginning, because they are the same leitmotifs heard at different stages of their development.
+
+The implication: Act I's leitmotifs should be *simplified versions* of what they become by Act III. Not sketches — recognisable statements that are nonetheless less developed. The complexity that accumulates across Acts II and III must be *reducible back* to the Act I form. This is not just compositional elegance. It is the structural requirement of the mythology: the Cosmos at the end must be recognisably the Cosmos from before everything happened.

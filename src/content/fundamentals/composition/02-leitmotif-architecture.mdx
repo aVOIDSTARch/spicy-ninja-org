@@ -1,0 +1,75 @@
+---
+title: "Leitmotif Architecture"
+branch: "composition"
+order: 2
+montessoriNode: "branches/composition"
+description: "How recurring themes build character identity in programmatic music, develop across a work, and create structural scars."
+draft: false
+---
+
+A leitmotif is a recurring musical theme associated with a particular character, place, idea, or emotional state. The concept was developed systematically by Wagner and applied with surgical precision by Prokofiev. It is the primary tool of programmatic composition.
+
+A leitmotif is not a label. It is a living entity that changes as its associated character changes.
+
+## What Makes a Good Leitmotif
+
+A leitmotif needs to be:
+
+**Specific enough to be recognizable** — it must have a distinctive shape (interval structure, rhythm, timbre) that the listener's nervous system can track even without conscious attention.
+
+**Flexible enough to be transformed** — it must survive retrograde, inversion, augmentation, and fragmentation without losing identity. If transforming it produces something unrecognizable, the theme is too generic.
+
+**Matched to its character's nature** — the sound must be the character, not just a label for them. Prokofiev's wolf is three French horns in unison because horns are physically large and their overtone series is naturally dominant. The instrument's character IS the character.
+
+## The Duck Inside the Wolf
+
+The most sophisticated technique in leitmotif architecture: a character's theme surviving inside the theme of what destroyed or consumed them.
+
+In *Peter and the Wolf*, after the wolf swallows the duck, the duck's oboe theme appears quietly inside the wolf's brass theme. The duck is gone. Her music persists — transformed, embedded, audible to those listening for it. The wolf carries her now. He is not the same wolf he was before.
+
+This is the structural mechanism for one character being permanently altered by their encounter with another. The consumed character's leitmotif leaves a trace inside the consuming character's material. That trace is the scar.
+
+## Three Stages of Leitmotif Development
+
+Any character with a complete arc needs their leitmotif to pass through at least three states:
+
+**Emergence**: Nascent, simple, establishing identity. The listener is meeting this material for the first time. Keep it clean and memorable.
+
+**Development**: Fuller, more complex, in dialogue with other characters' material. The theme has been through something. It shows.
+
+**Transformed**: Permanently altered by the events of the work. Not simply a restatement — a version that carries the weight of everything that happened. This is where structural scarring lives.
+
+## Timbral Casting
+
+In electronic music, leitmotif identity often lives in timbre more than pitch. The specific sound is the character. This is not different from orchestral practice — it is the same principle in a new medium.
+
+When casting a character's sound, the question is not "what sounds good" but "what IS this character." The timbre should match the narrative personality so precisely that a listener who has never heard the music described could still arrive at roughly the same casting from the character description alone.
+
+```ruby
+# Leitmotif as [pitch, duration] pairs in Sonic Pi
+cosmos_theme = [[:b3, 1.0], [:d4, 0.5], [:f#4, 0.5], [:a4, 2.0]]
+
+# Three stages: emergence, development, transformed
+define :cosmos_emergence do
+  cosmos_theme.each { |p, d| play p, sustain: d * 0.9, amp: 0.5; sleep d }
+end
+
+define :cosmos_developed do
+  # Fuller — added counterpoint in accompanying voice
+  cosmos_theme.each { |p, d|
+    play p, sustain: d * 0.9, amp: 0.7
+    play p - 7, sustain: d * 0.8, amp: 0.4  # fifth below
+    sleep d
+  }
+end
+
+define :cosmos_transformed do
+  # Post-wound: same pitches, inverted contour, slower
+  cosmos_theme.reverse.each { |p, d|
+    play p, sustain: d * 1.5, amp: 0.4  # augmented and quieter
+    sleep d * 1.5
+  }
+end
+```
+
+*Project connection: In Jus Pulsus, the Cosmos' string quartet theme, Pulsus' brass motif, and each supporting character's sonic signature are all leitmotifs in this tradition. The duck-inside-the-wolf mechanism is the structural model for the kintsugi wound — one character's material persisting inside another after the central catastrophe.*

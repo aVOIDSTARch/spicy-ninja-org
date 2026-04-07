@@ -1,0 +1,101 @@
+---
+title: "Weighted Random and the choose Function"
+branch: "markov-chains"
+order: 3
+montessoriNode: "branches/markov-chains"
+description: "Implementing Markov chains in Sonic Pi using weighted_choose and custom probability tables. Personality as code."
+draft: false
+---
+
+The previous lessons defined the theory. This one makes it executable. Sonic Pi has native tools for weighted random selection, and a Markov chain is just a series of weighted random choices where the weights depend on what was chosen last.
+
+## Sonic Pi's Built-In Tools
+
+```ruby
+# choose — uniform random selection from an array
+note = [:c4, :e4, :g4].choose
+# Each note has equal 1/3 probability
+
+# Sonic Pi does not have weighted_choose natively.
+# Build it with a weighted array:
+cosmos_notes = [
+  :d3, :d3, :d3, :d3,   # 4/10 probability — the root, home
+  :a3, :a3, :a3,         # 3/10 probability — the fifth, stable
+  :f3, :f3,              # 2/10 probability — the third, colour
+  :c4                    # 1/10 probability — the octave, reaching
+]
+note = cosmos_notes.choose
+```
+
+Repeat items to weight them. The probability of each item equals its count divided by the total array length. This is the simplest implementation of a weighted probability table.
+
+## A Full First-Order Markov Voice
+
+```ruby
+# Personality tables for the Cosmos
+# Key: current note → weighted array of next notes
+cosmos_transitions = {
+  :d3 => [:d3, :d3, :a3, :a3, :f3, :c4],
+  :a3 => [:d3, :a3, :a3, :f3, :f3, :e3],
+  :f3 => [:d3, :f3, :a3, :e3, :c4, :c4],
+  :c4 => [:a3, :f3, :d3, :d3, :d3, :g3],
+  :e3 => [:d3, :f3, :a3, :e3, :e3, :d3],
+  :g3 => [:d3, :a3, :f3, :g3, :e3, :d3],
+}
+
+# Use it in a live_loop:
+live_loop :cosmos do
+  current_note ||= :d3
+  play current_note, sustain: 1.5, release: 0.8, amp: 0.6
+  sleep 2
+  next_options = cosmos_transitions[current_note]
+  current_note = next_options ? next_options.choose : :d3
+end
+```
+
+The `||=` initialises `current_note` to `:d3` on the first iteration only. Every subsequent iteration it already has a value.
+
+## Giving Each Character a Distinct Probability Shape
+
+The personality tables above should *feel different* for each character. Not just different notes — different statistical shapes.
+
+| Character | Probability shape | Effect |
+|---|---|---|
+| The Cosmos | High weight on root and fifth, rare leaps | Settled, gravitational |
+| Pulsus | High weight on step motion + occasional aggressive leap | Insistent, directional |
+| The Bell | High weight on silence (rest), single pitches with long decay | Sparse, patient |
+| The Ground | Almost always the same pitch (pedal point with rare colour note) | Immovable |
+
+```ruby
+# Pulsus — insistent, directional, prone to the minor second pressure
+pulsus_transitions = {
+  :e4 => [:e4, :e4, :f4, :f4, :d4, :b3],  # loves the half-step pressure
+  :f4 => [:e4, :e4, :e4, :g4, :f4, :f4],  # resolves down or pushes up
+  :d4 => [:e4, :f4, :e4, :c4, :d4, :b3],
+  :b3 => [:c4, :e4, :b3, :b3, :a3, :d4],
+  :g4 => [:f4, :e4, :g4, :a4, :e4, :f4],
+  :c4 => [:b3, :d4, :c4, :e4, :c4, :f4],
+  :a3 => [:b3, :a3, :g3, :c4, :a3, :e4],
+}
+```
+
+## Modelling the Kintsugi Wound in Probability
+
+After the wound — after the look — Pulsus's probability table changes. The character's personality shifts. This is how you encode the scar in code:
+
+```ruby
+# Before the wound
+pulsus_pre = { :e4 => [:e4, :e4, :f4, :f4, :d4, :b3], ... }
+
+# After the wound — more erratic, more silence, the minor second now feels different
+pulsus_post = { :e4 => [:e4, :f4, :f4, :r, :r, :d4], ... }  # :r = rest
+
+# Use a variable to switch between them
+pulsus_table = use_pre_wound ? pulsus_pre : pulsus_post
+```
+
+The wound is not a visual event. It is a change in the probability distribution. The character becomes statistically different. This is the kintsugi architecture in code.
+
+## Exercise
+
+Write a probability table for one character you have not yet coded. Start with 4–6 notes. Assign weights that feel like the character's emotional state. Play it as a live_loop for five minutes. Ask: does this sound like that character's personality? If not, adjust the weights. The weights are the personality. Change the weights, change the character.
