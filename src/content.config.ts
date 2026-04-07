@@ -11,7 +11,7 @@ const projectTrack = defineCollection({
     composer:     z.string(),
     year:         z.string(),
     module:       z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]),
-    workNumber:   z.string(),
+    workNumber:   z.string().optional(),
     recording:    z.string().optional(),
     youtubeQuery: z.string(),
     listenFor:    z.array(z.string()),
