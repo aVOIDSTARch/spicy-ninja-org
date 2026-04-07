@@ -1,0 +1,44 @@
+---
+title: "Drumming / Music for 18 Musicians"
+composer: "Steve Reich"
+year: "1971 / 1976"
+module: 2
+order: 8
+youtubeQuery: "Steve Reich Drumming full 1974"
+youtubeId: "leHGLMXMnKs"
+youtubeId2: "Steve Reich Music for 18 Musicians full"
+spotifyUrl: "https://open.spotify.com/search/Steve%20Reich%20Drumming"
+listenFor:
+  - "The moment you realize the pattern has shifted — that the two voices are no longer together"
+  - "The emergent patterns between the two out-of-phase copies — rhythms nobody is playing"
+  - "Music for 18 Musicians: how it sounds like weather rather than notes"
+  - "How forward motion is created without a single traditional harmonic progression"
+  - "The relationship between the pattern length and the total cycle length"
+teaches:
+  - "Phasing — two copies of the same pattern with one pulling ahead, generating emergent complexity"
+  - "LCM (Least Common Multiple) as a compositional tool"
+  - "How Sonic Pi's simultaneous live_loops produce emergent complexity"
+  - "Your three drumming cycles (3, 4, 7 beats) produce an 84-beat emergent cycle: LCM(3,4,7) = 84"
+  - "Rhythm as mathematics producing emergent structures more complex than any single input"
+draft: false
+---
+
+Steve Reich studied West African drumming in Ghana in 1970 and returned to use what he learned to build a new kind of Western music. *Drumming* is 90 minutes of drums and voices, built from a single 12-beat rhythmic pattern that is gradually shifted out of phase with itself.
+
+## What Phasing Is
+
+**Phasing**: two copies of the same pattern starting together and then one gradually pulling ahead until they re-align. The emergent patterns between the two out-of-phase copies are never played by anyone. They arise from the mathematics of the offset.
+
+*Drumming* is built from: `X . X X . X . X X . X .` When this pattern is shifted one position against itself, a new pattern arises that no one is playing. Reich repeats this process across 90 minutes, each shift revealing new emergent patterns.
+
+## The Math of Your Orbital Mechanics
+
+In Sonic Pi: if `live_loop :a` runs a 12-step pattern and `live_loop :b` runs the same pattern starting `sleep 1` later, the *combination* produces a third thing that neither loop contains. This is not metaphor — this is the actual mathematics governing your piece.
+
+Your three simultaneous drumming cycles (3-beat, 4-beat, 7-beat in the sketches) produce emergent patterns whose length is LCM(3, 4, 7) = 84 beats before repeating. You composed a pattern 84 beats long by writing three patterns of 3, 4, and 7. The 84-beat cycle is the emergent structure. Nobody wrote it.
+
+When a pattern of length *a* is offset against a pattern of length *b* where a and b share no common factors, the combined pattern has length a × b. Reich uses this to create structures that take 20 minutes to complete one cycle. The listener hears forward motion without a single traditional harmonic progression. This is your central compositional challenge, solved mathematically.
+
+## Music for 18 Musicians
+
+*Music for 18 Musicians* applies the same thinking to pitched instruments: voices, marimbas, vibraphones, clarinets, strings, piano. Nothing in it is complicated. All simple patterns slightly offset from each other, and the combination produces something that sounds like weather. This is what your Act II sounds like from the outside — not the instruments, but their mathematical relationship made audible.
