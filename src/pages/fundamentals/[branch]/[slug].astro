@@ -1,0 +1,239 @@
+---
+import ZoneLayout from '../../../layouts/ZoneLayout.astro'
+import SceneScholars from '../../../components/scenes/SceneScholars.astro'
+import { getCollection, render } from 'astro:content'
+
+export async function getStaticPaths() {
+  const lessons = await getCollection('fundamentals', ({ data }) => !data.draft && data.order > 0)
+  return lessons.map(lesson => {
+    const parts = lesson.id.split('/')
+    const branch = parts[0]
+    const slug = parts[1].replace('.mdx', '')
+    return { params: { branch, slug }, props: { lesson } }
+  })
+}
+
+const { branch, slug } = Astro.params
+const { lesson } = Astro.props
+const { Content } = await render(lesson)
+
+const branchMeta: Record<string, { label: string; accent: string }> = {
+  'bach-math':      { label: 'Bach Math',            accent: '#c8922a' },
+  'markov-chains':  { label: 'Markov Chains',         accent: '#6b3fa0' },
+  'music-theory':   { label: 'Music Theory',          accent: '#2a6b9e' },
+  'composition':    { label: 'Composition',           accent: 'var(--cinnabar)' },
+  'characters':     { label: 'Character Development', accent: '#3a7d44' },
+}
+const meta = branchMeta[branch] ?? { label: branch, accent: 'var(--cinnabar)' }
+
+// All lessons in this branch for TOC
+const allBranchLessons = (await getCollection('fundamentals', ({ data }) =>
+  !data.draft && data.branch === branch && data.order > 0
+)).sort((a, b) => a.data.order - b.data.order)
+---
+
+<ZoneLayout zone="fundamentals" title={`${lesson.data.title} — ${meta.label} — spicyninja.org`}>
+  <SceneScholars slot="scene" />
+
+  <div class="fl-shell" style={`--branch-accent: ${meta.accent};`}>
+
+    <!-- TOC -->
+    <aside class="fl-toc" id="fl-toc">
+      <div class="fl-toc__header">
+        <a href={`/fundamentals/${branch}`} class="fl-toc__back">← {meta.label}</a>
+      </div>
+      <nav class="fl-toc__list">
+        {allBranchLessons.map((l, i) => {
+          const lslug = l.id.split('/').pop()?.replace('.mdx', '')
+          const active = lslug === slug
+          return (
+            <a href={`/fundamentals/${branch}/${lslug}`}
+               class={`fl-toc__item ${active ? 'fl-toc__item--active' : ''}`}
+               aria-current={active ? 'page' : undefined}>
+              <span class="fl-toc__num">{String(i + 1).padStart(2, '0')}</span>
+              <span class="fl-toc__name">{l.data.title}</span>
+            </a>
+          )
+        })}
+      </nav>
+      <button class="fl-toc__handle" id="fl-toc-handle" aria-label="Toggle contents">☰</button>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="fl-main">
+      <header class="fl-header">
+        <p class="fl-header__branch">{meta.label}</p>
+        <h1 class="fl-header__title">{lesson.data.title}</h1>
+      </header>
+      <div class="fl-prose">
+        <Content />
+      </div>
+    </main>
+  </div>
+</ZoneLayout>
+
+<style>
+  .fl-shell {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* TOC */
+  .fl-toc {
+    position: sticky; top: 0; height: 100vh;
+    width: 240px; flex-shrink: 0;
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border);
+    overflow-y: auto; scrollbar-width: none;
+    display: flex; flex-direction: column;
+    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+    z-index: 20;
+  }
+  .fl-toc::-webkit-scrollbar { display: none; }
+  .fl-toc--collapsed { transform: translateX(-224px); }
+
+  .fl-toc__header {
+    padding: 1.5rem 1.2rem 1rem;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .fl-toc__back {
+    font-family: var(--font-mono); font-size: 0.6rem;
+    color: var(--text-ghost); text-decoration: none;
+    letter-spacing: 0.1em; transition: color 0.2s;
+  }
+  .fl-toc__back:hover { color: var(--branch-accent); }
+
+  .fl-toc__list { padding: 1rem 0; flex: 1; }
+  .fl-toc__item {
+    display: flex; align-items: baseline; gap: 0.6rem;
+    padding: 0.4rem 1.2rem; text-decoration: none;
+    color: var(--text-muted); font-size: 0.7rem;
+    border-left: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .fl-toc__item:hover { color: var(--text-primary); }
+  .fl-toc__item--active {
+    color: var(--branch-accent) !important;
+    border-left-color: var(--branch-accent) !important;
+  }
+  .fl-toc__num {
+    font-family: var(--font-mono); font-size: 0.5rem;
+    color: var(--text-ghost); flex-shrink: 0; opacity: 0.5;
+  }
+
+  .fl-toc__handle {
+    position: absolute; top: 50%; right: -18px;
+    transform: translateY(-50%);
+    width: 18px; height: 48px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border); border-left: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 0.6rem; color: var(--text-ghost);
+    transition: color 0.2s;
+  }
+  .fl-toc__handle:hover { color: var(--branch-accent); }
+
+  /* MAIN */
+  .fl-main {
+    flex: 1; min-width: 0;
+    padding: 8vh 3.5rem 6rem;
+    max-width: 780px;
+  }
+
+  .fl-header { margin-bottom: 3rem; }
+  .fl-header__branch {
+    font-family: var(--font-mono); font-size: 0.52rem;
+    letter-spacing: 0.28em; text-transform: uppercase;
+    color: var(--branch-accent); margin-bottom: 0.6rem;
+  }
+  .fl-header__title {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    color: var(--text-primary); line-height: 1;
+  }
+
+  /* PROSE */
+  .fl-prose {
+    font-family: var(--font-body); font-size: 1rem;
+    line-height: 1.82; color: var(--text-secondary);
+    max-width: 68ch;
+  }
+  .fl-prose h2 {
+    font-family: var(--font-display); font-weight: 400;
+    font-size: 1.5rem; color: var(--text-primary);
+    margin: 2.5rem 0 1rem; line-height: 1.1;
+  }
+  .fl-prose h2::before {
+    content: ''; display: block; width: 2rem; height: 2px;
+    background: var(--branch-accent); margin-bottom: 0.7rem; opacity: 0.5;
+  }
+  .fl-prose p { margin-bottom: 1.2rem; }
+  .fl-prose em { color: var(--text-primary); font-style: italic; }
+  .fl-prose strong { color: var(--text-primary); font-weight: 500; }
+
+  /* code blocks */
+  .fl-prose pre {
+    background: var(--bg-secondary); border: 1px solid var(--border);
+    border-left: 3px solid var(--branch-accent);
+    padding: 1.2rem 1.5rem; margin: 1.5rem 0;
+    overflow-x: auto; font-size: 0.8rem; line-height: 1.6;
+  }
+  .fl-prose code {
+    font-family: var(--font-mono); font-size: 0.82em;
+    color: var(--branch-accent);
+    background: rgba(255,255,255,0.04);
+    padding: 0.1em 0.3em;
+  }
+  .fl-prose pre code {
+    color: var(--text-secondary); background: none; padding: 0;
+  }
+
+  /* tables */
+  .fl-prose table {
+    width: 100%; border-collapse: collapse;
+    font-size: 0.82rem; margin: 1.5rem 0;
+  }
+  .fl-prose th {
+    text-align: left; font-family: var(--font-mono);
+    font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--text-ghost); padding: 0 1rem 0.8rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .fl-prose td {
+    padding: 0.6rem 1rem 0.6rem 0;
+    border-bottom: 1px solid rgba(200,180,140,0.06);
+    color: var(--text-muted); vertical-align: top;
+  }
+  .fl-prose td:first-child { color: var(--text-secondary); }
+
+  /* blockquotes / callouts (italicised paragraphs starting with *Project) */
+  .fl-prose blockquote {
+    border-left: 2px solid var(--branch-accent);
+    padding: 0.8rem 1.2rem; margin: 1.5rem 0;
+    background: rgba(255,255,255,0.02);
+    color: var(--text-muted); font-size: 0.9rem;
+  }
+
+  @media (max-width: 860px) {
+    .fl-toc { display: none; }
+    .fl-main { padding: 6vh 1.5rem 4rem; }
+  }
+</style>
+
+<script>
+  const toc = document.getElementById('fl-toc')
+  const handle = document.getElementById('fl-toc-handle')
+  let collapsed = false
+
+  handle?.addEventListener('click', () => {
+    collapsed ? toc?.classList.remove('fl-toc--collapsed') : toc?.classList.add('fl-toc--collapsed')
+    collapsed = !collapsed
+  })
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 220 && !collapsed) {
+      toc?.classList.add('fl-toc--collapsed')
+      collapsed = true
+    }
+  }, { passive: true })
+</script>
