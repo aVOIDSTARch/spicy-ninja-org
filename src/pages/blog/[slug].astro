@@ -1,0 +1,89 @@
+---
+import ZoneLayout from '../../layouts/ZoneLayout.astro'
+import SceneVillage from '../../components/scenes/SceneVillage.astro'
+import { getCollection, render } from 'astro:content'
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft).catch(() => [])
+  return posts.map((post: any) => ({
+    params: { slug: post.id.replace('.mdx','') },
+    props: { post },
+  }))
+}
+
+const { post } = Astro.props
+const { Content } = await render(post)
+
+const formatAccents: Record<string, string> = {
+  'reflection':   '#6b3fa0',
+  'session-log':  '#2a6b9e',
+  'breakthrough': 'var(--cinnabar)',
+  'question':     '#c8922a',
+  'reference':    '#3a7d44',
+  'sketch':       '#9a6b4a',
+}
+const accent = formatAccents[post.data.format] ?? 'var(--cinnabar)'
+---
+
+<ZoneLayout zone="blog" title={`${post.data.title} — Blog — spicyninja.org`}>
+  <SceneVillage slot="scene" />
+
+  <div style="padding: 10vh 3.5rem 6rem; max-width: 820px;">
+    <a href="/blog"
+       style="font-family:var(--font-mono); font-size:0.6rem; letter-spacing:0.15em;
+              color:var(--text-ghost); text-decoration:none; display:inline-block; margin-bottom:2.5rem;">
+      ← Blog
+    </a>
+
+    <header style={`border-top:3px solid ${accent}; padding-top:1.5rem; margin-bottom:3rem;`}>
+      <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1rem;">
+        <span style={`font-family:var(--font-mono); font-size:0.5rem; letter-spacing:0.2em;
+                       text-transform:uppercase; color:${accent};`}>
+          {post.data.format}
+        </span>
+        <span style="font-family:var(--font-mono); font-size:0.5rem; color:var(--text-ghost);">
+          {new Date(post.data.date).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' })}
+        </span>
+      </div>
+      <h1 style="font-family:var(--font-display); font-weight:700; font-size:clamp(2rem,5vw,3.5rem);
+                  color:var(--text-primary); line-height:1; margin-bottom:1rem;">
+        {post.data.title}
+      </h1>
+      <p style="font-family:var(--font-body); font-size:1rem; color:var(--text-muted); line-height:1.7;">
+        {post.data.description}
+      </p>
+    </header>
+
+    <div class="blog-prose"><Content /></div>
+
+    {post.data.derivedFromJournal && (
+      <div style={`margin-top:3rem; padding:1rem 1.5rem; border-left:2px solid ${accent}; background:var(--bg-card);`}>
+        <p style="font-family:var(--font-mono); font-size:0.58rem; color:var(--text-ghost); letter-spacing:0.12em;">
+          Derived from listening journal:
+          <a href={`/journal/${post.data.derivedFromJournal}`}
+             style={`color:${accent}; text-decoration:none; margin-left:0.5rem;`}>
+            {post.data.derivedFromJournal}
+          </a>
+        </p>
+      </div>
+    )}
+  </div>
+</ZoneLayout>
+
+<style>
+  .blog-prose {
+    font-family: var(--font-body); font-size: 1rem;
+    line-height: 1.82; color: var(--text-secondary); max-width: 68ch;
+  }
+  .blog-prose p { margin-bottom: 1.2rem; }
+  .blog-prose h2 {
+    font-family: var(--font-display); font-weight: 400; font-size: 1.5rem;
+    color: var(--text-primary); margin: 2.5rem 0 1rem; line-height: 1.1;
+  }
+  .blog-prose em { color: var(--text-primary); font-style: italic; }
+  .blog-prose strong { color: var(--text-primary); font-weight: 500; }
+  .blog-prose blockquote {
+    border-left: 2px solid var(--border-hi); padding: 0.6rem 1.2rem;
+    margin: 1.5rem 0; color: var(--text-muted);
+  }
+</style>

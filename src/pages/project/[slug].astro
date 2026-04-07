@@ -1,0 +1,63 @@
+---
+import ZoneLayout from '../../layouts/ZoneLayout.astro'
+import SceneMountain from '../../components/scenes/SceneMountain.astro'
+import { getCollection, render } from 'astro:content'
+
+export async function getStaticPaths() {
+  const docs = await getCollection('project', ({ data }) => !data.draft).catch(() => [])
+  return docs.map((doc: any) => ({
+    params: { slug: doc.id.replace('.mdx','') },
+    props: { doc },
+  }))
+}
+
+const { doc } = Astro.props
+const { Content } = await render(doc)
+---
+
+<ZoneLayout zone="project" title={`${doc.data.title} — Project — spicyninja.org`}>
+  <SceneMountain slot="scene" />
+
+  <div style="padding: 10vh 3.5rem 6rem; max-width: 780px;">
+    <a href="/project"
+       style="font-family:var(--font-mono); font-size:0.6rem; letter-spacing:0.15em;
+              color:var(--text-ghost); text-decoration:none; display:inline-block; margin-bottom:2.5rem;">
+      ← Project
+    </a>
+    <p style="font-family:var(--font-mono); font-size:0.52rem; letter-spacing:0.28em;
+               text-transform:uppercase; color:#6b3fa0; margin-bottom:0.6rem;">Jus Pulsus</p>
+    <h1 style="font-family:var(--font-display); font-weight:700; font-size:clamp(2rem,5vw,3.5rem);
+               color:var(--text-primary); line-height:1; margin-bottom:3rem;">
+      {doc.data.title}
+    </h1>
+    <div class="project-prose">
+      <Content />
+    </div>
+  </div>
+</ZoneLayout>
+
+<style>
+  .project-prose {
+    font-family: var(--font-body); font-size: 1rem;
+    line-height: 1.82; color: var(--text-secondary); max-width: 68ch;
+  }
+  .project-prose h2 {
+    font-family: var(--font-display); font-weight: 400;
+    font-size: 1.5rem; color: var(--text-primary);
+    margin: 2.5rem 0 1rem; line-height: 1.1;
+  }
+  .project-prose h2::before {
+    content: ''; display: block; width: 2rem; height: 2px;
+    background: #6b3fa0; margin-bottom: 0.7rem; opacity: 0.5;
+  }
+  .project-prose h3 {
+    font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--text-ghost);
+    margin: 2rem 0 0.8rem;
+  }
+  .project-prose p { margin-bottom: 1.2rem; }
+  .project-prose em { color: var(--text-primary); font-style: italic; }
+  .project-prose strong { color: var(--text-primary); font-weight: 500; }
+  .project-prose ul { margin: 0 0 1.2rem 1.5rem; }
+  .project-prose li { margin-bottom: 0.4rem; color: var(--text-secondary); }
+</style>

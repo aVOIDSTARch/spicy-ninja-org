@@ -5,18 +5,25 @@ import SceneTownSquare from '../../components/scenes/SceneTownSquare.astro'
 
 <ZoneLayout zone="community" title="Community — spicyninja.org">
   <SceneTownSquare slot="scene" />
+
   <div style="padding: 14vh 4rem 6rem; max-width: 820px;">
     <p class="eyebrow">public space</p>
-    <h1 class="hero-heading" style="margin-bottom: 1rem;">
-      Community
-    </h1>
+    <h1 class="hero-heading" style="margin-bottom:1rem;">Community</h1>
     <p style="font-family:var(--font-body); font-size:1.05rem; color:var(--text-secondary);
-              max-width:560px; line-height:1.85; margin-top:1.5rem;">
-      A public space for listening, questions, and resonance.
+              max-width:560px; line-height:1.85; margin-top:1.5rem; margin-bottom:3rem;">
+      Listening Wall, Question Board, Resonance Wall.
+      Submissions are approval-gated. Public display is per-entry toggleable.
     </p>
-    <p style="font-family:var(--font-mono); font-size:0.62rem; letter-spacing:0.25em;
-              text-transform:uppercase; color:var(--zone-accent); margin-top:3rem; opacity:0.6;">
-      coming soon
-    </p>
+    <div style="border:1px solid var(--border); border-left:3px solid var(--cinnabar);
+                padding:2rem; background:var(--bg-card);">
+      <p style="font-family:var(--font-mono); font-size:0.6rem; letter-spacing:0.2em;
+                 text-transform:uppercase; color:var(--cinnabar); margin-bottom:0.6rem;">
+        Not yet open
+      </p>
+      <p style="font-family:var(--font-body); color:var(--text-muted); font-size:0.9rem; line-height:1.7;">
+        The community submission system requires server-side infrastructure for the approval
+        gate. It will open when the project reaches public release.
+      </p>
+    </div>
   </div>
 </ZoneLayout>
