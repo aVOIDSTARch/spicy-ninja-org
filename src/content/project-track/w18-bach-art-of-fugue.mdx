@@ -1,0 +1,66 @@
+---
+title: "The Art of Fugue"
+composer: "Johann Sebastian Bach"
+year: "c. 1740–1750"
+module: 5
+order: 18
+recording: "Musica Antiqua Köln, Reinhard Goebel (1988)"
+youtubeQuery: "Bach Art of Fugue Musica Antiqua Köln full"
+scoreUrl: "https://imslp.org/wiki/The_Art_of_Fugue,_BWV_1080_(Bach,_Johann_Sebastian)"
+listenFor:
+  - "How the same subject sounds completely different in each of the 14 fugues despite being the same notes"
+  - "The moment a second voice enters answering the first — two complete intelligences in dialogue"
+  - "Contrapunctus XIV — where it breaks off unfinished. Sit with the final unresolved chord."
+  - "Retrograde inversion — the subject played backwards and upside down simultaneously"
+  - "How counterpoint produces a texture more complex than any single voice contains"
+teaches:
+  - "Mathematical operations on musical material — retrograde, inversion, augmentation, diminution"
+  - "How to generate infinite variation from a single theme through systematic transformation"
+  - "Counterpoint as emergent phenomenon — the combination produces more than the sum of its parts"
+  - "The fugue as the oldest example of a system producing outputs more complex than its inputs"
+  - "Sonic Pi equivalents: array.reverse (retrograde), interval inversion, sleep multiplication (augmentation)"
+draft: false
+---
+
+The fugue is the most mathematically explicit compositional form in Western music. *The Art of Fugue* is the most extreme example of what a fugue can become.
+
+## What a Fugue Is
+
+A fugue begins with a single theme — the **subject**. A second voice enters, answering the subject in a different register. A third voice enters. Then a fourth. Each voice maintains complete independence while being harmonically aware of all the others. The voices can be combined in any order without breaking.
+
+The subject can be transformed by mathematical operations:
+
+- **Retrograde** — play the notes in reverse order
+- **Inversion** — flip every interval upside down (a rising third becomes a falling third)
+- **Retrograde inversion** — backwards and upside down simultaneously
+- **Augmentation** — double all note durations (the theme at half speed)
+- **Diminution** — halve all note durations (the theme at double speed)
+- **Stretto** — a second voice enters before the first voice has finished
+
+These are not aesthetic choices. They are mathematical operations on a musical object. Bach builds 14 complete fugues and 4 canons from a single subject, each applying more extreme mathematical operations to the same material.
+
+## The Sonic Pi Equivalents
+
+These operations translate directly to your compositional toolkit:
+
+- **Retrograde**: `notes.reverse` on any array
+- **Inversion**: `notes.map { |n| root + (root - n) }`
+- **Augmentation**: multiply all `sleep` values by 2
+- **Diminution**: divide all `sleep` values by 2
+- **Stretto**: two `live_loop`s with a `sleep` offset between their starts
+
+Apply these to your characters' leitmotifs. The Cosmos' viola theme inverted is not a new theme — it is the Cosmos seen from below. The Pulsus motif augmented is the same mind moving through time at half speed. The same material, transformed, sounds like a different character's perspective on the same truth.
+
+## Contrapunctus XIV
+
+The final fugue breaks off unfinished. Bach died before completing it. His son added a note to the manuscript: *"The author died here."* The final unresolved chord is perhaps the most honest ending any composer has written.
+
+This is not a failure. It is a structural fact: Bach died while writing a fugue about the inexhaustibility of mathematical transformation. The work is literally incomplete because completion was not possible — the mathematics never end. There is always another operation. There is always another fugue.
+
+Your piece ends in Act IV. The ouroboros structure means it loops back to its own beginning. This is your version of Contrapunctus XIV: not an ending but a return to the conditions that made the piece possible. Not the author dying here — the author beginning again.
+
+## The Fugue You Are Already Writing
+
+Your live_loops are fugue voices. Each character is a voice that maintains independence while remaining harmonically aware of the others. The Cosmos' string quartet is a four-voice fugue. Pulsus' brass-wind ensemble is another. When they combine in Act III, you have an eight-voice fugue — which is exactly what Bach was building toward.
+
+You are writing fugues. You just call them live_loops.
