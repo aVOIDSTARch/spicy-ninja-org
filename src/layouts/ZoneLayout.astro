@@ -1,0 +1,131 @@
+---
+/*
+  ZoneLayout.astro
+  ─────────────────────────────────────────────────────────
+  Base layout for all content zones. Wraps Base.astro and:
+    - Sets data-zone attribute for CSS zone overrides
+    - Injects zone accent token overrides via <style>
+    - Renders the zone's ParallaxScene behind content
+    - Keeps content above scene with z-index and bg fade
+
+  Zone-specific layouts (ProjectTrackLayout, etc.)
+  extend this by passing their scene component in the
+  "scene" slot and their content in the default slot.
+
+  Props:
+    zone        string  — matches CSS data-zone values
+    title       string  — page <title>
+    description string  — meta description
+*/
+
+import Base from './Base.astro'
+
+interface Props {
+  zone: 'project-track' | 'montessori' | 'fundamentals' |
+        'journey' | 'journal' | 'blog' | 'project' | 'community'
+  title?: string
+  description?: string
+}
+
+const { zone, title, description } = Astro.props
+
+/* Zone accent token map */
+const zoneAccents: Record<string, { accent: string; dim: string; glow: string }> = {
+  'project-track': { accent: '#E34234', dim: 'rgba(227,66,52,0.15)',   glow: 'rgba(227,66,52,0.08)'  },
+  'montessori':    { accent: '#E8A020', dim: 'rgba(232,160,32,0.15)',  glow: 'rgba(232,160,32,0.08)' },
+  'fundamentals':  { accent: '#8b6914', dim: 'rgba(139,105,20,0.15)',  glow: 'rgba(139,105,20,0.06)' },
+  'journey':       { accent: '#c87840', dim: 'rgba(200,120,64,0.15)',  glow: 'rgba(200,120,64,0.08)' },
+  'journal':       { accent: '#c8b490', dim: 'rgba(200,180,144,0.15)', glow: 'rgba(200,180,144,0.06)'},
+  'blog':          { accent: '#E34234', dim: 'rgba(227,66,52,0.12)',   glow: 'rgba(227,66,52,0.06)'  },
+  'project':       { accent: '#6b3fa0', dim: 'rgba(107,63,160,0.15)',  glow: 'rgba(107,63,160,0.08)' },
+  'community':     { accent: '#b87333', dim: 'rgba(184,115,51,0.15)',  glow: 'rgba(184,115,51,0.08)' },
+}
+
+const a = zoneAccents[zone] ?? zoneAccents['project-track']
+---
+
+<Base title={title} description={description}>
+  <!-- Zone wrapper — sets data-zone and CSS accent overrides -->
+  <div
+    class="zone-shell"
+    data-zone={zone}
+    style={`
+      --zone-accent: ${a.accent};
+      --zone-accent-dim: ${a.dim};
+      --zone-glow: ${a.glow};
+    `}
+  >
+    <!-- Scene layer (behind everything) -->
+    <div class="zone-scene">
+      <slot name="scene" />
+    </div>
+
+    <!-- Content layer (above scene) -->
+    <div class="zone-content">
+      <slot />
+    </div>
+  </div>
+</Base>
+
+<style>
+  /* Zone shell fills the page-shell offset */
+  .zone-shell {
+    position: relative;
+    min-height: 100vh;
+  }
+
+  /* Scene sits fixed behind — pointer events off */
+  .zone-scene {
+    position: fixed;
+    inset: 0 0 0 52px;  /* rail offset */
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  @media (max-width: 768px) {
+    .zone-scene { inset: 52px 0 0 0; }  /* topbar offset */
+  }
+
+  /*
+    Content layer — sits above scene.
+    Semi-transparent bg gradient so scene shows through
+    subtly at top, becomes more opaque as content builds.
+  */
+  .zone-content {
+    position: relative;
+    z-index: 10;
+    background: linear-gradient(
+      to bottom,
+      transparent                        0%,
+      rgba(var(--bg-primary-rgb), 0.55) 15%,
+      rgba(var(--bg-primary-rgb), 0.82) 35%,
+      var(--bg-primary)                 60%
+    );
+    min-height: 100vh;
+    padding-bottom: 8rem;
+  }
+
+  /*
+    bg-primary as RGB for rgba() blending.
+    Woodblock dark: 42,26,10
+    Red Lacquer: 245,237,224
+  */
+  :root,
+  [data-theme="dark"]  { --bg-primary-rgb: 42,26,10;    }
+  [data-theme="light"] { --bg-primary-rgb: 245,237,224; }
+
+  /*
+    Zone accent application —
+    active rail link, card borders, headings reference --zone-accent
+  */
+  .zone-shell .rail-link--active,
+  .zone-shell .rail-link--active .rail-link__kanji,
+  .zone-shell .rail-link--active .rail-link__label {
+    color: var(--zone-accent) !important;
+    border-left-color: var(--zone-accent) !important;
+  }
+
+  .zone-shell .card-accent { border-left-color: var(--zone-accent); }
+
+  .zone-shell .eyebrow { color: var(--zone-accent); opacity: 0.7; }
+</style>
