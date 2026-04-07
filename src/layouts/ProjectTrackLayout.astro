@@ -1,0 +1,533 @@
+---
+/*
+  ProjectTrackLayout.astro
+  Zone: project-track — cinnabar accent, SceneDojo behind
+  
+  Layout:
+    Left: slide-away TOC (~260px) — module list + work links
+    Right: main content area — work detail
+    
+  TOC behaviour:
+    - Visible by default on load
+    - Slides off-screen left on scroll >200px OR explicit toggle
+    - Persistent handle tab remains to restore it
+    - Pure CSS transform + JS scroll listener
+    
+  Slots / props:
+    title, composer, year, module, recording, youtubeQuery
+    listenFor[], teaches[]
+    Body content via <slot/>
+*/
+
+import ZoneLayout from './ZoneLayout.astro'
+import SceneDojo from '../components/scenes/SceneDojo.astro'
+
+interface Props {
+  title:        string
+  composer:     string
+  year:         string
+  module:       1 | 2 | 3 | 4
+  recording?:   string
+  youtubeQuery: string
+  listenFor:    string[]
+  teaches:      string[]
+  prevWork?:    { slug: string; title: string }
+  nextWork?:    { slug: string; title: string }
+}
+
+const { title, composer, year, module, recording, youtubeQuery, listenFor, teaches, prevWork, nextWork } = Astro.props
+
+const moduleLabels: Record<number, { label: string; question: string }> = {
+  1: { label: 'The Architecture of Narrative Music',
+       question: 'How does music tell a story with characters, without words?' },
+  2: { label: 'Rhythm as Primary Reality',
+       question: 'What happens when rhythm is not the servant of melody but its equal?' },
+  3: { label: 'Sound as Architecture and Cosmos',
+       question: 'What becomes possible when texture is the primary musical subject?' },
+  4: { label: 'The Indian Classical System',
+       question: 'What does a complete alternative theory of musical time look like?' },
+}
+
+const mod = moduleLabels[module]
+---
+
+<ZoneLayout zone="project-track" title={`${title} — spicyninja.org`}>
+  <SceneDojo slot="scene" />
+
+  <div class="pt-shell">
+
+    <!-- TOC sidebar -->
+    <aside class="pt-toc" id="pt-toc" aria-label="Course contents">
+      <div class="pt-toc__inner">
+
+        <p class="pt-toc__eyebrow">Project Track</p>
+        <p class="pt-toc__module-label">Module {module}</p>
+        <h2 class="pt-toc__module-title">{mod.label}</h2>
+        <p class="pt-toc__question">{mod.question}</p>
+
+        <hr class="pt-toc__rule"/>
+
+        <nav>
+          <p class="pt-toc__nav-label">Works in this module</p>
+          <!-- Placeholder links — will be dynamic once all works are added -->
+          <a href="/project-track/w01-peter-and-the-wolf"
+             class={`pt-toc__link ${Astro.url.pathname.includes('peter') ? 'pt-toc__link--active' : ''}`}>
+            <span class="pt-toc__link-num">W01</span>
+            Peter and the Wolf
+          </a>
+          <a href="/project-track/w02-human-condition"
+             class="pt-toc__link">
+            <span class="pt-toc__link-num">W02</span>
+            The Human Condition
+          </a>
+        </nav>
+
+        <hr class="pt-toc__rule"/>
+
+        <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(youtubeQuery)}`}
+           target="_blank" rel="noopener"
+           class="pt-toc__listen-btn">
+          ▶ Find on YouTube
+        </a>
+      </div>
+    </aside>
+
+    <!-- TOC toggle handle -->
+    <button class="pt-toc__handle" id="pt-toc-handle" aria-label="Toggle contents panel">
+      <span class="pt-toc__handle-icon">◁</span>
+    </button>
+
+    <!-- Main content -->
+    <main class="pt-main" id="pt-main">
+      <div class="pt-main__inner">
+
+        <!-- Work header -->
+        <header class="pt-header">
+          <p class="pt-header__eyebrow">Module {module} — Work {Astro.url.pathname.match(/w(\d+)/)?.[1] ?? ''}</p>
+          <h1 class="pt-header__title">{title}</h1>
+          <p class="pt-header__meta">{composer} · {year}</p>
+          {recording && <p class="pt-header__recording">Rec: {recording}</p>}
+        </header>
+
+        <!-- Body content from MDX -->
+        <div class="pt-prose">
+          <slot />
+        </div>
+
+        <!-- Listen for -->
+        <section class="pt-section">
+          <h2 class="pt-section__heading">What to listen for</h2>
+          <ol class="pt-list">
+            {listenFor.map(item => (
+              <li class="pt-list__item">{item}</li>
+            ))}
+          </ol>
+        </section>
+
+        <!-- Teaches -->
+        <section class="pt-section">
+          <h2 class="pt-section__heading">What this teaches</h2>
+          <ul class="pt-teaches">
+            {teaches.map(item => (
+              <li class="pt-teaches__item">
+                <span class="pt-teaches__dot">✦</span>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <!-- Listening layers -->
+        <section class="pt-layers">
+          <h2 class="pt-section__heading">How to listen</h2>
+          <div class="pt-layers__grid">
+            {[
+              { num: 'I',   name: 'Naked',      desc: 'Pure reception. No analysis. Body and sound only. This listen is sacred.' },
+              { num: 'II',  name: 'Inhabited',  desc: 'Active attention to the flagged elements above. You are inside the music now.' },
+              { num: 'III', name: 'Anatomical', desc: 'Structural dissection. How does this work? What is it made of?' },
+              { num: 'IV',  name: 'Notebook',   desc: 'Physical notebook only. Images, feelings, raw material. Not theory — sensation.' },
+            ].map(({ num, name, desc }) => (
+              <div class="pt-layer">
+                <span class="pt-layer__num">{num}</span>
+                <span class="pt-layer__name">{name}</span>
+                <p class="pt-layer__desc">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <!-- Prev / Next navigation -->
+        <nav class="pt-nav" aria-label="Work navigation">
+          {prevWork && (
+            <a href={`/project-track/${prevWork.slug}`} class="pt-nav__link pt-nav__link--prev">
+              ← {prevWork.title}
+            </a>
+          )}
+          {nextWork && (
+            <a href={`/project-track/${nextWork.slug}`} class="pt-nav__link pt-nav__link--next">
+              {nextWork.title} →
+            </a>
+          )}
+        </nav>
+
+      </div>
+    </main>
+  </div>
+</ZoneLayout>
+
+<style>
+  /* ── SHELL: TOC + MAIN side by side ── */
+  .pt-shell {
+    display: flex;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* ── TOC ── */
+  .pt-toc {
+    position: fixed;
+    top: 0; left: 52px; bottom: 0;
+    width: 260px;
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border);
+    z-index: 50;
+    transform: translateX(0);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .pt-toc.is-hidden {
+    transform: translateX(-260px);
+  }
+  .pt-toc__inner {
+    padding: 5rem 1.5rem 3rem;
+  }
+  .pt-toc__eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--zone-accent, var(--cinnabar));
+    opacity: 0.8;
+    margin-bottom: 0.8rem;
+  }
+  .pt-toc__module-label {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-ghost);
+    margin-bottom: 0.4rem;
+  }
+  .pt-toc__module-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    line-height: 1.3;
+    margin-bottom: 0.6rem;
+  }
+  .pt-toc__question {
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: 0.78rem;
+    color: var(--text-ghost);
+    line-height: 1.6;
+    margin-bottom: 0;
+  }
+  .pt-toc__rule {
+    border: none;
+    height: 1px;
+    background: var(--border);
+    margin: 1.2rem 0;
+  }
+  .pt-toc__nav-label {
+    font-family: var(--font-mono);
+    font-size: 0.52rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-ghost);
+    margin-bottom: 0.6rem;
+  }
+  .pt-toc__link {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0.5rem 0;
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    padding-left: 0.6rem;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .pt-toc__link:hover { color: var(--text-primary); border-left-color: var(--cinnabar-warm); }
+  .pt-toc__link--active { color: var(--zone-accent, var(--cinnabar)); border-left-color: var(--zone-accent, var(--cinnabar)); }
+  .pt-toc__link-num {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.15em;
+    color: var(--text-ghost);
+    flex-shrink: 0;
+  }
+  .pt-toc__listen-btn {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--zone-accent, var(--cinnabar));
+    text-decoration: none;
+    padding: 0.7rem 0;
+    transition: opacity 0.2s;
+  }
+  .pt-toc__listen-btn:hover { opacity: 0.7; }
+
+  /* ── TOC HANDLE ── */
+  .pt-toc__handle {
+    position: fixed;
+    top: 50%;
+    left: calc(52px + 260px);
+    transform: translateY(-50%) translateX(0);
+    z-index: 51;
+    width: 16px;
+    height: 48px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-left: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s;
+    padding: 0;
+  }
+  .pt-toc__handle:hover { background: var(--bg-tertiary); }
+  .pt-toc__handle.toc-hidden { left: 52px; }
+  .pt-toc__handle-icon {
+    font-size: 0.55rem;
+    color: var(--text-ghost);
+    transition: transform 0.35s;
+  }
+  .pt-toc__handle.toc-hidden .pt-toc__handle-icon { transform: rotate(180deg); }
+
+  /* ── MAIN ── */
+  .pt-main {
+    margin-left: 260px;
+    flex: 1;
+    transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 100vh;
+  }
+  .pt-main.toc-hidden { margin-left: 0; }
+  .pt-main__inner {
+    max-width: 760px;
+    padding: 5rem 3rem 8rem;
+  }
+
+  /* ── HEADER ── */
+  .pt-header { margin-bottom: 2.5rem; }
+  .pt-header__eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--zone-accent, var(--cinnabar));
+    margin-bottom: 0.8rem;
+    display: block;
+  }
+  .pt-header__title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.2rem, 4vw, 3.5rem);
+    color: var(--text-primary);
+    line-height: 1.05;
+    margin-bottom: 0.5rem;
+  }
+  .pt-header__meta {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    color: var(--text-ghost);
+    text-transform: uppercase;
+  }
+  .pt-header__recording {
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: 0.82rem;
+    color: var(--text-ghost);
+    margin-top: 0.3rem;
+  }
+
+  /* ── PROSE ── */
+  .pt-prose {
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: var(--text-secondary);
+    margin-bottom: 2.5rem;
+    border-left: 3px solid var(--zone-accent, var(--cinnabar));
+    padding-left: 1.5rem;
+  }
+  .pt-prose p { margin-bottom: 1.1rem; }
+  .pt-prose em { color: var(--text-primary); font-style: italic; }
+  .pt-prose strong { color: var(--text-primary); font-weight: 600; }
+
+  /* ── SECTIONS ── */
+  .pt-section { margin-bottom: 2.5rem; }
+  .pt-section__heading {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Listen for list */
+  .pt-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.8rem; }
+  .pt-list__item {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    padding-left: 1.2rem;
+    position: relative;
+  }
+  .pt-list__item::before {
+    content: '◦';
+    position: absolute;
+    left: 0;
+    color: var(--zone-accent, var(--cinnabar));
+    font-size: 0.7rem;
+    top: 0.35rem;
+  }
+
+  /* Teaches */
+  .pt-teaches { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+  .pt-teaches__item {
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+  }
+  .pt-teaches__dot {
+    color: var(--cinnabar-warm);
+    font-size: 0.6rem;
+    flex-shrink: 0;
+  }
+
+  /* ── LISTENING LAYERS ── */
+  .pt-layers { margin-bottom: 3rem; }
+  .pt-layers__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--border);
+    margin-top: 1rem;
+  }
+  .pt-layer {
+    background: var(--bg-card);
+    padding: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    transition: background 0.2s;
+  }
+  .pt-layer:hover { background: var(--bg-raised); }
+  .pt-layer__num {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 2rem;
+    color: var(--zone-accent, var(--cinnabar));
+    line-height: 1;
+    opacity: 0.6;
+  }
+  .pt-layer__name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+  }
+  .pt-layer__desc {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    color: var(--text-ghost);
+    line-height: 1.6;
+    margin-top: 0.2rem;
+  }
+
+  /* ── WORK NAVIGATION ── */
+  .pt-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
+  .pt-nav__link {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-ghost);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .pt-nav__link:hover { color: var(--zone-accent, var(--cinnabar)); }
+  .pt-nav__link--next { margin-left: auto; }
+
+  /* ── MOBILE ── */
+  @media (max-width: 768px) {
+    .pt-toc { display: none; }
+    .pt-toc__handle { display: none; }
+    .pt-main { margin-left: 0; }
+    .pt-main__inner { padding: 3rem 1.5rem 5rem; }
+    .pt-layers__grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  const toc    = document.getElementById('pt-toc')
+  const handle = document.getElementById('pt-toc-handle')
+  const main   = document.getElementById('pt-main')
+  const SCROLL_THRESHOLD = 200
+  let tocVisible = true
+  let scrollHidden = false
+
+  function showToc() {
+    tocVisible = true
+    scrollHidden = false
+    toc?.classList.remove('is-hidden')
+    handle?.classList.remove('toc-hidden')
+    main?.classList.remove('toc-hidden')
+    const icon = handle?.querySelector('.pt-toc__handle-icon') as HTMLElement | null
+    if (icon) icon.textContent = '◁'
+  }
+
+  function hideToc() {
+    tocVisible = false
+    toc?.classList.add('is-hidden')
+    handle?.classList.add('toc-hidden')
+    main?.classList.add('toc-hidden')
+    const icon = handle?.querySelector('.pt-toc__handle-icon') as HTMLElement | null
+    if (icon) icon.textContent = '▷'
+  }
+
+  handle?.addEventListener('click', () => {
+    if (tocVisible) { hideToc(); scrollHidden = false }
+    else showToc()
+  })
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > SCROLL_THRESHOLD && tocVisible && !scrollHidden) {
+      hideToc()
+      scrollHidden = true
+    }
+  }, { passive: true })
+</script>
