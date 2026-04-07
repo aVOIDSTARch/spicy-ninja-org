@@ -1,0 +1,116 @@
+---
+// SceneMountain.astro — Project / Jus Pulsus zone
+// Mountaintop: stars, clouds below, lone pagoda, ninja meditating elevated above clouds
+// Transcendent, mythological. Violet-tinged dark accent.
+import ParallaxScene from './ParallaxScene.astro'
+---
+<ParallaxScene zone="project">
+  <svg slot="far" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax meet"
+       style="position:absolute;bottom:0;left:0;width:100%;height:100%">
+    <!-- Stars — scattered -->
+    <g fill="var(--sil-window)" opacity="0.35">
+      <circle cx="80"  cy="50"  r="1.5"/>
+      <circle cx="180" cy="30"  r="1"/>
+      <circle cx="260" cy="80"  r="1.5"/>
+      <circle cx="350" cy="20"  r="1"/>
+      <circle cx="420" cy="65"  r="1.5"/>
+      <circle cx="510" cy="35"  r="1"/>
+      <circle cx="600" cy="15"  r="2"/>
+      <circle cx="680" cy="55"  r="1.5"/>
+      <circle cx="780" cy="25"  r="1"/>
+      <circle cx="850" cy="70"  r="1.5"/>
+      <circle cx="950" cy="40"  r="1"/>
+      <circle cx="1050" cy="20" r="1.5"/>
+      <circle cx="1140" cy="60" r="1"/>
+      <circle cx="130" cy="130" r="1"/>
+      <circle cx="290" cy="150" r="1.5"/>
+      <circle cx="460" cy="120" r="1"/>
+      <circle cx="640" cy="105" r="1.5"/>
+      <circle cx="820" cy="140" r="1"/>
+      <circle cx="980" cy="110" r="1.5"/>
+      <circle cx="1100" cy="145" r="1"/>
+    </g>
+    <!-- Faint full moon -->
+    <circle cx="950" cy="120" r="55" fill="var(--sil-far)"/>
+    <circle cx="950" cy="120" r="46" fill="var(--sil-window)" opacity="0.15"/>
+    <!-- Far mountain peaks barely visible -->
+    <ellipse cx="250"  cy="800" rx="500" ry="300" fill="var(--sil-far)"/>
+    <ellipse cx="950"  cy="800" rx="480" ry="280" fill="var(--sil-far)"/>
+  </svg>
+
+  <svg slot="mid" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax meet"
+       style="position:absolute;bottom:0;left:0;width:100%;height:100%">
+    <!-- Cloud sea below the peak — fluffy tops -->
+    <g fill="var(--sil-mid)" opacity="0.7">
+      <ellipse cx="100"  cy="650" rx="180" ry="60"/>
+      <ellipse cx="0"    cy="680" rx="160" ry="55"/>
+      <ellipse cx="280"  cy="620" rx="200" ry="65"/>
+      <ellipse cx="420"  cy="660" rx="170" ry="55"/>
+      <ellipse cx="600"  cy="640" rx="190" ry="60"/>
+      <ellipse cx="760"  cy="655" rx="180" ry="58"/>
+      <ellipse cx="940"  cy="630" rx="200" ry="62"/>
+      <ellipse cx="1100" cy="650" rx="185" ry="56"/>
+      <ellipse cx="1200" cy="680" rx="160" ry="52"/>
+    </g>
+    <!-- Cloud fill below -->
+    <rect x="0" y="660" width="1200" height="140" fill="var(--sil-mid)" opacity="0.5"/>
+
+    <!-- Lone pagoda at peak center -->
+    <g fill="var(--sil-mid)">
+      <rect x="546" y="380" width="108" height="280"/>
+      <!-- Five tiers -->
+      <polygon points="500,380 700,380 600,325"/>
+      <polygon points="510,328 690,328 600,280"/>
+      <polygon points="520,283 680,283 600,240"/>
+      <polygon points="530,243 670,243 600,206"/>
+      <polygon points="540,209 660,209 600,178"/>
+      <!-- Spire -->
+      <rect x="596" y="138" width="8" height="44"/>
+      <!-- Windows -->
+      <rect x="564" y="400" width="22" height="28" rx="2" fill="var(--sil-window)" opacity="0.4"/>
+      <rect x="614" y="400" width="22" height="28" rx="2" fill="var(--sil-window)" opacity="0.4"/>
+      <rect x="564" y="460" width="22" height="28" rx="2" fill="var(--sil-window)" opacity="0.35"/>
+      <rect x="614" y="460" width="22" height="28" rx="2" fill="var(--sil-window)" opacity="0.35"/>
+    </g>
+  </svg>
+
+  <svg slot="near" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax meet"
+       style="position:absolute;bottom:0;left:0;width:100%;height:100%">
+    <!-- Mountain peak platform / rocky summit -->
+    <ellipse cx="600" cy="800" rx="700" ry="200" fill="var(--sil-near)" opacity="0.9"/>
+    <ellipse cx="600" cy="720" rx="400" ry="100" fill="var(--sil-near)" opacity="0.8"/>
+    <!-- Rock details on peak -->
+    <g fill="var(--sil-near)">
+      <ellipse cx="200" cy="730" rx="60" ry="25"/>
+      <ellipse cx="160" cy="725" rx="40" ry="20"/>
+      <ellipse cx="950" cy="728" rx="55" ry="22"/>
+      <ellipse cx="1000" cy="722" rx="38" ry="18"/>
+      <!-- Fissures in rock -->
+      <line x1="400" y1="720" x2="420" y2="760" stroke="var(--sil-far)" stroke-width="2" opacity="0.3"/>
+      <line x1="700" y1="715" x2="685" y2="755" stroke="var(--sil-far)" stroke-width="2" opacity="0.3"/>
+    </g>
+  </svg>
+
+  <svg slot="fg" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax meet"
+       style="position:absolute;bottom:0;left:0;width:100%;height:100%">
+    <!-- Ninja meditating — elevated, facing outward over clouds -->
+    <g fill="var(--sil-fg)" transform="translate(260, 560)">
+      <!-- Seated on a rock outcrop -->
+      <ellipse cx="0" cy="88" rx="48" ry="18" fill="var(--sil-near)" opacity="0.8"/>
+      <!-- Body perfectly upright — meditative posture -->
+      <circle cx="0" cy="0" r="22"/>
+      <!-- Mask barely visible — facing away slightly -->
+      <rect x="-8" y="-2" width="18" height="7" rx="3"
+            fill="var(--zone-accent, var(--cinnabar))" opacity="0.6"/>
+      <ellipse cx="2" cy="40" rx="20" ry="30"/>
+      <!-- Arms resting in lap — perfectly still -->
+      <ellipse cx="-18" cy="55" rx="14" ry="7" transform="rotate(-8,-18,55)"/>
+      <ellipse cx="18"  cy="55" rx="14" ry="7" transform="rotate(8,18,55)"/>
+      <!-- Cross-legged -->
+      <ellipse cx="-24" cy="74" rx="24" ry="12" transform="rotate(5,-24,74)"/>
+      <ellipse cx="24"  cy="74" rx="24" ry="12" transform="rotate(-5,24,74)"/>
+      <!-- Wide cloak pooling perfectly still — no wind at this height, only stillness -->
+      <path d="M -24 20 Q -35 55 -32 88 Q 0 82 32 88 Q 35 55 24 20 Z" opacity="0.55"/>
+    </g>
+  </svg>
+</ParallaxScene>
