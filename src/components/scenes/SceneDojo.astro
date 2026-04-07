@@ -1,0 +1,238 @@
+---
+/*
+  SceneDojo.astro — Project Track zone scene
+  Dojo interior: tatami floor, weapons rack, training dummy,
+  shoji screens glowing behind, ninja in focused training stance.
+
+  Slot assignments:
+    far   — shoji screens / back wall with light bleeding through
+    mid   — weapons rack, target posts, hanging scrolls
+    near  — tatami floor lines, support pillars
+    fg    — ninja figure in training stance
+*/
+import ParallaxScene from './ParallaxScene.astro'
+---
+
+<ParallaxScene zone="project-track">
+
+  <!-- FAR: shoji screen wall with warm glow bleeding through -->
+  <svg slot="far" viewBox="0 0 1200 800"
+       preserveAspectRatio="xMidYMax meet"
+       style="position:absolute;bottom:0;left:0;width:100%;height:100%">
+
+    <!-- Back wall -->
+    <rect x="0" y="300" width="1200" height="500" fill="var(--sil-far)"/>
+
+    <!-- Shoji screen panels — 6 across -->
+    <!-- Panel glow first (behind frames) -->
+    <rect x="50"  y="310" width="160" height="280" fill="var(--sil-window)" opacity="0.18"/>
+    <rect x="230" y="310" width="160" height="280" fill="var(--sil-window)" opacity="0.22"/>
+    <rect x="410" y="310" width="160" height="280" fill="var(--sil-window)" opacity="0.15"/>
+    <rect x="620" y="310" width="160" height="280" fill="var(--sil-window)" opacity="0.20"/>
+    <rect x="800" y="310" width="160" height="280" fill="var(--sil-window)" opacity="0.25"/>
+    <rect x="980" y="310" width="160" height="280" fill="var(--sil-window)" opacity="0.18"/>
+
+    <!-- Shoji frames -->
+    <g fill="none" stroke="var(--sil-far)" stroke-width="3" opacity="0.8">
+      <!-- Panel borders -->
+      <rect x="50"  y="310" width="160" height="280"/>
+      <rect x="230" y="310" width="160" height="280"/>
+      <rect x="410" y="310" width="160" height="280"/>
+      <rect x="620" y="310" width="160" height="280"/>
+      <rect x="800" y="310" width="160" height="280"/>
+      <rect x="980" y="310" width="160" height="280"/>
+      <!-- Grid lines on panels -->
+      <line x1="50"  y1="450" x2="210"  y2="450"/>
+      <line x1="130" y1="310" x2="130"  y2="590"/>
+      <line x1="230" y1="450" x2="390"  y2="450"/>
+      <line x1="310" y1="310" x2="310"  y2="590"/>
+      <line x1="410" y1="450" x2="570"  y2="450"/>
+      <line x1="490" y1="310" x2="490"  y2="590"/>
+      <line x1="620" y1="450" x2="780"  y2="450"/>
+      <line x1="700" y1="310" x2="700"  y2="590"/>
+      <line x1="800" y1="450" x2="960"  y2="450"/>
+      <line x1="880" y1="310" x2="880"  y2="590"/>
+      <line x1="980" y1="450" x2="1140" y2="450"/>
+      <line x1="1060" y1="310" x2="1060" y2="590"/>
+    </g>
+
+    <!-- Floor beam at base of screens -->
+    <rect x="0" y="588" width="1200" height="12" fill="var(--sil-far)"/>
+
+    <!-- Ceiling beam -->
+    <rect x="0" y="295" width="1200" height="18" fill="var(--sil-far)"/>
+
+    <!-- Hanging scrolls between panels -->
+    <rect x="195" y="320" width="20" height="200" rx="2" fill="var(--sil-far)" opacity="0.7"/>
+    <rect x="198" y="318" width="14" height="8" fill="var(--sil-far)" opacity="0.9"/>
+    <rect x="575" y="320" width="20" height="200" rx="2" fill="var(--sil-far)" opacity="0.7"/>
+    <rect x="578" y="318" width="14" height="8" fill="var(--sil-far)" opacity="0.9"/>
+    <rect x="965" y="320" width="20" height="200" rx="2" fill="var(--sil-far)" opacity="0.7"/>
+    <rect x="968" y="318" width="14" height="8" fill="var(--sil-far)" opacity="0.9"/>
+  </svg>
+
+</ParallaxScene>
+
+  <!-- MID: weapons rack, target post, hanging lantern -->
+  <svg slot="mid" viewBox="0 0 1200 800"
+       preserveAspectRatio="xMidYMax meet"
+       style="position:absolute;bottom:0;left:0;width:100%;height:100%">
+
+    <!-- Left weapons rack -->
+    <g fill="var(--sil-mid)">
+      <!-- Rack frame -->
+      <rect x="60" y="430" width="14" height="220"/>
+      <rect x="160" y="430" width="14" height="220"/>
+      <rect x="55" y="445" width="125" height="10" rx="2"/>
+      <rect x="55" y="530" width="125" height="10" rx="2"/>
+      <rect x="55" y="615" width="125" height="10" rx="2"/>
+      <!-- Swords leaning on rack -->
+      <rect x="78"  y="420" width="6" height="200" rx="2" transform="rotate(-8,78,420)"/>
+      <rect x="95"  y="418" width="6" height="198" rx="2" transform="rotate(-3,95,418)"/>
+      <rect x="112" y="420" width="6" height="200" rx="2" transform="rotate(4,112,420)"/>
+      <rect x="130" y="422" width="6" height="196" rx="2" transform="rotate(9,130,422)"/>
+      <!-- Bo staffs leaning -->
+      <rect x="148" y="415" width="5" height="240" rx="2" transform="rotate(3,148,415)"/>
+    </g>
+
+    <!-- Center target post -->
+    <g fill="var(--sil-mid)">
+      <rect x="580" y="420" width="20" height="250"/>
+      <rect x="565" y="640" width="50" height="30" rx="2"/>
+      <!-- Target rings on post -->
+      <circle cx="590" cy="470" r="28" fill="none" stroke="var(--sil-mid)" stroke-width="3"/>
+      <circle cx="590" cy="470" r="18" fill="none" stroke="var(--sil-mid)" stroke-width="3"/>
+      <circle cx="590" cy="470" r="8"  fill="var(--sil-mid)"/>
+      <!-- Strike marks on post -->
+      <line x1="575" y1="520" x2="605" y2="540" stroke="var(--sil-mid)" stroke-width="3"/>
+      <line x1="578" y1="545" x2="602" y2="530" stroke="var(--sil-mid)" stroke-width="3"/>
+    </g>
+
+    <!-- Right training dummy (makiwara post) -->
+    <g fill="var(--sil-mid)">
+      <rect x="1050" y="410" width="24" height="260"/>
+      <rect x="1035" y="660" width="54" height="25" rx="2"/>
+      <!-- Wrapped section -->
+      <rect x="1048" y="418" width="28" height="80" rx="4"/>
+      <line x1="1050" y1="428" x2="1076" y2="428" stroke="var(--bg-secondary)" stroke-width="2"/>
+      <line x1="1050" y1="438" x2="1076" y2="438" stroke="var(--bg-secondary)" stroke-width="2"/>
+      <line x1="1050" y1="448" x2="1076" y2="448" stroke="var(--bg-secondary)" stroke-width="2"/>
+      <line x1="1050" y1="458" x2="1076" y2="458" stroke="var(--bg-secondary)" stroke-width="2"/>
+      <line x1="1050" y1="468" x2="1076" y2="468" stroke="var(--bg-secondary)" stroke-width="2"/>
+      <line x1="1050" y1="478" x2="1076" y2="478" stroke="var(--bg-secondary)" stroke-width="2"/>
+      <line x1="1050" y1="488" x2="1076" y2="488" stroke="var(--bg-secondary)" stroke-width="2"/>
+    </g>
+
+    <!-- Hanging lanterns (ceiling) -->
+    <g fill="var(--sil-mid)">
+      <!-- Cord -->
+      <line x1="300" y1="0" x2="300" y2="380" stroke="var(--sil-mid)" stroke-width="2"/>
+      <!-- Lantern body -->
+      <ellipse cx="300" cy="398" rx="18" ry="25" fill="var(--sil-window)" opacity="0.5"/>
+      <rect x="290" y="373" width="20" height="6" rx="2" fill="var(--sil-mid)"/>
+      <rect x="290" y="417" width="20" height="6" rx="2" fill="var(--sil-mid)"/>
+      <!-- Ribs -->
+      <line x1="284" y1="385" x2="316" y2="385" stroke="var(--sil-mid)" stroke-width="1" opacity="0.5"/>
+      <line x1="282" y1="398" x2="318" y2="398" stroke="var(--sil-mid)" stroke-width="1" opacity="0.5"/>
+      <line x1="284" y1="410" x2="316" y2="410" stroke="var(--sil-mid)" stroke-width="1" opacity="0.5"/>
+      <!-- Tassel -->
+      <line x1="297" y1="423" x2="297" y2="435" stroke="var(--sil-mid)" stroke-width="1" opacity="0.6"/>
+      <line x1="300" y1="423" x2="300" y2="438" stroke="var(--sil-mid)" stroke-width="1" opacity="0.6"/>
+      <line x1="303" y1="423" x2="303" y2="435" stroke="var(--sil-mid)" stroke-width="1" opacity="0.6"/>
+
+      <!-- Second lantern -->
+      <line x1="900" y1="0" x2="900" y2="360" stroke="var(--sil-mid)" stroke-width="2"/>
+      <ellipse cx="900" cy="378" rx="18" ry="25" fill="var(--sil-window)" opacity="0.45"/>
+      <rect x="890" y="353" width="20" height="6" rx="2" fill="var(--sil-mid)"/>
+      <rect x="890" y="397" width="20" height="6" rx="2" fill="var(--sil-mid)"/>
+      <line x1="884" y1="365" x2="916" y2="365" stroke="var(--sil-mid)" stroke-width="1" opacity="0.5"/>
+      <line x1="882" y1="378" x2="918" y2="378" stroke="var(--sil-mid)" stroke-width="1" opacity="0.5"/>
+      <line x1="884" y1="390" x2="916" y2="390" stroke="var(--sil-mid)" stroke-width="1" opacity="0.5"/>
+    </g>
+  </svg>
+
+  <!-- NEAR: tatami floor lines, pillars, floor level -->
+  <svg slot="near" viewBox="0 0 1200 800"
+       preserveAspectRatio="xMidYMax meet"
+       style="position:absolute;bottom:0;left:0;width:100%;height:100%">
+
+    <!-- Floor surface -->
+    <rect x="0" y="660" width="1200" height="140" fill="var(--sil-near)" opacity="0.6"/>
+
+    <!-- Tatami mat lines — horizontal seams -->
+    <g stroke="var(--sil-far)" stroke-width="1.5" opacity="0.35" fill="none">
+      <!-- Horizontal seams -->
+      <line x1="0" y1="668" x2="1200" y2="668"/>
+      <line x1="0" y1="700" x2="1200" y2="700"/>
+      <line x1="0" y1="732" x2="1200" y2="732"/>
+      <!-- Vertical seams (alternating offset per row) -->
+      <line x1="180" y1="660" x2="180" y2="700"/>
+      <line x1="360" y1="660" x2="360" y2="700"/>
+      <line x1="540" y1="660" x2="540" y2="700"/>
+      <line x1="720" y1="660" x2="720" y2="700"/>
+      <line x1="900" y1="660" x2="900" y2="700"/>
+      <line x1="1080" y1="660" x2="1080" y2="700"/>
+      <!-- Offset second row -->
+      <line x1="90"  y1="700" x2="90"  y2="732"/>
+      <line x1="270" y1="700" x2="270" y2="732"/>
+      <line x1="450" y1="700" x2="450" y2="732"/>
+      <line x1="630" y1="700" x2="630" y2="732"/>
+      <line x1="810" y1="700" x2="810" y2="732"/>
+      <line x1="990" y1="700" x2="990" y2="732"/>
+    </g>
+
+    <!-- Support pillars (foreground) -->
+    <rect x="0"    y="400" width="40"  height="400" fill="var(--sil-near)" opacity="0.9"/>
+    <rect x="1160" y="400" width="40"  height="400" fill="var(--sil-near)" opacity="0.9"/>
+    <!-- Pillar base ornaments -->
+    <rect x="0"    y="640" width="44"  height="24" rx="2" fill="var(--sil-near)"/>
+    <rect x="1156" y="640" width="44"  height="24" rx="2" fill="var(--sil-near)"/>
+  </svg>
+
+  <!-- FG: ninja in training stance (focused, bokken raised) -->
+  <svg slot="fg" viewBox="0 0 1200 800"
+       preserveAspectRatio="xMidYMax meet"
+       style="position:absolute;bottom:0;left:0;width:100%;height:100%">
+
+    <g fill="var(--sil-fg)" transform="translate(820, 420)">
+      <!-- Head -->
+      <circle cx="0" cy="0" r="28"/>
+      <!-- Mask eye slit -->
+      <rect x="-16" y="-5" width="32" height="8" rx="3" fill="var(--zone-accent, var(--cinnabar))"/>
+
+      <!-- Torso — forward lean -->
+      <ellipse cx="0" cy="55" rx="26" ry="36" transform="rotate(-8)"/>
+
+      <!-- Right arm raised overhead — gripping bokken -->
+      <ellipse cx="28" cy="20" rx="10" ry="30" transform="rotate(-55,28,20)"/>
+      <ellipse cx="48" cy="-10" rx="8" ry="28" transform="rotate(-65,48,-10)"/>
+
+      <!-- Left arm extended forward -->
+      <ellipse cx="-25" cy="35" rx="9" ry="28" transform="rotate(30,-25,35)"/>
+      <ellipse cx="-46" cy="55" rx="7" ry="22" transform="rotate(25,-46,55)"/>
+
+      <!-- Bokken (wooden training sword) — diagonal overhead -->
+      <rect x="30" y="-65" width="8" height="90" rx="3"
+            transform="rotate(-55,30,-65)"
+            fill="var(--sil-mid)"/>
+      <!-- Tsuba (guard) -->
+      <ellipse cx="58" cy="-28" rx="12" ry="5"
+               transform="rotate(-55,58,-28)"
+               fill="var(--sil-mid)"/>
+
+      <!-- Left leg — wide stance -->
+      <ellipse cx="-22" cy="108" rx="14" ry="40" transform="rotate(12,-22,108)"/>
+      <ellipse cx="-28" cy="155" rx="12" ry="30" transform="rotate(8,-28,155)"/>
+
+      <!-- Right leg — planted, bent -->
+      <ellipse cx="22" cy="105" rx="14" ry="38" transform="rotate(-15,22,105)"/>
+      <ellipse cx="18" cy="150" rx="12" ry="28" transform="rotate(-10,18,150)"/>
+
+      <!-- Hakama / skirt lines -->
+      <line x1="-20" y1="80" x2="-25" y2="120" stroke="var(--bg-secondary)" stroke-width="2" opacity="0.4"/>
+      <line x1="0"   y1="85" x2="-2"  y2="128" stroke="var(--bg-secondary)" stroke-width="2" opacity="0.4"/>
+      <line x1="18"  y1="80" x2="20"  y2="118" stroke="var(--bg-secondary)" stroke-width="2" opacity="0.4"/>
+    </g>
+  </svg>
+
+</ParallaxScene>
