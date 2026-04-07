@@ -1,0 +1,374 @@
+
+<style>
+/* ── SHELL ── */
+.bc-shell { max-width: 800px; padding: 10vh 3.5rem 8rem; }
+
+.bc-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 0.95;
+  margin-bottom: 0;
+}
+
+/* ── SECTIONS ── */
+.bc-section {
+  margin-top: 3rem;
+  padding-top: 3rem;
+  border-top: 1px solid var(--border);
+}
+.bc-section:first-of-type { border-top: none; padding-top: 0; margin-top: 2rem; }
+.bc-section-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.4rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+.bc-section-desc {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-bottom: 1.2rem;
+  font-style: italic;
+}
+
+/* ── FORMAT PICKER ── */
+.bc-formats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+}
+.bc-format-btn {
+  background: var(--bg-card);
+  border: none;
+  padding: 1rem 1.2rem;
+  cursor: pointer;
+  text-align: left;
+  border-left: 3px solid transparent;
+  transition: background 0.15s, border-color 0.15s;
+}
+.bc-format-btn:hover { background: var(--bg-raised); }
+.bc-format-btn.active {
+  background: var(--bg-raised);
+  border-left-color: var(--fmt-accent);
+}
+.bc-format-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+.bc-format-btn.active .bc-format-label { color: var(--fmt-accent); }
+.bc-format-desc {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--text-ghost);
+  line-height: 1.4;
+}
+
+/* ── META ── */
+.bc-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
+.bc-field { display: flex; flex-direction: column; gap: 0.3rem; }
+.bc-field--full { grid-column: 1 / -1; }
+.bc-label {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-ghost);
+}
+.bc-input {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 0.5rem 0.8rem;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.2s;
+}
+.bc-input:focus { border-color: var(--border-hi); }
+.bc-input[type="date"] { color-scheme: dark; }
+
+/* ── BODY ── */
+.bc-body-field { display: flex; flex-direction: column; gap: 0.3rem; }
+.bc-textarea {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  line-height: 1.8;
+  padding: 0.9rem 1rem;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.bc-textarea:focus { border-color: var(--border-hi); }
+.bc-textarea--short { min-height: 60px; font-size: 0.82rem; }
+
+.bc-extra-fields { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1rem; }
+.bc-extra { display: flex; flex-direction: column; gap: 0.3rem; }
+
+/* ── ACTIONS ── */
+.bc-actions-section { padding-bottom: 0; }
+.bc-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.7rem; }
+.bc-btn {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.48rem 1.1rem;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+.bc-btn--save:hover   { border-color: var(--gossamer); color: var(--gossamer); }
+.bc-btn--export:hover { border-color: #2a6b9e; color: #2a6b9e; }
+.bc-btn--clear:hover  { border-color: var(--cinnabar); color: var(--cinnabar); }
+.bc-hint {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--text-ghost);
+  line-height: 1.6;
+}
+.bc-hint code { color: var(--text-muted); background: var(--bg-raised); padding: 0.1em 0.3em; }
+
+/* ── DRAFTS ── */
+.bc-drafts-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.bc-draft-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.65rem 1rem; background: var(--bg-card); border: 1px solid var(--border);
+}
+.bc-draft-info { font-family: var(--font-mono); font-size: 0.62rem; color: var(--text-muted); }
+.bc-draft-info strong { color: var(--text-secondary); display: block; }
+.bc-draft-actions { display: flex; gap: 0.3rem; }
+.bc-draft-btn {
+  font-family: var(--font-mono); font-size: 0.5rem; letter-spacing: 0.1em;
+  text-transform: uppercase; padding: 0.28rem 0.55rem; border: 1px solid var(--border);
+  background: none; color: var(--text-ghost); cursor: pointer; transition: border-color 0.15s, color 0.15s;
+}
+.bc-draft-btn:hover { border-color: var(--gossamer); color: var(--gossamer); }
+.bc-draft-btn--del:hover { border-color: var(--cinnabar); color: var(--cinnabar); }
+
+@media (max-width: 600px) {
+  .bc-shell { padding: 6vh 1.2rem 5rem; }
+  .bc-formats { grid-template-columns: 1fr 1fr; }
+  .bc-meta-grid { grid-template-columns: 1fr; }
+  .bc-field--full { grid-column: 1; }
+}
+</style>
+
+<script>
+const STORAGE_PREFIX = 'sn-blog:';
+let currentFormat = null;
+
+// Format content hints
+const formatHints = {
+  'reflection':   'Long-form, considered. Let it breathe. A pull quote optional.',
+  'session-log':  'Chronological. Timestamps welcome. Process over polish.',
+  'breakthrough': 'State the breakthrough directly, then unpack it. No hedging.',
+  'question':     'The question IS the post. The body can be sparse or absent.',
+  'reference':    'Citation-style. Source, link, and why it matters.',
+  'sketch':       'Loose and informal. Fragments allowed. Can be a few lines.',
+};
+
+// ── Format picker ─────────────────────────────────────────────
+document.getElementById('bc-formats')?.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-format]');
+  if (!btn) return;
+  selectFormat(btn.dataset.format);
+});
+
+function selectFormat(fmt) {
+  currentFormat = fmt;
+  document.querySelectorAll('.bc-format-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.format === fmt);
+  });
+  const hint = document.getElementById('bc-content-hint');
+  if (hint) hint.textContent = formatHints[fmt] || '';
+
+  document.querySelectorAll('.bc-extra').forEach(el => {
+    el.style.display = el.dataset.for === fmt ? 'flex' : 'none';
+  });
+}
+
+// ── Field refs ────────────────────────────────────────────────
+const fields = {
+  title:      document.getElementById('bc-title'),
+  desc:       document.getElementById('bc-desc'),
+  date:       document.getElementById('bc-date'),
+  derived:    document.getElementById('bc-derived'),
+  body:       document.getElementById('bc-body'),
+  pullQuote:  document.getElementById('bc-pull-quote'),
+  statement:  document.getElementById('bc-statement'),
+  question:   document.getElementById('bc-question'),
+  refSource:  document.getElementById('bc-ref-source'),
+  refUrl:     document.getElementById('bc-ref-url'),
+};
+
+if (fields.date && !fields.date.value) {
+  fields.date.value = new Date().toISOString().slice(0,10);
+}
+
+// ── Read state ────────────────────────────────────────────────
+function readState() {
+  return {
+    format:    currentFormat,
+    title:     fields.title.value,
+    desc:      fields.desc.value,
+    date:      fields.date.value,
+    derived:   fields.derived.value,
+    body:      fields.body.value,
+    pullQuote: fields.pullQuote?.value,
+    statement: fields.statement?.value,
+    question:  fields.question?.value,
+    refSource: fields.refSource?.value,
+    refUrl:    fields.refUrl?.value,
+    savedAt:   new Date().toISOString(),
+  };
+}
+function loadState(s) {
+  if (s.format) selectFormat(s.format);
+  Object.keys(fields).forEach(k => {
+    if (fields[k] && s[k] !== undefined) fields[k].value = s[k];
+  });
+}
+
+// ── Autosave ──────────────────────────────────────────────────
+let saveTimer;
+Object.values(fields).forEach(el => el?.addEventListener('input', () => {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveDraft, 900);
+}));
+
+function getDraftId() {
+  if (fields.title.value.trim() && fields.date.value) {
+    return `${fields.date.value}-${fields.title.value.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,40)}`;
+  }
+  return `draft-${Date.now()}`;
+}
+let currentDraftId = `draft-${Date.now()}`;
+
+function saveDraft() {
+  currentDraftId = getDraftId();
+  localStorage.setItem(STORAGE_PREFIX + currentDraftId, JSON.stringify(readState()));
+  renderDraftsList();
+}
+
+document.getElementById('bc-save')?.addEventListener('click', () => {
+  saveDraft();
+  const btn = document.getElementById('bc-save');
+  btn.textContent = 'Saved ✓';
+  setTimeout(() => { btn.textContent = 'Save draft'; }, 1500);
+});
+
+// ── Slugify ───────────────────────────────────────────────────
+function slugify(s) {
+  return s.toLowerCase().trim().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-').slice(0,60);
+}
+
+// ── Export .mdx ───────────────────────────────────────────────
+document.getElementById('bc-export')?.addEventListener('click', () => {
+  const s = readState();
+  if (!s.title) { alert('Add a title before exporting.'); return; }
+  if (!s.format) { alert('Select a format before exporting.'); return; }
+
+  const slug   = `${s.date}-${slugify(s.title)}`;
+  const extras = [];
+  if (s.pullQuote) extras.push(`pullQuote: "${s.pullQuote.replace(/"/g,'\\"')}"`);
+  if (s.statement) extras.push(`statement: "${s.statement.replace(/"/g,'\\"')}"`);
+  if (s.question)  extras.push(`question: "${s.question.replace(/"/g,'\\"')}"`);
+  if (s.refSource) extras.push(`refSource: "${s.refSource.replace(/"/g,'\\"')}"`);
+  if (s.refUrl)    extras.push(`refUrl: "${s.refUrl.replace(/"/g,'\\"')}"`);
+
+  const frontmatter = [
+    '---',
+    `title: "${s.title.replace(/"/g,'\\"')}"`,
+    `date: ${s.date}`,
+    `description: "${s.desc.replace(/"/g,'\\"')}"`,
+    `format: "${s.format}"`,
+    s.derived ? `derivedFromJournal: "${s.derived}"` : 'derivedFromJournal: null',
+    ...extras,
+    'commentsEnabled: false',
+    'commentsPublic: false',
+    'draft: true',
+    '---',
+    '',
+  ].join('\n');
+
+  const blob = new Blob([frontmatter + (s.body || '')], { type: 'text/markdown' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `${slug}.mdx`; a.click();
+  URL.revokeObjectURL(url);
+});
+
+// ── Clear ─────────────────────────────────────────────────────
+document.getElementById('bc-clear')?.addEventListener('click', () => {
+  if (!confirm('Clear this post? Save or export first.')) return;
+  Object.values(fields).forEach(el => { if (el) el.value = ''; });
+  fields.date.value = new Date().toISOString().slice(0,10);
+  currentFormat = null;
+  document.querySelectorAll('.bc-format-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.bc-extra').forEach(el => el.style.display = 'none');
+});
+
+// ── Drafts list ───────────────────────────────────────────────
+function renderDraftsList() {
+  const listEl = document.getElementById('bc-drafts-list');
+  if (!listEl) return;
+  const drafts = Object.keys(localStorage)
+    .filter(k => k.startsWith(STORAGE_PREFIX))
+    .map(k => ({ id: k.replace(STORAGE_PREFIX,''), ...JSON.parse(localStorage.getItem(k)) }))
+    .sort((a,b) => (b.savedAt||'').localeCompare(a.savedAt||''));
+
+  if (drafts.length === 0) {
+    listEl.innerHTML = '<p style="font-family:var(--font-mono);font-size:0.6rem;color:var(--text-ghost)">No saved drafts.</p>';
+    return;
+  }
+  listEl.innerHTML = drafts.map(d => `
+    <div class="bc-draft-item">
+      <div class="bc-draft-info">
+        <strong>${d.title || '(untitled)'}</strong>
+        ${d.date || ''} · ${d.format || ''}
+      </div>
+      <div class="bc-draft-actions">
+        <button class="bc-draft-btn" data-load="${d.id}">Load</button>
+        <button class="bc-draft-btn bc-draft-btn--del" data-del="${d.id}">Delete</button>
+      </div>
+    </div>
+  `).join('');
+
+  listEl.querySelectorAll('[data-load]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      loadState(JSON.parse(localStorage.getItem(STORAGE_PREFIX + btn.dataset.load) || '{}'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+  listEl.querySelectorAll('[data-del]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (!confirm('Delete this draft?')) return;
+      localStorage.removeItem(STORAGE_PREFIX + btn.dataset.del);
+      renderDraftsList();
+    });
+  });
+}
+renderDraftsList();
+</script>
