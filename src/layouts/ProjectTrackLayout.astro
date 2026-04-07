@@ -48,16 +48,18 @@ const allWorks = (await getCollection('project-track'))
 
 // Module color accents
 const moduleAccents: Record<number, string> = {
-  1: 'var(--cinnabar)',        // narrative — cinnabar
-  2: 'var(--cinnabar-warm)',   // rhythm — saffron/orange
-  3: '#2a6b9e',                // texture — steel blue
-  4: '#c8922a',                // indian classical — amber gold
+  1: 'var(--cinnabar)',
+  2: 'var(--cinnabar-warm)',
+  3: '#2a6b9e',
+  4: '#c8922a',
+  5: '#6b3fa0',
 }
 const moduleNames: Record<number, string> = {
   1: 'The Architecture of Narrative Music',
   2: 'Rhythm as Primary Reality',
   3: 'Sound as Architecture and Cosmos',
   4: 'The Indian Classical System',
+  5: 'The Mathematics of Emergence',
 }
 
 const accent = moduleAccents[work.data.module] ?? 'var(--cinnabar)'
@@ -77,7 +79,7 @@ const moduleName = moduleNames[work.data.module] ?? ''
       </div>
 
       <nav class="pt-toc__list">
-        {[1,2,3,4].map(mod => (
+        {[1,2,3,4,5].map(mod => (
           <div class="pt-toc__module">
             <span class="pt-toc__module-label">Module {mod}</span>
             {allWorks

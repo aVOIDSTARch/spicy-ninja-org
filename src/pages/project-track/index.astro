@@ -7,10 +7,11 @@ const works = (await getCollection('project-track', ({ data }) => !data.draft))
   .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
 
 const modules = [
-  { num: 1, title: 'The Architecture of Narrative Music',    question: 'How does music tell a story with characters, without words?',                                          accent: 'var(--cinnabar)' },
-  { num: 2, title: 'Rhythm as Primary Reality',              question: 'What happens when rhythm is not the servant of melody but its equal?',                                  accent: 'var(--cinnabar-warm)' },
-  { num: 3, title: 'Sound as Architecture and Cosmos',       question: 'What becomes possible when texture and timbre are the primary musical subject?',                        accent: '#2a6b9e' },
-  { num: 4, title: 'The Indian Classical System',            question: 'What does a complete alternative theory of musical time and emotion look like?',                         accent: '#c8922a' },
+  { num: 1, title: 'The Architecture of Narrative Music',    question: 'How does music tell a story with characters, without words?',                                         accent: 'var(--cinnabar)' },
+  { num: 2, title: 'Rhythm as Primary Reality',              question: 'What happens when rhythm is not the servant of melody but its equal?',                                 accent: 'var(--cinnabar-warm)' },
+  { num: 3, title: 'Sound as Architecture and Cosmos',       question: 'What becomes possible when texture and timbre are the primary musical subject?',                       accent: '#2a6b9e' },
+  { num: 4, title: 'The Indian Classical System',            question: 'What does a complete alternative theory of musical time and emotion look like?',                        accent: '#c8922a' },
+  { num: 5, title: 'The Mathematics of Emergence',           question: 'How do independent, simple elements combine to produce something greater than their arithmetic sum?',   accent: '#6b3fa0' },
 ]
 ---
 
@@ -22,28 +23,29 @@ const modules = [
     <h1 class="hero-heading" style="margin-bottom: 1rem;">Project Track</h1>
     <p style="font-family:var(--font-body); font-size:1.05rem; color:var(--text-secondary);
               max-width:580px; line-height:1.85; margin-bottom:3.5rem;">
-      Eight works across four modules. Not music history — each work was chosen because it teaches something
-      irreplaceable and load-bearing for making <em>Jus Pulsus</em>. Sequence matters.
+      Twenty works across five modules. Not music history — each work was chosen because it teaches
+      something irreplaceable and load-bearing for making <em>Jus Pulsus</em>. Sequence matters.
     </p>
 
-    {modules.map(mod => (
-      <section style="margin-bottom: 3.5rem;">
-        <div style="display:flex; align-items:baseline; gap:1rem; margin-bottom:0.5rem;">
-          <span style={`font-family:var(--font-mono); font-size:0.52rem; letter-spacing:0.28em; text-transform:uppercase; color:${mod.accent};`}>
-            Module {mod.num}
-          </span>
-        </div>
-        <h2 style={`font-family:var(--font-display); font-weight:400; font-size:1.6rem; color:var(--text-primary); margin-bottom:0.4rem; border-left:3px solid ${mod.accent}; padding-left:1rem;`}>
-          {mod.title}
-        </h2>
-        <p style="font-family:var(--font-mono); font-size:0.65rem; color:var(--text-ghost); margin-bottom:1.2rem; padding-left:1.3rem; font-style:italic; letter-spacing:0.05em;">
-          {mod.question}
-        </p>
+    {modules.map(mod => {
+      const modWorks = works.filter(w => w.data.module === mod.num)
+      if (modWorks.length === 0) return null
+      return (
+        <section style="margin-bottom: 3.5rem;">
+          <div style="display:flex; align-items:baseline; gap:1rem; margin-bottom:0.5rem;">
+            <span style={`font-family:var(--font-mono); font-size:0.52rem; letter-spacing:0.28em; text-transform:uppercase; color:${mod.accent};`}>
+              Module {mod.num}
+            </span>
+          </div>
+          <h2 style={`font-family:var(--font-display); font-weight:400; font-size:1.6rem; color:var(--text-primary); margin-bottom:0.4rem; border-left:3px solid ${mod.accent}; padding-left:1rem;`}>
+            {mod.title}
+          </h2>
+          <p style="font-family:var(--font-mono); font-size:0.65rem; color:var(--text-ghost); margin-bottom:1.2rem; padding-left:1.3rem; font-style:italic; letter-spacing:0.05em;">
+            {mod.question}
+          </p>
 
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--border);">
-          {works
-            .filter(w => w.data.module === mod.num)
-            .map(w => (
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--border);">
+            {modWorks.map(w => (
               <a
                 href={`/project-track/${w.id}`}
                 style={`display:block; background:var(--bg-card); padding:1.5rem; text-decoration:none; border-left:3px solid ${mod.accent}; transition:background 0.2s ease;`}
@@ -60,10 +62,10 @@ const modules = [
                   {w.data.composer} · {w.data.year}
                 </span>
               </a>
-            ))
-          }
-        </div>
-      </section>
-    ))}
+            ))}
+          </div>
+        </section>
+      )
+    })}
   </div>
 </ZoneLayout>
