@@ -1,182 +1,241 @@
 ---
 /*
   ProjectTrackLayout.astro
-  Zone: project-track — cinnabar accent, SceneDojo behind
-  
-  Layout:
-    Left: slide-away TOC (~260px) — module list + work links
-    Right: main content area — work detail
-    
-  TOC behaviour:
-    - Visible by default on load
-    - Slides off-screen left on scroll >200px OR explicit toggle
-    - Persistent handle tab remains to restore it
-    - Pure CSS transform + JS scroll listener
-    
-  Slots / props:
-    title, composer, year, module, recording, youtubeQuery
-    listenFor[], teaches[]
-    Body content via <slot/>
+  Renders a single project-track work page.
+
+  Features:
+  - Slide-away TOC (all 8 works listed, current highlighted)
+  - Module color accent on current work
+  - YouTube embed via youtubeId frontmatter
+  - Spotify/Apple Music links
+  - 4-layer visual structure: Pre-listening / Listen For / What It Teaches / Deep Read
+  - Course notes panel slot (right slide-out, built later)
+  - Zone: project-track / SceneDojo behind content
 */
 
 import ZoneLayout from './ZoneLayout.astro'
 import SceneDojo from '../components/scenes/SceneDojo.astro'
+import { getCollection } from 'astro:content'
 
 interface Props {
-  title:        string
-  composer:     string
-  year:         string
-  module:       1 | 2 | 3 | 4
-  recording?:   string
-  youtubeQuery: string
-  listenFor:    string[]
-  teaches:      string[]
-  prevWork?:    { slug: string; title: string }
-  nextWork?:    { slug: string; title: string }
+  work: {
+    id: string
+    data: {
+      title: string
+      composer: string
+      year: string
+      module: 1|2|3|4
+      order: number
+      recording?: string
+      youtubeQuery: string
+      youtubeId?: string
+      youtubeId2?: string
+      spotifyUrl?: string
+      appleMusicUrl?: string
+      listenFor: string[]
+      teaches: string[]
+      draft: boolean
+    }
+  }
 }
 
-const { title, composer, year, module, recording, youtubeQuery, listenFor, teaches, prevWork, nextWork } = Astro.props
+const { work } = Astro.props
 
-const moduleLabels: Record<number, { label: string; question: string }> = {
-  1: { label: 'The Architecture of Narrative Music',
-       question: 'How does music tell a story with characters, without words?' },
-  2: { label: 'Rhythm as Primary Reality',
-       question: 'What happens when rhythm is not the servant of melody but its equal?' },
-  3: { label: 'Sound as Architecture and Cosmos',
-       question: 'What becomes possible when texture is the primary musical subject?' },
-  4: { label: 'The Indian Classical System',
-       question: 'What does a complete alternative theory of musical time look like?' },
+// Get all works for TOC, sorted by order
+const allWorks = (await getCollection('project-track'))
+  .filter(w => !w.data.draft)
+  .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0))
+
+// Module color accents
+const moduleAccents: Record<number, string> = {
+  1: 'var(--cinnabar)',        // narrative — cinnabar
+  2: 'var(--cinnabar-warm)',   // rhythm — saffron/orange
+  3: '#2a6b9e',                // texture — steel blue
+  4: '#c8922a',                // indian classical — amber gold
+}
+const moduleNames: Record<number, string> = {
+  1: 'The Architecture of Narrative Music',
+  2: 'Rhythm as Primary Reality',
+  3: 'Sound as Architecture and Cosmos',
+  4: 'The Indian Classical System',
 }
 
-const mod = moduleLabels[module]
+const accent = moduleAccents[work.data.module] ?? 'var(--cinnabar)'
+const moduleName = moduleNames[work.data.module] ?? ''
 ---
 
-<ZoneLayout zone="project-track" title={`${title} — spicyninja.org`}>
+<ZoneLayout zone="project-track" title={`${work.data.title} — ${work.data.composer} — spicyninja.org`}>
   <SceneDojo slot="scene" />
 
-  <div class="pt-shell">
+  <div class="pt-shell" style={`--work-accent: ${accent};`}>
 
-    <!-- TOC sidebar -->
-    <aside class="pt-toc" id="pt-toc" aria-label="Course contents">
-      <div class="pt-toc__inner">
-
-        <p class="pt-toc__eyebrow">Project Track</p>
-        <p class="pt-toc__module-label">Module {module}</p>
-        <h2 class="pt-toc__module-title">{mod.label}</h2>
-        <p class="pt-toc__question">{mod.question}</p>
-
-        <hr class="pt-toc__rule"/>
-
-        <nav>
-          <p class="pt-toc__nav-label">Works in this module</p>
-          <!-- Placeholder links — will be dynamic once all works are added -->
-          <a href="/project-track/w01-peter-and-the-wolf"
-             class={`pt-toc__link ${Astro.url.pathname.includes('peter') ? 'pt-toc__link--active' : ''}`}>
-            <span class="pt-toc__link-num">W01</span>
-            Peter and the Wolf
-          </a>
-          <a href="/project-track/w02-human-condition"
-             class="pt-toc__link">
-            <span class="pt-toc__link-num">W02</span>
-            The Human Condition
-          </a>
-        </nav>
-
-        <hr class="pt-toc__rule"/>
-
-        <a href={`https://www.youtube.com/results?search_query=${encodeURIComponent(youtubeQuery)}`}
-           target="_blank" rel="noopener"
-           class="pt-toc__listen-btn">
-          ▶ Find on YouTube
-        </a>
+    <!-- SLIDE-AWAY TOC -->
+    <aside class="pt-toc" id="pt-toc" aria-label="Works list">
+      <div class="pt-toc__header">
+        <span class="pt-toc__eyebrow">Project Track</span>
+        <a href="/project-track" class="pt-toc__back">← All works</a>
       </div>
+
+      <nav class="pt-toc__list">
+        {[1,2,3,4].map(mod => (
+          <div class="pt-toc__module">
+            <span class="pt-toc__module-label">Module {mod}</span>
+            {allWorks
+              .filter(w => w.data.module === mod)
+              .map(w => {
+                const active = w.id === work.id
+                return (
+                  <a
+                    href={`/project-track/${w.id}`}
+                    class={`pt-toc__item ${active ? 'pt-toc__item--active' : ''}`}
+                    aria-current={active ? 'page' : undefined}
+                  >
+                    <span class="pt-toc__num">{String(w.data.order ?? '').padStart(2,'0')}</span>
+                    <span class="pt-toc__name">{w.data.title}</span>
+                  </a>
+                )
+              })
+            }
+          </div>
+        ))}
+      </nav>
+
+      <!-- TOC toggle handle -->
+      <button class="pt-toc__handle" id="pt-toc-handle" aria-label="Toggle table of contents">
+        <span>☰</span>
+      </button>
     </aside>
 
-    <!-- TOC toggle handle -->
-    <button class="pt-toc__handle" id="pt-toc-handle" aria-label="Toggle contents panel">
-      <span class="pt-toc__handle-icon">◁</span>
-    </button>
-
-    <!-- Main content -->
+    <!-- MAIN CONTENT -->
     <main class="pt-main" id="pt-main">
-      <div class="pt-main__inner">
 
-        <!-- Work header -->
-        <header class="pt-header">
-          <p class="pt-header__eyebrow">Module {module} — Work {Astro.url.pathname.match(/w(\d+)/)?.[1] ?? ''}</p>
-          <h1 class="pt-header__title">{title}</h1>
-          <p class="pt-header__meta">{composer} · {year}</p>
-          {recording && <p class="pt-header__recording">Rec: {recording}</p>}
-        </header>
+      <!-- Work header -->
+      <header class="pt-header">
+        <p class="pt-header__module">
+          <span class="pt-header__mod-num">Module {work.data.module}</span>
+          <span class="pt-header__mod-name">{moduleName}</span>
+        </p>
+        <h1 class="pt-header__title">{work.data.title}</h1>
+        <p class="pt-header__byline">
+          <span class="pt-header__composer">{work.data.composer}</span>
+          <span class="pt-header__year">{work.data.year}</span>
+          {work.data.recording && (
+            <span class="pt-header__rec">{work.data.recording}</span>
+          )}
+        </p>
+      </header>
 
-        <!-- Body content from MDX -->
+      <!-- LAYER 1: LISTEN NOW — YouTube embed + streaming links -->
+      <section class="pt-section pt-section--listen">
+        <div class="pt-section__label">
+          <span class="pt-section__num">01</span>
+          <span class="pt-section__name">Listen Now</span>
+        </div>
+
+        {work.data.youtubeId ? (
+          <div class="pt-embed">
+            <iframe
+              src={`https://www.youtube.com/embed/${work.data.youtubeId}`}
+              title={`${work.data.title} — ${work.data.composer}`}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+              loading="lazy"
+            ></iframe>
+          </div>
+        ) : (
+          <div class="pt-embed-search">
+            <p class="pt-embed-search__label">Search YouTube for:</p>
+            <a
+              href={`https://www.youtube.com/results?search_query=${encodeURIComponent(work.data.youtubeQuery)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="pt-embed-search__query"
+            >
+              {work.data.youtubeQuery} ↗
+            </a>
+          </div>
+        )}
+
+        <div class="pt-links">
+          {work.data.youtubeId && (
+            <a
+              href={`https://www.youtube.com/watch?v=${work.data.youtubeId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="pt-link pt-link--yt"
+            >
+              YouTube ↗
+            </a>
+          )}
+          {work.data.spotifyUrl && (
+            <a
+              href={work.data.spotifyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="pt-link pt-link--spotify"
+            >
+              Spotify ↗
+            </a>
+          )}
+          {work.data.appleMusicUrl && (
+            <a
+              href={work.data.appleMusicUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="pt-link pt-link--apple"
+            >
+              Apple Music ↗
+            </a>
+          )}
+        </div>
+      </section>
+
+      <!-- LAYER 2: LISTEN FOR -->
+      <section class="pt-section pt-section--listenfor">
+        <div class="pt-section__label">
+          <span class="pt-section__num">02</span>
+          <span class="pt-section__name">Listen For</span>
+        </div>
+        <ul class="pt-checklist">
+          {work.data.listenFor.map((item, i) => (
+            <li class="pt-checklist__item">
+              <span class="pt-checklist__num">{String(i+1).padStart(2,'0')}</span>
+              <span class="pt-checklist__text">{item}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <!-- LAYER 3: PRE-LISTENING CONTEXT (MDX body) -->
+      <section class="pt-section pt-section--context">
+        <div class="pt-section__label">
+          <span class="pt-section__num">03</span>
+          <span class="pt-section__name">Pre-Listening Context</span>
+        </div>
         <div class="pt-prose">
           <slot />
         </div>
+      </section>
 
-        <!-- Listen for -->
-        <section class="pt-section">
-          <h2 class="pt-section__heading">What to listen for</h2>
-          <ol class="pt-list">
-            {listenFor.map(item => (
-              <li class="pt-list__item">{item}</li>
-            ))}
-          </ol>
-        </section>
+      <!-- LAYER 4: WHAT THIS TEACHES -->
+      <section class="pt-section pt-section--teaches">
+        <div class="pt-section__label">
+          <span class="pt-section__num">04</span>
+          <span class="pt-section__name">What This Teaches</span>
+        </div>
+        <ul class="pt-teaches">
+          {work.data.teaches.map(item => (
+            <li class="pt-teaches__item">{item}</li>
+          ))}
+        </ul>
+      </section>
 
-        <!-- Teaches -->
-        <section class="pt-section">
-          <h2 class="pt-section__heading">What this teaches</h2>
-          <ul class="pt-teaches">
-            {teaches.map(item => (
-              <li class="pt-teaches__item">
-                <span class="pt-teaches__dot">✦</span>
-                {item}
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <!-- Listening layers -->
-        <section class="pt-layers">
-          <h2 class="pt-section__heading">How to listen</h2>
-          <div class="pt-layers__grid">
-            {[
-              { num: 'I',   name: 'Naked',      desc: 'Pure reception. No analysis. Body and sound only. This listen is sacred.' },
-              { num: 'II',  name: 'Inhabited',  desc: 'Active attention to the flagged elements above. You are inside the music now.' },
-              { num: 'III', name: 'Anatomical', desc: 'Structural dissection. How does this work? What is it made of?' },
-              { num: 'IV',  name: 'Notebook',   desc: 'Physical notebook only. Images, feelings, raw material. Not theory — sensation.' },
-            ].map(({ num, name, desc }) => (
-              <div class="pt-layer">
-                <span class="pt-layer__num">{num}</span>
-                <span class="pt-layer__name">{name}</span>
-                <p class="pt-layer__desc">{desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <!-- Prev / Next navigation -->
-        <nav class="pt-nav" aria-label="Work navigation">
-          {prevWork && (
-            <a href={`/project-track/${prevWork.slug}`} class="pt-nav__link pt-nav__link--prev">
-              ← {prevWork.title}
-            </a>
-          )}
-          {nextWork && (
-            <a href={`/project-track/${nextWork.slug}`} class="pt-nav__link pt-nav__link--next">
-              {nextWork.title} →
-            </a>
-          )}
-        </nav>
-
-      </div>
     </main>
   </div>
 </ZoneLayout>
 
 <style>
-  /* ── SHELL: TOC + MAIN side by side ── */
+  /* ── SHELL ── */
   .pt-shell {
     display: flex;
     min-height: 100vh;
@@ -185,349 +244,361 @@ const mod = moduleLabels[module]
 
   /* ── TOC ── */
   .pt-toc {
-    position: fixed;
-    top: 0; left: 52px; bottom: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
     width: 260px;
+    flex-shrink: 0;
     background: var(--bg-secondary);
     border-right: 1px solid var(--border);
-    z-index: 50;
-    transform: translateX(0);
-    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
+    scrollbar-width: none;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+    z-index: 20;
   }
-  .pt-toc.is-hidden {
-    transform: translateX(-260px);
-  }
-  .pt-toc__inner {
-    padding: 5rem 1.5rem 3rem;
+  .pt-toc::-webkit-scrollbar { display: none; }
+
+  .pt-toc--collapsed { transform: translateX(-244px); }
+
+  .pt-toc__header {
+    padding: 1.5rem 1.2rem 1rem;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
   }
   .pt-toc__eyebrow {
+    display: block;
     font-family: var(--font-mono);
-    font-size: 0.55rem;
+    font-size: 0.52rem;
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: var(--zone-accent, var(--cinnabar));
-    opacity: 0.8;
-    margin-bottom: 0.8rem;
+    color: var(--work-accent);
+    margin-bottom: 0.4rem;
+  }
+  .pt-toc__back {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: var(--text-ghost);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    transition: color 0.2s ease;
+  }
+  .pt-toc__back:hover { color: var(--text-muted); }
+
+  .pt-toc__list { padding: 1rem 0; flex: 1; }
+
+  .pt-toc__module {
+    margin-bottom: 1rem;
+    padding: 0 1.2rem;
   }
   .pt-toc__module-label {
+    display: block;
     font-family: var(--font-mono);
-    font-size: 0.58rem;
-    letter-spacing: 0.2em;
+    font-size: 0.5rem;
+    letter-spacing: 0.25em;
     text-transform: uppercase;
     color: var(--text-ghost);
     margin-bottom: 0.4rem;
+    opacity: 0.5;
   }
-  .pt-toc__module-title {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 0.95rem;
-    color: var(--text-primary);
-    line-height: 1.3;
-    margin-bottom: 0.6rem;
-  }
-  .pt-toc__question {
-    font-family: var(--font-body);
-    font-style: italic;
-    font-size: 0.78rem;
-    color: var(--text-ghost);
-    line-height: 1.6;
-    margin-bottom: 0;
-  }
-  .pt-toc__rule {
-    border: none;
-    height: 1px;
-    background: var(--border);
-    margin: 1.2rem 0;
-  }
-  .pt-toc__nav-label {
-    font-family: var(--font-mono);
-    font-size: 0.52rem;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--text-ghost);
-    margin-bottom: 0.6rem;
-  }
-  .pt-toc__link {
+
+  .pt-toc__item {
     display: flex;
     align-items: baseline;
     gap: 0.6rem;
-    padding: 0.5rem 0;
-    font-family: var(--font-body);
-    font-size: 0.82rem;
-    color: var(--text-muted);
+    padding: 0.45rem 0;
     text-decoration: none;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    line-height: 1.3;
     border-left: 2px solid transparent;
-    padding-left: 0.6rem;
-    transition: color 0.2s, border-color 0.2s;
+    padding-left: 0.5rem;
+    margin-left: -0.7rem;
+    transition: color 0.2s ease, border-color 0.2s ease;
   }
-  .pt-toc__link:hover { color: var(--text-primary); border-left-color: var(--cinnabar-warm); }
-  .pt-toc__link--active { color: var(--zone-accent, var(--cinnabar)); border-left-color: var(--zone-accent, var(--cinnabar)); }
-  .pt-toc__link-num {
+  .pt-toc__item:hover { color: var(--text-primary); border-left-color: var(--border-hi); }
+  .pt-toc__item--active {
+    color: var(--work-accent) !important;
+    border-left-color: var(--work-accent) !important;
+  }
+  .pt-toc__num {
     font-family: var(--font-mono);
-    font-size: 0.55rem;
-    letter-spacing: 0.15em;
+    font-size: 0.5rem;
     color: var(--text-ghost);
     flex-shrink: 0;
+    opacity: 0.5;
   }
-  .pt-toc__listen-btn {
-    display: block;
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--zone-accent, var(--cinnabar));
-    text-decoration: none;
-    padding: 0.7rem 0;
-    transition: opacity 0.2s;
-  }
-  .pt-toc__listen-btn:hover { opacity: 0.7; }
+  .pt-toc__item--active .pt-toc__num { color: var(--work-accent); opacity: 0.7; }
 
-  /* ── TOC HANDLE ── */
+  /* TOC handle — visible tab at edge when collapsed */
   .pt-toc__handle {
-    position: fixed;
+    position: absolute;
     top: 50%;
-    left: calc(52px + 260px);
-    transform: translateY(-50%) translateX(0);
-    z-index: 51;
-    width: 16px;
+    right: -18px;
+    transform: translateY(-50%);
+    width: 18px;
     height: 48px;
     background: var(--bg-secondary);
     border: 1px solid var(--border);
     border-left: none;
-    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s;
-    padding: 0;
-  }
-  .pt-toc__handle:hover { background: var(--bg-tertiary); }
-  .pt-toc__handle.toc-hidden { left: 52px; }
-  .pt-toc__handle-icon {
-    font-size: 0.55rem;
+    cursor: pointer;
+    font-size: 0.6rem;
     color: var(--text-ghost);
-    transition: transform 0.35s;
+    transition: color 0.2s ease;
   }
-  .pt-toc__handle.toc-hidden .pt-toc__handle-icon { transform: rotate(180deg); }
+  .pt-toc__handle:hover { color: var(--text-primary); }
 
   /* ── MAIN ── */
   .pt-main {
-    margin-left: 260px;
     flex: 1;
-    transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    min-height: 100vh;
-  }
-  .pt-main.toc-hidden { margin-left: 0; }
-  .pt-main__inner {
-    max-width: 760px;
-    padding: 5rem 3rem 8rem;
+    min-width: 0;
+    padding: 3rem 3.5rem 6rem;
+    max-width: 800px;
+    transition: padding-left 0.4s cubic-bezier(0.4,0,0.2,1);
   }
 
   /* ── HEADER ── */
-  .pt-header { margin-bottom: 2.5rem; }
-  .pt-header__eyebrow {
+  .pt-header { margin-bottom: 3rem; }
+  .pt-header__module {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+  }
+  .pt-header__mod-num {
     font-family: var(--font-mono);
-    font-size: 0.58rem;
+    font-size: 0.52rem;
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: var(--zone-accent, var(--cinnabar));
-    margin-bottom: 0.8rem;
-    display: block;
+    color: var(--work-accent);
+  }
+  .pt-header__mod-name {
+    font-family: var(--font-mono);
+    font-size: 0.52rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-ghost);
   }
   .pt-header__title {
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: clamp(2.2rem, 4vw, 3.5rem);
-    color: var(--text-primary);
-    line-height: 1.05;
-    margin-bottom: 0.5rem;
-  }
-  .pt-header__meta {
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.15em;
-    color: var(--text-ghost);
-    text-transform: uppercase;
-  }
-  .pt-header__recording {
-    font-family: var(--font-body);
-    font-style: italic;
-    font-size: 0.82rem;
-    color: var(--text-ghost);
-    margin-top: 0.3rem;
-  }
-
-  /* ── PROSE ── */
-  .pt-prose {
-    font-family: var(--font-body);
-    font-size: 1.05rem;
-    line-height: 1.85;
-    color: var(--text-secondary);
-    margin-bottom: 2.5rem;
-    border-left: 3px solid var(--zone-accent, var(--cinnabar));
-    padding-left: 1.5rem;
-  }
-  .pt-prose p { margin-bottom: 1.1rem; }
-  .pt-prose em { color: var(--text-primary); font-style: italic; }
-  .pt-prose strong { color: var(--text-primary); font-weight: 600; }
-
-  /* ── SECTIONS ── */
-  .pt-section { margin-bottom: 2.5rem; }
-  .pt-section__heading {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 1.1rem;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 0.95;
     color: var(--text-primary);
     margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--border);
   }
-
-  /* Listen for list */
-  .pt-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.8rem; }
-  .pt-list__item {
-    font-family: var(--font-body);
-    font-size: 0.95rem;
-    line-height: 1.7;
-    color: var(--text-secondary);
-    padding-left: 1.2rem;
-    position: relative;
-  }
-  .pt-list__item::before {
-    content: '◦';
-    position: absolute;
-    left: 0;
-    color: var(--zone-accent, var(--cinnabar));
-    font-size: 0.7rem;
-    top: 0.35rem;
-  }
-
-  /* Teaches */
-  .pt-teaches { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
-  .pt-teaches__item {
+  .pt-header__byline {
     display: flex;
-    align-items: baseline;
-    gap: 0.7rem;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.06em;
-    color: var(--text-muted);
-  }
-  .pt-teaches__dot {
-    color: var(--cinnabar-warm);
-    font-size: 0.6rem;
-    flex-shrink: 0;
-  }
-
-  /* ── LISTENING LAYERS ── */
-  .pt-layers { margin-bottom: 3rem; }
-  .pt-layers__grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1px;
-    background: var(--border);
-    margin-top: 1rem;
-  }
-  .pt-layer {
-    background: var(--bg-card);
-    padding: 1.2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-    transition: background 0.2s;
-  }
-  .pt-layer:hover { background: var(--bg-raised); }
-  .pt-layer__num {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: 2rem;
-    color: var(--zone-accent, var(--cinnabar));
-    line-height: 1;
-    opacity: 0.6;
-  }
-  .pt-layer__name {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 0.95rem;
-    color: var(--text-primary);
-  }
-  .pt-layer__desc {
-    font-family: var(--font-body);
-    font-size: 0.8rem;
-    color: var(--text-ghost);
-    line-height: 1.6;
-    margin-top: 0.2rem;
-  }
-
-  /* ── WORK NAVIGATION ── */
-  .pt-nav {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border);
-  }
-  .pt-nav__link {
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
     font-family: var(--font-mono);
     font-size: 0.65rem;
-    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    letter-spacing: 0.12em;
+  }
+  .pt-header__composer { color: var(--text-secondary); }
+  .pt-header__rec { color: var(--text-ghost); font-size: 0.6rem; width: 100%; margin-top: 0.2rem; }
+
+  /* ── SECTIONS ── */
+  .pt-section {
+    margin-bottom: 3.5rem;
+    padding-bottom: 3.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .pt-section:last-child { border-bottom: none; }
+
+  .pt-section__label {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+  }
+  .pt-section__num {
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    color: var(--work-accent);
+    opacity: 0.6;
+  }
+  .pt-section__name {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.25em;
     text-transform: uppercase;
     color: var(--text-ghost);
-    text-decoration: none;
-    transition: color 0.2s;
   }
-  .pt-nav__link:hover { color: var(--zone-accent, var(--cinnabar)); }
-  .pt-nav__link--next { margin-left: auto; }
 
-  /* ── MOBILE ── */
-  @media (max-width: 768px) {
+  /* ── YOUTUBE EMBED ── */
+  .pt-embed {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: var(--bg-secondary);
+    margin-bottom: 1rem;
+  }
+  .pt-embed iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+  .pt-embed-search {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--work-accent);
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .pt-embed-search__label {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-ghost);
+    margin-bottom: 0.5rem;
+  }
+  .pt-embed-search__query {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--work-accent);
+    text-decoration: none;
+  }
+  .pt-embed-search__query:hover { text-decoration: underline; }
+
+  /* ── STREAMING LINKS ── */
+  .pt-links {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .pt-link {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+  .pt-link:hover { border-color: var(--work-accent); color: var(--work-accent); }
+  .pt-link--yt:hover { border-color: #ff4444; color: #ff4444; }
+  .pt-link--spotify:hover { border-color: #1db954; color: #1db954; }
+
+  /* ── LISTEN-FOR CHECKLIST ── */
+  .pt-checklist {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .pt-checklist__item {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1rem 1.2rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--work-accent);
+  }
+  .pt-checklist__num {
+    font-family: var(--font-mono);
+    font-size: 0.52rem;
+    color: var(--work-accent);
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+    opacity: 0.6;
+  }
+  .pt-checklist__text {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.65;
+  }
+
+  /* ── PROSE (MDX body) ── */
+  .pt-prose {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.82;
+    color: var(--text-secondary);
+    max-width: 68ch;
+  }
+  .pt-prose h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin: 2.5rem 0 1rem;
+    line-height: 1.1;
+  }
+  .pt-prose h2::before {
+    content: '';
+    display: block;
+    width: 2rem;
+    height: 2px;
+    background: var(--work-accent);
+    margin-bottom: 0.7rem;
+    opacity: 0.5;
+  }
+  .pt-prose p { margin-bottom: 1.2rem; }
+  .pt-prose em { color: var(--text-primary); font-style: italic; }
+  .pt-prose strong { color: var(--text-primary); font-weight: 500; }
+
+  /* ── TEACHES LIST ── */
+  .pt-teaches {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+  }
+  .pt-teaches__item {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    padding: 0.7rem 1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    line-height: 1.5;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
     .pt-toc { display: none; }
-    .pt-toc__handle { display: none; }
-    .pt-main { margin-left: 0; }
-    .pt-main__inner { padding: 3rem 1.5rem 5rem; }
-    .pt-layers__grid { grid-template-columns: 1fr; }
+    .pt-main { padding: 2rem 1.5rem 4rem; }
+    .pt-teaches { grid-template-columns: 1fr; }
   }
 </style>
 
 <script>
-  const toc    = document.getElementById('pt-toc')
+  const toc = document.getElementById('pt-toc')
   const handle = document.getElementById('pt-toc-handle')
-  const main   = document.getElementById('pt-main')
-  const SCROLL_THRESHOLD = 200
-  let tocVisible = true
-  let scrollHidden = false
 
-  function showToc() {
-    tocVisible = true
-    scrollHidden = false
-    toc?.classList.remove('is-hidden')
-    handle?.classList.remove('toc-hidden')
-    main?.classList.remove('toc-hidden')
-    const icon = handle?.querySelector('.pt-toc__handle-icon') as HTMLElement | null
-    if (icon) icon.textContent = '◁'
+  // Auto-collapse on scroll past threshold
+  let collapsed = false
+
+  function collapseTOC() {
+    if (!collapsed) {
+      toc?.classList.add('pt-toc--collapsed')
+      collapsed = true
+    }
   }
-
-  function hideToc() {
-    tocVisible = false
-    toc?.classList.add('is-hidden')
-    handle?.classList.add('toc-hidden')
-    main?.classList.add('toc-hidden')
-    const icon = handle?.querySelector('.pt-toc__handle-icon') as HTMLElement | null
-    if (icon) icon.textContent = '▷'
+  function expandTOC() {
+    toc?.classList.remove('pt-toc--collapsed')
+    collapsed = false
   }
 
   handle?.addEventListener('click', () => {
-    if (tocVisible) { hideToc(); scrollHidden = false }
-    else showToc()
+    collapsed ? expandTOC() : collapseTOC()
   })
 
   window.addEventListener('scroll', () => {
-    if (window.scrollY > SCROLL_THRESHOLD && tocVisible && !scrollHidden) {
-      hideToc()
-      scrollHidden = true
-    }
+    if (window.scrollY > 220 && !collapsed) collapseTOC()
   }, { passive: true })
 </script>
