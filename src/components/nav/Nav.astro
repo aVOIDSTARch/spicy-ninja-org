@@ -1,0 +1,246 @@
+---
+/*
+  Nav.astro
+  Fixed top navigation for spicyninja.org.
+  - Logo left, links right
+  - Active route highlighted in cinnabar
+  - Mobile: hamburger slides down full-width link list
+  - Theme tokens drive all colors — works in both Woodblock and Red Lacquer
+  - No JS framework — vanilla Astro + inline script
+*/
+
+const navLinks = [
+  { href: '/tracks',         label: 'Tracks'        },
+  { href: '/project-track',  label: 'Project Track' },
+  { href: '/montessori',     label: 'Montessori'    },
+  { href: '/fundamentals',   label: 'Fundamentals'  },
+  { href: '/journal',        label: 'Journal'       },
+  { href: '/blog',           label: 'Blog'          },
+  { href: '/project',        label: 'Project'       },
+  { href: '/about',          label: 'About'         },
+]
+
+const currentPath = Astro.url.pathname
+---
+
+<header class="sn-nav" id="sn-nav">
+  <div class="sn-nav__inner">
+
+    <!-- Logo -->
+    <a href="/" class="sn-nav__logo" aria-label="spicyninja.org home">
+      <span class="sn-nav__logo-star">✦</span>
+      spicyninja.org
+    </a>
+
+    <!-- Desktop links -->
+    <nav class="sn-nav__links" aria-label="Main navigation">
+      {navLinks.map(({ href, label }) => {
+        const active = currentPath === href || currentPath.startsWith(href + '/')
+        return (
+          <a
+            href={href}
+            class={`sn-nav__link ${active ? 'sn-nav__link--active' : ''}`}
+            aria-current={active ? 'page' : undefined}
+          >
+            {label}
+          </a>
+        )
+      })}
+    </nav>
+
+    <!-- Mobile hamburger -->
+    <button
+      class="sn-nav__burger"
+      id="sn-nav-burger"
+      aria-label="Toggle navigation"
+      aria-expanded="false"
+      aria-controls="sn-nav-mobile"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+  </div>
+
+  <!-- Mobile menu -->
+  <div class="sn-nav__mobile" id="sn-nav-mobile" aria-hidden="true">
+    {navLinks.map(({ href, label }) => {
+      const active = currentPath === href || currentPath.startsWith(href + '/')
+      return (
+        <a
+          href={href}
+          class={`sn-nav__mobile-link ${active ? 'sn-nav__link--active' : ''}`}
+          aria-current={active ? 'page' : undefined}
+        >
+          {label}
+        </a>
+      )
+    })}
+  </div>
+</header>
+
+<style>
+  /* ---- NAV SHELL ---- */
+  .sn-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: var(--nav-bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    transition: background 0.35s ease, border-color 0.35s ease;
+  }
+
+  .sn-nav__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  /* ---- LOGO ---- */
+  .sn-nav__logo {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--cinnabar);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    transition: opacity 0.2s ease;
+  }
+  .sn-nav__logo:hover { opacity: 0.8; }
+
+  .sn-nav__logo-star {
+    font-size: 0.7rem;
+    color: var(--cinnabar-warm);
+    animation: shurikenSpin 8s linear infinite;
+    display: inline-block;
+  }
+
+  /* ---- DESKTOP LINKS ---- */
+  .sn-nav__links {
+    display: flex;
+    align-items: center;
+    gap: 0.1rem;
+    flex-wrap: nowrap;
+    overflow: hidden;
+  }
+
+  .sn-nav__link {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    font-weight: 300;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 0.4rem 0.7rem;
+    transition: color 0.2s ease;
+    white-space: nowrap;
+  }
+  .sn-nav__link:hover { color: var(--text-primary); }
+  .sn-nav__link--active {
+    color: var(--cinnabar) !important;
+  }
+
+  /* ---- HAMBURGER ---- */
+  .sn-nav__burger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+  }
+
+  .sn-nav__burger span {
+    display: block;
+    height: 1.5px;
+    background: var(--text-primary);
+    transition: transform 0.25s ease, opacity 0.25s ease, background 0.35s ease;
+    transform-origin: center;
+  }
+
+  /* Burger open state */
+  .sn-nav__burger[aria-expanded="true"] span:nth-child(1) {
+    transform: translateY(6.5px) rotate(45deg);
+  }
+  .sn-nav__burger[aria-expanded="true"] span:nth-child(2) {
+    opacity: 0;
+  }
+  .sn-nav__burger[aria-expanded="true"] span:nth-child(3) {
+    transform: translateY(-6.5px) rotate(-45deg);
+  }
+
+  /* ---- MOBILE MENU ---- */
+  .sn-nav__mobile {
+    display: none;
+    flex-direction: column;
+    background: var(--nav-bg);
+    border-top: 1px solid var(--border);
+    padding: 0.5rem 0 1rem;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .sn-nav__mobile[aria-hidden="false"] {
+    max-height: 600px;
+  }
+
+  .sn-nav__mobile-link {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 0.8rem 2rem;
+    transition: color 0.2s ease, background 0.2s ease;
+  }
+  .sn-nav__mobile-link:hover {
+    color: var(--text-primary);
+    background: var(--border);
+  }
+
+  /* ---- RESPONSIVE ---- */
+  @media (max-width: 900px) {
+    .sn-nav__links { display: none; }
+    .sn-nav__burger { display: flex; }
+    .sn-nav__mobile { display: flex; }
+  }
+</style>
+
+<script>
+  const burger = document.getElementById('sn-nav-burger')
+  const mobileMenu = document.getElementById('sn-nav-mobile')
+
+  burger?.addEventListener('click', () => {
+    const expanded = burger.getAttribute('aria-expanded') === 'true'
+    burger.setAttribute('aria-expanded', String(!expanded))
+    mobileMenu?.setAttribute('aria-hidden', String(expanded))
+  })
+
+  // Close mobile menu on link click
+  mobileMenu?.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      burger?.setAttribute('aria-expanded', 'false')
+      mobileMenu.setAttribute('aria-hidden', 'true')
+    })
+  })
+</script>
