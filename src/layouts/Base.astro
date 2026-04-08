@@ -2,6 +2,7 @@
 import '../styles/global.css'
 import Nav from '../components/nav/Nav.astro'
 import ThemeToggle from '../components/ui/ThemeToggle.astro'
+import AuthIsland from '../components/ui/AuthIsland.astro'
 
 interface Props {
   title?: string
@@ -31,26 +32,28 @@ const {
   </head>
   <body>
     <Nav />
-    <!-- Rail offset wrapper: pushes content right of the 52px rail on desktop -->
     <div class="page-shell">
       <slot />
     </div>
     <ThemeToggle />
+    <!-- Auth island: client-only, outputs nothing until Ctrl+Shift+/ -->
+    <AuthIsland />
   </body>
 </html>
 
 <style is:global>
-  /* Desktop: offset content right of the rail */
   .page-shell {
     margin-left: 52px;
     min-height: 100vh;
   }
-
-  /* Mobile: no offset, topbar handles nav */
   @media (max-width: 768px) {
     .page-shell {
       margin-left: 0;
       padding-top: 52px;
     }
+  }
+  /* Admin bar pushes page-shell up when visible */
+  body.sn-authed .page-shell {
+    padding-bottom: 42px;
   }
 </style>

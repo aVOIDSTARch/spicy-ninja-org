@@ -1,0 +1,312 @@
+---
+/**
+ * AuthIsland.astro
+ *
+ * Outputs zero visible markup for logged-out visitors.
+ * Ctrl+Shift+/ (or ⌘+Shift+/ on Mac) fires the modal.
+ *
+ * Set PUBLIC_AUTH_PASSPHRASE_HASH in .env:
+ *   node -e "const c=require('crypto');console.log(c.createHash('sha256').update('YOUR_PASS').digest('hex'))"
+ */
+
+// Bake hash into page at build time — safe to expose (it's a hash, not the secret)
+const HASH = import.meta.env.PUBLIC_AUTH_PASSPHRASE_HASH ?? ''
+---
+
+<!-- No markup — everything injected by script -->
+
+<style>
+/* ── Auth Modal ── */
+#sn-auth-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: rgba(15, 8, 4, 0.88);
+  align-items: center;
+  justify-content: center;
+}
+#sn-auth-modal.open { display: flex; }
+
+.sn-modal-box {
+  background: var(--bg-secondary, #3d2510);
+  border: 1px solid rgba(240,232,208,0.18);
+  border-top: 2px solid var(--cinnabar, #E34234);
+  padding: 2.5rem 2.5rem 2rem;
+  width: min(380px, 90vw);
+  position: relative;
+  animation: sn-appear 0.2s ease;
+}
+
+.sn-modal-eyebrow {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.52rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--cinnabar, #E34234);
+  margin-bottom: 1.2rem;
+}
+
+.sn-modal-input {
+  width: 100%;
+  background: var(--bg-primary, #2a1a0a);
+  border: 1px solid rgba(240,232,208,0.10);
+  color: var(--text-primary, #F0E8D0);
+  font-family: var(--font-mono, monospace);
+  font-size: 1rem;
+  padding: 0.75rem 1rem;
+  outline: none;
+  letter-spacing: 0.3em;
+  transition: border-color 0.2s;
+  caret-color: var(--cinnabar, #E34234);
+}
+.sn-modal-input:focus { border-color: rgba(227,66,52,0.5); }
+.sn-modal-input.sn-shake { animation: sn-shake 0.35s ease; }
+
+.sn-modal-sub {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.6rem;
+}
+.sn-modal-hint {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.5rem;
+  letter-spacing: 0.15em;
+  color: var(--text-ghost, #6a4828);
+}
+.sn-modal-err {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.58rem;
+  color: #d4204a;
+  min-height: 1em;
+}
+.sn-modal-close {
+  position: absolute; top: 0.8rem; right: 1rem;
+  background: none; border: none;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  color: var(--text-ghost, #6a4828);
+  cursor: pointer; text-transform: uppercase;
+}
+.sn-modal-close:hover { color: var(--text-primary, #F0E8D0); }
+
+/* ── Admin bar ── */
+#sn-admin-bar {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 52px; right: 0;
+  z-index: 8000;
+  height: 42px;
+  background: var(--bg-secondary, #3d2510);
+  border-top: 1px solid rgba(227,66,52,0.4);
+  align-items: center;
+  padding: 0 1.5rem;
+  gap: 0;
+  animation: sn-slideup 0.2s ease;
+}
+#sn-admin-bar.open { display: flex; }
+
+.sn-bar-pill {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.5rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--cinnabar, #E34234);
+  margin-right: 1.5rem;
+  opacity: 0.7;
+}
+.sn-bar-link {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted, #a08060);
+  text-decoration: none;
+  padding: 0.2rem 0.8rem;
+  border: 1px solid transparent;
+  margin-right: 0.25rem;
+  transition: color 0.15s, border-color 0.15s;
+}
+.sn-bar-link:hover { color: var(--text-primary, #F0E8D0); border-color: rgba(240,232,208,0.12); }
+.sn-bar-link.here { color: var(--cinnabar, #E34234); border-color: rgba(227,66,52,0.3); }
+
+.sn-bar-spacer { flex: 1; }
+
+.sn-bar-hint {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.48rem;
+  letter-spacing: 0.1em;
+  color: var(--text-ghost, #6a4828);
+  margin-right: 1.5rem;
+}
+.sn-bar-logout {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.52rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-ghost, #6a4828);
+  background: none; border: none; cursor: pointer; padding: 0.2rem 0.4rem;
+}
+.sn-bar-logout:hover { color: #d4204a; }
+
+/* ── Draft visibility ── */
+[data-draft="true"] { display: none !important; }
+body.sn-authed [data-draft="true"] { display: revert !important; }
+body.sn-authed { padding-bottom: 42px; }
+
+/* ── Animations ── */
+@keyframes sn-shake {
+  0%,100% { transform: translateX(0); }
+  20%,60% { transform: translateX(-5px); }
+  40%,80% { transform: translateX(5px); }
+}
+@keyframes sn-appear {
+  from { opacity:0; transform: translateY(-8px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+@keyframes sn-slideup {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  #sn-admin-bar { left: 0; }
+}
+</style>
+
+<script define:vars={{ HASH }}>
+// ── Constants ─────────────────────────────────────────────────────────────────
+const STORAGE_KEY  = 'sn-auth'
+const TOKEN_TTL_MS = 1000 * 60 * 60 * 24 * 30  // 30 days
+const BAKED_HASH   = HASH                        // injected from Astro at build
+
+// ── Crypto ────────────────────────────────────────────────────────────────────
+async function sha256(input) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input))
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('')
+}
+
+async function verify(passphrase) {
+  if (!BAKED_HASH || BAKED_HASH === 'REPLACE_WITH_YOUR_HASH') return false
+  const hashed = await sha256(passphrase.trim())
+  return hashed === BAKED_HASH.toLowerCase()
+}
+
+// ── Token ─────────────────────────────────────────────────────────────────────
+function writeToken() {
+  const now = Date.now()
+  localStorage.setItem(STORAGE_KEY, btoa(JSON.stringify({ issued: now, expires: now + TOKEN_TTL_MS, v: 1 })))
+}
+function clearToken() { localStorage.removeItem(STORAGE_KEY) }
+function authed() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return false
+    const t = JSON.parse(atob(raw))
+    return t.v === 1 && Date.now() < t.expires
+  } catch { return false }
+}
+
+// ── DOM Builders ──────────────────────────────────────────────────────────────
+function buildModal() {
+  const el = Object.assign(document.createElement('div'), { id: 'sn-auth-modal' })
+  el.innerHTML = `
+    <div class="sn-modal-box">
+      <button class="sn-modal-close" id="snmc">✕</button>
+      <div class="sn-modal-eyebrow">Admin access</div>
+      <input class="sn-modal-input" id="snmi" type="password"
+        placeholder="passphrase" autocomplete="current-password" spellcheck="false"/>
+      <div class="sn-modal-sub">
+        <div class="sn-modal-err" id="snme"></div>
+        <div class="sn-modal-hint">esc or ctrl+shift+/ to close</div>
+      </div>
+    </div>`
+  document.body.appendChild(el)
+
+  document.getElementById('snmc')?.addEventListener('click', closeModal)
+  el.addEventListener('click', e => { if (e.target === el) closeModal() })
+  document.getElementById('snmi')?.addEventListener('keydown', async e => {
+    if (e.key === 'Enter') { e.preventDefault(); await tryLogin(e.target.value) }
+  })
+}
+
+function buildBar() {
+  const pages = [
+    { href: '/journal/new',   label: 'New Journal Entry' },
+    { href: '/blog/compose',  label: 'New Blog Post'     },
+    { href: '/journal',       label: 'Journal'           },
+    { href: '/blog',          label: 'Blog'              },
+  ]
+  const el = Object.assign(document.createElement('div'), { id: 'sn-admin-bar' })
+  el.innerHTML = `
+    <span class="sn-bar-pill">admin</span>
+    ${pages.map(p => `<a class="sn-bar-link${window.location.pathname===p.href?' here':''}" href="${p.href}">${p.label}</a>`).join('')}
+    <div class="sn-bar-spacer"></div>
+    <span class="sn-bar-hint">ctrl+shift+/ to toggle</span>
+    <button class="sn-bar-logout" id="snbl">Logout</button>`
+  document.body.appendChild(el)
+  document.getElementById('snbl')?.addEventListener('click', logout)
+}
+
+// ── State ─────────────────────────────────────────────────────────────────────
+function applyState(showBar) {
+  const isIn = authed()
+  document.body.classList.toggle('sn-authed', isIn)
+  const bar = document.getElementById('sn-admin-bar')
+  if (bar) bar.classList.toggle('open', isIn && showBar !== false)
+}
+
+function openModal() {
+  const modal = document.getElementById('sn-auth-modal')
+  const inp   = document.getElementById('snmi')
+  const err   = document.getElementById('snme')
+  modal?.classList.add('open')
+  if (err) err.textContent = ''
+  if (inp) { inp.value = ''; setTimeout(() => inp.focus(), 50) }
+}
+function closeModal() {
+  document.getElementById('sn-auth-modal')?.classList.remove('open')
+}
+
+async function tryLogin(passphrase) {
+  const inp = document.getElementById('snmi')
+  const err = document.getElementById('snme')
+  const ok  = await verify(passphrase)
+  if (ok) {
+    writeToken()
+    closeModal()
+    applyState(true)
+  } else {
+    if (inp) { inp.value = ''; inp.classList.add('sn-shake'); setTimeout(()=>inp.classList.remove('sn-shake'),400) }
+    if (err) err.textContent = 'incorrect'
+  }
+}
+
+function logout() {
+  clearToken()
+  document.body.classList.remove('sn-authed')
+  document.getElementById('sn-admin-bar')?.classList.remove('open')
+}
+
+// ── Keystroke ─────────────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  const combo = (e.ctrlKey || e.metaKey) && e.shiftKey && e.key === '/'
+  if (!combo) return
+  e.preventDefault()
+  if (authed()) {
+    document.getElementById('sn-admin-bar')?.classList.toggle('open')
+  } else {
+    openModal()
+  }
+})
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal()
+})
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+buildModal()
+buildBar()
+applyState(authed())  // show bar immediately if already logged in
+</script>
