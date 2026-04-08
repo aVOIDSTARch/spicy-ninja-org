@@ -1,6 +1,7 @@
 ---
 import ZoneLayout from '../../../layouts/ZoneLayout.astro'
 import SceneScholars from '../../../components/scenes/SceneScholars.astro'
+import CourseNotesPanel from '../../../components/ui/CourseNotesPanel.astro'
 import { getCollection, render } from 'astro:content'
 
 export async function getStaticPaths() {
@@ -26,7 +27,6 @@ const branchMeta: Record<string, { label: string; accent: string }> = {
 }
 const meta = branchMeta[branch] ?? { label: branch, accent: 'var(--cinnabar)' }
 
-// All lessons in this branch for TOC
 const allBranchLessons = (await getCollection('fundamentals', ({ data }) =>
   !data.draft && data.branch === branch && data.order > 0
 )).sort((a, b) => a.data.order - b.data.order)
@@ -56,7 +56,10 @@ const allBranchLessons = (await getCollection('fundamentals', ({ data }) =>
           )
         })}
       </nav>
-      <button class="fl-toc__handle" id="fl-toc-handle" aria-label="Toggle contents">☰</button>
+      <!-- Handle: visible as a tab on the right edge at all times -->
+      <button class="fl-toc__handle" id="fl-toc-handle" aria-label="Toggle table of contents">
+        <span class="fl-toc__handle-icon" id="fl-toc-icon">‹</span>
+      </button>
     </aside>
 
     <!-- MAIN -->
@@ -70,6 +73,9 @@ const allBranchLessons = (await getCollection('fundamentals', ({ data }) =>
       </div>
     </main>
   </div>
+
+  <!-- Course notes panel for this lesson -->
+  <CourseNotesPanel slug={`${branch}-${slug}`} courseTitle={lesson.data.title} />
 </ZoneLayout>
 
 <style>
@@ -122,17 +128,25 @@ const allBranchLessons = (await getCollection('fundamentals', ({ data }) =>
     color: var(--text-ghost); flex-shrink: 0; opacity: 0.5;
   }
 
+  /* Handle — always visible tab on right edge of TOC */
   .fl-toc__handle {
-    position: absolute; top: 50%; right: -18px;
+    position: absolute; top: 50%; right: -22px;
     transform: translateY(-50%);
-    width: 18px; height: 48px;
+    width: 22px; height: 52px;
     background: var(--bg-secondary);
     border: 1px solid var(--border); border-left: none;
     display: flex; align-items: center; justify-content: center;
-    cursor: pointer; font-size: 0.6rem; color: var(--text-ghost);
-    transition: color 0.2s;
+    cursor: pointer; color: var(--text-ghost);
+    transition: color 0.2s, background 0.2s;
+    z-index: 21;
   }
-  .fl-toc__handle:hover { color: var(--branch-accent); }
+  .fl-toc__handle:hover { color: var(--branch-accent); background: var(--bg-raised); }
+  .fl-toc__handle-icon {
+    font-size: 0.9rem; line-height: 1;
+    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+    display: block;
+  }
+  .fl-toc--collapsed .fl-toc__handle-icon { transform: rotate(180deg); }
 
   /* MAIN */
   .fl-main {
@@ -172,7 +186,6 @@ const allBranchLessons = (await getCollection('fundamentals', ({ data }) =>
   .fl-prose em { color: var(--text-primary); font-style: italic; }
   .fl-prose strong { color: var(--text-primary); font-weight: 500; }
 
-  /* code blocks */
   .fl-prose pre {
     background: var(--bg-secondary); border: 1px solid var(--border);
     border-left: 3px solid var(--branch-accent);
@@ -185,11 +198,8 @@ const allBranchLessons = (await getCollection('fundamentals', ({ data }) =>
     background: rgba(255,255,255,0.04);
     padding: 0.1em 0.3em;
   }
-  .fl-prose pre code {
-    color: var(--text-secondary); background: none; padding: 0;
-  }
+  .fl-prose pre code { color: var(--text-secondary); background: none; padding: 0; }
 
-  /* tables */
   .fl-prose table {
     width: 100%; border-collapse: collapse;
     font-size: 0.82rem; margin: 1.5rem 0;
@@ -207,7 +217,6 @@ const allBranchLessons = (await getCollection('fundamentals', ({ data }) =>
   }
   .fl-prose td:first-child { color: var(--text-secondary); }
 
-  /* blockquotes / callouts (italicised paragraphs starting with *Project) */
   .fl-prose blockquote {
     border-left: 2px solid var(--branch-accent);
     padding: 0.8rem 1.2rem; margin: 1.5rem 0;
@@ -222,18 +231,29 @@ const allBranchLessons = (await getCollection('fundamentals', ({ data }) =>
 </style>
 
 <script>
-  const toc = document.getElementById('fl-toc')
+  const toc    = document.getElementById('fl-toc') as HTMLElement | null
   const handle = document.getElementById('fl-toc-handle')
   let collapsed = false
 
-  handle?.addEventListener('click', () => {
-    collapsed ? toc?.classList.remove('fl-toc--collapsed') : toc?.classList.add('fl-toc--collapsed')
-    collapsed = !collapsed
-  })
+  function setCollapsed(state: boolean) {
+    collapsed = state
+    toc?.classList.toggle('fl-toc--collapsed', collapsed)
+  }
+
+  // Handle click always toggles
+  handle?.addEventListener('click', () => setCollapsed(!collapsed))
+
+  // Auto-collapse on scroll down, re-open on scroll back to top
+  let lastY = window.scrollY
   window.addEventListener('scroll', () => {
-    if (window.scrollY > 220 && !collapsed) {
-      toc?.classList.add('fl-toc--collapsed')
-      collapsed = true
+    const y = window.scrollY
+    const scrollingDown = y > lastY
+    lastY = y
+
+    if (scrollingDown && y > 220 && !collapsed) {
+      setCollapsed(true)
+    } else if (!scrollingDown && y < 100 && collapsed) {
+      setCollapsed(false)
     }
   }, { passive: true })
 </script>

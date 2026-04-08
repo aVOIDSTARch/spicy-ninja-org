@@ -3,6 +3,7 @@ import '../styles/global.css'
 import Nav from '../components/nav/Nav.astro'
 import ThemeToggle from '../components/ui/ThemeToggle.astro'
 import AuthIsland from '../components/ui/AuthIsland.astro'
+import RawIdeasPanel from '../components/ui/RawIdeasPanel.astro'
 
 interface Props {
   title?: string
@@ -36,24 +37,15 @@ const {
       <slot />
     </div>
     <ThemeToggle />
-    <!-- Auth island: client-only, outputs nothing until Ctrl+Shift+/ -->
     <AuthIsland />
+    <RawIdeasPanel />
   </body>
 </html>
 
 <style is:global>
-  .page-shell {
-    margin-left: 52px;
-    min-height: 100vh;
-  }
+  .page-shell { margin-left: 52px; min-height: 100vh; }
   @media (max-width: 768px) {
-    .page-shell {
-      margin-left: 0;
-      padding-top: 52px;
-    }
+    .page-shell { margin-left: 0; padding-top: 52px; }
   }
-  /* Admin bar pushes page-shell up when visible */
-  body.sn-authed .page-shell {
-    padding-bottom: 42px;
-  }
+  body.sn-authed .page-shell { padding-bottom: 42px; }
 </style>

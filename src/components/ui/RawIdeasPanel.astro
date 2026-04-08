@@ -1,354 +1,313 @@
+---
+/**
+ * RawIdeasPanel.astro
+ * Global floating ideas capture. Login-gated — FAB hidden until authed.
+ * Captures: content, tag, url (auto), timestamp (auto).
+ * Export → .md file for manual drop into repo.
+ * Wire: import in Base.astro so it's on every page.
+ */
+---
+
+<!-- FAB (hidden; shown by auth state) -->
+<button class="ideas-fab" id="ideas-fab"
+  style="display:none" aria-label="Capture idea" aria-expanded="false">
+  <span style="font-size:1.1rem;line-height:1">✦</span>
+</button>
+
+<!-- Backdrop -->
+<div class="ideas-backdrop" id="ideas-backdrop" aria-hidden="true"></div>
+
+<!-- Panel -->
+<aside class="ideas-panel" id="ideas-panel" aria-hidden="true" aria-label="Raw ideas capture">
+  <div class="ideas-panel__header">
+    <div>
+      <span class="ideas-panel__eyebrow">Raw Ideas</span>
+      <span class="ideas-panel__title">Capture</span>
+    </div>
+    <button class="ideas-close" id="ideas-close" aria-label="Close ideas panel">✕</button>
+  </div>
+
+  <!-- Input area -->
+  <div class="ideas-panel__input">
+    <textarea
+      class="ideas-textarea"
+      id="ideas-textarea"
+      placeholder="The idea. Markdown supported. Cmd+Enter to add."
+      rows="5"
+    ></textarea>
+    <div class="ideas-row">
+      <input class="ideas-tag" id="ideas-tag" type="text" placeholder="#tag (optional)" />
+      <button class="ideas-btn ideas-btn--add" id="ideas-add">Add</button>
+    </div>
+    <p class="ideas-hint">
+      URL and timestamp captured automatically.
+      Cmd+Enter to add without clicking.
+    </p>
+  </div>
+
+  <!-- Captured list -->
+  <div class="ideas-panel__list" id="ideas-list" aria-label="Captured ideas"></div>
+
+  <!-- Footer actions -->
+  <div class="ideas-panel__footer">
+    <button class="ideas-btn ideas-btn--export" id="ideas-export">Export .md</button>
+    <button class="ideas-btn ideas-btn--clear"  id="ideas-clear">Clear all</button>
+  </div>
+</aside>
 
 <style>
-/* ── FAB ── */
+/* FAB */
 .ideas-fab {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  width: 44px;
-  height: 44px;
+  position: fixed; bottom: 2rem; right: 5.5rem;
+  width: 44px; height: 44px;
   background: var(--bg-secondary);
   border: 1px solid var(--border);
-  color: var(--text-ghost);
-  font-size: 1.1rem;
-  cursor: pointer;
+  color: var(--cinnabar);
   z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: border-color 0.2s, color 0.2s, transform 0.2s;
-}
-.ideas-fab:hover {
-  border-color: var(--gossamer);
-  color: var(--gossamer);
-  transform: scale(1.08);
-}
-
-/* ── PANEL ── */
-.ideas-panel {
-  position: fixed;
-  bottom: 5.5rem;
-  right: 2rem;
-  width: min(380px, calc(100vw - 2rem));
-  max-height: 70vh;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  z-index: 150;
-  transform: translateY(10px);
-  opacity: 0;
-  pointer-events: none;
-  transition: transform 0.25s ease, opacity 0.25s ease;
-}
-.ideas-panel[aria-hidden="false"] {
-  transform: translateY(0);
-  opacity: 1;
-  pointer-events: all;
-}
-
-.ideas-panel__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.8rem 1rem 0.7rem;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.ideas-panel__eyebrow {
-  font-family: var(--font-mono);
-  font-size: 0.5rem;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--gossamer);
-}
-.ideas-panel__close {
-  background: none;
-  border: none;
-  color: var(--text-ghost);
+  align-items: center; justify-content: center;
   cursor: pointer;
-  font-size: 0.8rem;
-  transition: color 0.15s;
+  transition: border-color 0.2s, transform 0.2s;
 }
-.ideas-panel__close:hover { color: var(--text-primary); }
+.ideas-fab:hover { border-color: var(--cinnabar); transform: scale(1.1); }
 
-.ideas-panel__compose {
-  padding: 0.8rem 1rem;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.ideas-panel__textarea {
-  width: 100%;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  line-height: 1.65;
-  padding: 0.7rem 0.8rem;
-  resize: vertical;
-  outline: none;
-  transition: border-color 0.2s;
-}
-.ideas-panel__textarea:focus { border-color: var(--border-hi); }
-
-.ideas-panel__tag-row {
-  display: flex;
-  gap: 0.4rem;
-  margin-top: 0.5rem;
-}
-.ideas-panel__tag {
-  flex: 1;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  padding: 0.35rem 0.6rem;
-  outline: none;
-}
-.ideas-panel__tag::placeholder { color: var(--text-ghost); }
-
-.ideas-panel__btn {
-  font-family: var(--font-mono);
-  font-size: 0.55rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  padding: 0.38rem 0.8rem;
-  border: 1px solid var(--border);
-  background: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: border-color 0.2s, color 0.2s;
-}
-.ideas-panel__btn--add:hover    { border-color: var(--gossamer); color: var(--gossamer); }
-.ideas-panel__btn--export:hover { border-color: var(--gossamer); color: var(--gossamer); }
-.ideas-panel__btn--clear:hover  { border-color: var(--cinnabar); color: var(--cinnabar); }
-
-/* ── IDEAS LIST ── */
-.ideas-panel__list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 0.5rem 1rem;
-  scrollbar-width: thin;
-}
-.idea-item {
-  padding: 0.6rem 0;
-  border-bottom: 1px solid var(--border);
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 0.3rem;
-}
-.idea-item:last-child { border-bottom: none; }
-.idea-item__text {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: var(--text-muted);
-  line-height: 1.5;
-  white-space: pre-wrap;
-  word-break: break-word;
-  grid-column: 1 / -1;
-}
-.idea-item__meta {
-  font-family: var(--font-mono);
-  font-size: 0.5rem;
-  color: var(--text-ghost);
-  grid-column: 1;
-}
-.idea-item__tag {
-  font-family: var(--font-mono);
-  font-size: 0.5rem;
-  color: var(--gossamer);
-  letter-spacing: 0.1em;
-}
-.idea-item__delete {
-  grid-row: 2;
-  grid-column: 2;
-  background: none;
-  border: none;
-  color: var(--text-ghost);
-  cursor: pointer;
-  font-size: 0.65rem;
-  padding: 0 0.2rem;
-  transition: color 0.15s;
-  align-self: center;
-}
-.idea-item__delete:hover { color: var(--cinnabar); }
-
-/* ── FOOTER ── */
-.ideas-panel__footer {
-  padding: 0.7rem 1rem;
-  border-top: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.ideas-panel__footer .ideas-panel__btn { margin-right: 0.4rem; }
-.ideas-panel__hint {
-  font-family: var(--font-mono);
-  font-size: 0.52rem;
-  color: var(--text-ghost);
-  margin-top: 0.5rem;
-  line-height: 1.5;
-}
-.ideas-panel__hint code {
-  color: var(--text-muted);
-  background: var(--bg-raised);
-  padding: 0.1em 0.3em;
-}
-
-/* ── BACKDROP ── */
+/* Backdrop */
 .ideas-backdrop {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 149;
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.35); z-index: 599;
 }
 .ideas-backdrop.active { display: block; }
+
+/* Panel */
+.ideas-panel {
+  position: fixed; top: 0; right: 0;
+  width: min(440px, 100vw); height: 100vh;
+  background: var(--bg-secondary);
+  border-left: 1px solid var(--border);
+  border-top: 2px solid var(--cinnabar);
+  display: flex; flex-direction: column;
+  z-index: 600;
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+.ideas-panel[aria-hidden="false"] { transform: translateX(0); }
+
+.ideas-panel__header {
+  display: flex; align-items: flex-start;
+  justify-content: space-between;
+  padding: 1.2rem 1.5rem 1rem;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.ideas-panel__eyebrow {
+  display: block; font-family: var(--font-mono);
+  font-size: 0.5rem; letter-spacing: 0.28em;
+  text-transform: uppercase; color: var(--cinnabar); margin-bottom: 0.3rem;
+}
+.ideas-panel__title {
+  font-family: var(--font-display); font-size: 1rem;
+  color: var(--text-primary);
+}
+.ideas-close {
+  background: none; border: none; color: var(--text-ghost);
+  cursor: pointer; font-size: 0.9rem; padding: 0.2rem 0.4rem;
+  transition: color 0.15s;
+}
+.ideas-close:hover { color: var(--text-primary); }
+
+/* Input area */
+.ideas-panel__input { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.ideas-textarea {
+  width: 100%; background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary); font-family: var(--font-mono);
+  font-size: 0.75rem; line-height: 1.65;
+  padding: 0.8rem 1rem; resize: none; outline: none;
+  transition: border-color 0.2s; margin-bottom: 0.6rem;
+}
+.ideas-textarea:focus { border-color: var(--border-hi); }
+
+.ideas-row { display: flex; gap: 0.5rem; }
+.ideas-tag {
+  flex: 1; background: var(--bg-card); border: 1px solid var(--border);
+  color: var(--text-muted); font-family: var(--font-mono); font-size: 0.7rem;
+  padding: 0.4rem 0.7rem; outline: none; transition: border-color 0.2s;
+}
+.ideas-tag:focus { border-color: var(--border-hi); }
+
+.ideas-btn {
+  font-family: var(--font-mono); font-size: 0.58rem;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  padding: 0.4rem 0.9rem; border: 1px solid var(--border);
+  background: none; color: var(--text-muted); cursor: pointer;
+  transition: border-color 0.2s, color 0.2s; white-space: nowrap;
+}
+.ideas-btn--add:hover    { border-color: var(--cinnabar); color: var(--cinnabar); }
+.ideas-btn--export:hover { border-color: var(--text-secondary); color: var(--text-secondary); }
+.ideas-btn--clear:hover  { border-color: #d4204a; color: #d4204a; }
+
+.ideas-hint {
+  font-family: var(--font-mono); font-size: 0.52rem;
+  color: var(--text-ghost); margin-top: 0.5rem; line-height: 1.5;
+}
+
+/* List */
+.ideas-panel__list {
+  flex: 1; overflow-y: auto; padding: 0.8rem 1.5rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+}
+.idea-item {
+  position: relative; padding: 0.8rem 2rem 0.8rem 0.9rem;
+  border-left: 2px solid var(--border); margin-bottom: 0.8rem;
+  background: var(--bg-card);
+}
+.idea-item__text {
+  font-family: var(--font-mono); font-size: 0.72rem;
+  color: var(--text-secondary); line-height: 1.55;
+  word-break: break-word; white-space: pre-wrap; margin-bottom: 0.3rem;
+}
+.idea-item__meta {
+  font-family: var(--font-mono); font-size: 0.52rem;
+  color: var(--text-ghost); letter-spacing: 0.05em;
+}
+.idea-item__tag {
+  font-family: var(--font-mono); font-size: 0.52rem;
+  color: var(--cinnabar); margin-top: 0.2rem; letter-spacing: 0.08em;
+}
+.idea-item__delete {
+  position: absolute; top: 0.5rem; right: 0.5rem;
+  background: none; border: none; color: var(--text-ghost);
+  cursor: pointer; font-size: 0.65rem; padding: 0.2rem;
+  transition: color 0.15s;
+}
+.idea-item__delete:hover { color: #d4204a; }
+
+/* Footer */
+.ideas-panel__footer {
+  display: flex; gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border); flex-shrink: 0;
+}
 </style>
 
 <script>
-const STORAGE_KEY = 'sn-ideas';
-const AUTH_KEY    = 'sn-auth';
+const STORAGE_KEY = 'sn-ideas'
+const AUTH_KEY    = 'sn-auth'
 
-const fab      = document.getElementById('ideas-fab');
-const panel    = document.getElementById('ideas-panel');
-const backdrop = document.getElementById('ideas-backdrop');
-const closeBtn = document.getElementById('ideas-close');
-const textarea = document.getElementById('ideas-textarea');
-const tagInput = document.getElementById('ideas-tag');
-const addBtn   = document.getElementById('ideas-add');
-const listEl   = document.getElementById('ideas-list');
-const exportBtn = document.getElementById('ideas-export');
-const clearBtn  = document.getElementById('ideas-clear');
+const fab      = document.getElementById('ideas-fab')
+const panel    = document.getElementById('ideas-panel')
+const backdrop = document.getElementById('ideas-backdrop')
+const closeBtn = document.getElementById('ideas-close')
+const textarea = document.getElementById('ideas-textarea')
+const tagInput = document.getElementById('ideas-tag')
+const addBtn   = document.getElementById('ideas-add')
+const listEl   = document.getElementById('ideas-list')
+const exportBtn = document.getElementById('ideas-export')
+const clearBtn  = document.getElementById('ideas-clear')
 
-// ── Auth gate ─────────────────────────────────────────────────
 function isAuthed() {
-  try { return !!localStorage.getItem(AUTH_KEY); }
-  catch { return false; }
-}
-if (isAuthed() && fab) fab.style.display = 'flex';
-
-// ── Storage ───────────────────────────────────────────────────
-function getIdeas() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch { return []; }
+    const raw = localStorage.getItem(AUTH_KEY)
+    if (!raw) return false
+    const t = JSON.parse(atob(raw))
+    return t.v === 1 && Date.now() < t.expires
+  } catch { return false }
+}
+
+function checkAuth() {
+  if (isAuthed() && fab) fab.style.display = 'flex'
+}
+checkAuth()
+
+// Re-check auth state when body class changes (login/logout)
+const mo = new MutationObserver(checkAuth)
+mo.observe(document.body, { attributes: true, attributeFilter: ['class'] })
+
+function getIdeas() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]') }
+  catch { return [] }
 }
 function saveIdeas(ideas) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(ideas));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(ideas))
 }
 
-// ── Render ────────────────────────────────────────────────────
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+}
+
 function renderIdeas() {
-  const ideas = getIdeas();
-  if (ideas.length === 0) {
-    listEl.innerHTML = '<p style="font-family:var(--font-mono);font-size:0.58rem;color:var(--text-ghost);padding:0.5rem 0">No ideas captured yet.</p>';
-    return;
+  const ideas = getIdeas()
+  if (!ideas.length) {
+    listEl.innerHTML = '<p style="font-family:var(--font-mono);font-size:0.58rem;color:var(--text-ghost);padding:0.5rem 0">No ideas captured yet.</p>'
+    return
   }
   listEl.innerHTML = [...ideas].reverse().map((idea, ri) => {
-    const i = ideas.length - 1 - ri;
-    return `
-      <div class="idea-item">
-        <div class="idea-item__text">${escHtml(idea.content)}</div>
-        <div class="idea-item__meta">${idea.timestamp.slice(0,16).replace('T',' ')} · ${escHtml(idea.url.replace(/^https?:\/\/[^/]+/, ''))}</div>
-        ${idea.tag ? `<div class="idea-item__tag">#${escHtml(idea.tag)}</div>` : ''}
-        <button class="idea-item__delete" data-index="${i}" aria-label="Delete idea">✕</button>
-      </div>
-    `;
-  }).join('');
-
+    const i = ideas.length - 1 - ri
+    return `<div class="idea-item">
+      <div class="idea-item__text">${escHtml(idea.content)}</div>
+      <div class="idea-item__meta">${idea.timestamp.slice(0,16).replace('T',' ')} · ${escHtml(idea.url.replace(/^https?:\/\/[^/]+/,''))}</div>
+      ${idea.tag ? `<div class="idea-item__tag">#${escHtml(idea.tag)}</div>` : ''}
+      <button class="idea-item__delete" data-index="${i}" aria-label="Delete">✕</button>
+    </div>`
+  }).join('')
   listEl.querySelectorAll('.idea-item__delete').forEach(btn => {
     btn.addEventListener('click', () => {
-      const ideas = getIdeas();
-      ideas.splice(Number(btn.dataset.index), 1);
-      saveIdeas(ideas);
-      renderIdeas();
-    });
-  });
-}
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      const arr = getIdeas(); arr.splice(Number(btn.dataset.index), 1)
+      saveIdeas(arr); renderIdeas()
+    })
+  })
 }
 
-// ── Open / Close ──────────────────────────────────────────────
 function openPanel() {
-  panel.setAttribute('aria-hidden', 'false');
-  backdrop.classList.add('active');
-  renderIdeas();
-  setTimeout(() => textarea.focus(), 250);
+  panel?.setAttribute('aria-hidden', 'false')
+  backdrop?.classList.add('active')
+  renderIdeas()
+  setTimeout(() => textarea?.focus(), 250)
 }
 function closePanel() {
-  panel.setAttribute('aria-hidden', 'true');
-  backdrop.classList.remove('active');
+  panel?.setAttribute('aria-hidden', 'true')
+  backdrop?.classList.remove('active')
 }
 
-fab?.addEventListener('click', () => {
-  panel.getAttribute('aria-hidden') === 'true' ? openPanel() : closePanel();
-});
-closeBtn?.addEventListener('click', closePanel);
-backdrop?.addEventListener('click', closePanel);
+fab?.addEventListener('click', () =>
+  panel?.getAttribute('aria-hidden') === 'true' ? openPanel() : closePanel()
+)
+closeBtn?.addEventListener('click', closePanel)
+backdrop?.addEventListener('click', closePanel)
 
-// ── Add idea ──────────────────────────────────────────────────
 function addIdea() {
-  const content = textarea.value.trim();
-  if (!content) return;
-  const ideas = getIdeas();
-  ideas.push({
-    content,
-    tag:       tagInput.value.trim() || null,
-    url:       window.location.href,
-    timestamp: new Date().toISOString(),
-  });
-  saveIdeas(ideas);
-  textarea.value = '';
-  tagInput.value = '';
-  addBtn.textContent = 'Added ✓';
-  setTimeout(() => { addBtn.textContent = 'Add'; }, 1200);
-  renderIdeas();
+  const content = textarea?.value.trim()
+  if (!content) return
+  const ideas = getIdeas()
+  ideas.push({ content, tag: tagInput?.value.trim() || null, url: window.location.href, timestamp: new Date().toISOString() })
+  saveIdeas(ideas)
+  if (textarea) textarea.value = ''
+  if (tagInput) tagInput.value = ''
+  if (addBtn) { addBtn.textContent = 'Added ✓'; setTimeout(() => { addBtn.textContent = 'Add' }, 1200) }
+  renderIdeas()
 }
 
-addBtn?.addEventListener('click', addIdea);
-textarea?.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) addIdea();
-});
+addBtn?.addEventListener('click', addIdea)
+textarea?.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) addIdea() })
 
-// ── Export ────────────────────────────────────────────────────
 exportBtn?.addEventListener('click', () => {
-  const ideas = getIdeas();
-  if (ideas.length === 0) { alert('No ideas to export.'); return; }
+  const ideas = getIdeas()
+  if (!ideas.length) { alert('No ideas to export.'); return }
+  const today = new Date().toISOString().slice(0,10)
+  const md = `# Raw Ideas Export — ${today}\n\n` +
+    [...ideas].reverse().map(idea =>
+      `**${idea.timestamp.slice(0,16).replace('T',' ')}**${idea.tag?` #${idea.tag}`:''}\n*${idea.url}*\n\n${idea.content}`
+    ).join('\n\n---\n\n')
+  const url = URL.createObjectURL(new Blob([md], { type: 'text/markdown' }))
+  const a = Object.assign(document.createElement('a'), { href: url, download: `ideas-${today}.md` })
+  a.click(); URL.revokeObjectURL(url)
+})
 
-  const today = new Date().toISOString().slice(0,10);
-  const header = `<!-- append this block to ideas.md in your repo -->\n\n---\n\n## Export — ${today}\n\n`;
-  const body = [...ideas].reverse().map(idea => {
-    const lines = [
-      `**${idea.timestamp.slice(0,16).replace('T',' ')}**${idea.tag ? ` #${idea.tag}` : ''}`,
-      `*${idea.url}*`,
-      '',
-      idea.content,
-      '',
-    ];
-    return lines.join('\n');
-  }).join('---\n\n');
-
-  const blob = new Blob([header + body], { type: 'text/markdown' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href     = url;
-  a.download = `ideas-export-${today}.md`;
-  a.click();
-  URL.revokeObjectURL(url);
-});
-
-// ── Clear ─────────────────────────────────────────────────────
 clearBtn?.addEventListener('click', () => {
-  if (!confirm('Clear all captured ideas from this browser? Export first if you want to keep them.')) return;
-  localStorage.removeItem(STORAGE_KEY);
-  renderIdeas();
-});
+  if (!confirm('Clear all captured ideas from this browser? Export first if you want to keep them.')) return
+  localStorage.removeItem(STORAGE_KEY)
+  renderIdeas()
+})
 
-// ── Keyboard ──────────────────────────────────────────────────
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && panel.getAttribute('aria-hidden') === 'false') closePanel();
-});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && panel?.getAttribute('aria-hidden') === 'false') closePanel()
+})
 </script>
