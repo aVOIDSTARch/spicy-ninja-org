@@ -1,23 +1,4 @@
 ---
-/*
-  ZoneLayout.astro
-  ─────────────────────────────────────────────────────────
-  Base layout for all content zones. Wraps Base.astro and:
-    - Sets data-zone attribute for CSS zone overrides
-    - Injects zone accent token overrides via <style>
-    - Renders the zone's ParallaxScene behind content
-    - Keeps content above scene with z-index and bg fade
-
-  Zone-specific layouts (ProjectTrackLayout, etc.)
-  extend this by passing their scene component in the
-  "scene" slot and their content in the default slot.
-
-  Props:
-    zone        string  — matches CSS data-zone values
-    title       string  — page <title>
-    description string  — meta description
-*/
-
 import Base from './Base.astro'
 
 interface Props {
@@ -29,11 +10,10 @@ interface Props {
 
 const { zone, title, description } = Astro.props
 
-/* Zone accent token map */
 const zoneAccents: Record<string, { accent: string; dim: string; glow: string }> = {
   'project-track': { accent: '#E34234', dim: 'rgba(227,66,52,0.15)',   glow: 'rgba(227,66,52,0.08)'  },
   'montessori':    { accent: '#E8A020', dim: 'rgba(232,160,32,0.15)',  glow: 'rgba(232,160,32,0.08)' },
-  'fundamentals':  { accent: '#8b6914', dim: 'rgba(139,105,20,0.15)',  glow: 'rgba(139,105,20,0.06)' },
+  'fundamentals':  { accent: '#E8A020', dim: 'rgba(232,160,32,0.15)',  glow: 'rgba(232,160,20,0.06)' },
   'journey':       { accent: '#c87840', dim: 'rgba(200,120,64,0.15)',  glow: 'rgba(200,120,64,0.08)' },
   'journal':       { accent: '#c8b490', dim: 'rgba(200,180,144,0.15)', glow: 'rgba(200,180,144,0.06)'},
   'blog':          { accent: '#E34234', dim: 'rgba(227,66,52,0.12)',   glow: 'rgba(227,66,52,0.06)'  },
@@ -45,22 +25,20 @@ const a = zoneAccents[zone] ?? zoneAccents['project-track']
 ---
 
 <Base title={title} description={description}>
-  <!-- Zone wrapper — sets data-zone and CSS accent overrides -->
   <div
     class="zone-shell"
     data-zone={zone}
-    style={`
-      --zone-accent: ${a.accent};
-      --zone-accent-dim: ${a.dim};
-      --zone-glow: ${a.glow};
-    `}
+    style={`--zone-accent:${a.accent};--zone-accent-dim:${a.dim};--zone-glow:${a.glow};`}
   >
-    <!-- Scene layer (behind everything) -->
+    <!-- Scene: full-viewport crisp silhouette illustration, fixed behind -->
     <div class="zone-scene">
       <slot name="scene" />
     </div>
 
-    <!-- Content layer (above scene) -->
+    <!-- Spacer pushes content below the scene viewport -->
+    <div class="zone-spacer" aria-hidden="true"></div>
+
+    <!-- Content: solid ground slides up over the scene on scroll -->
     <div class="zone-content">
       <slot />
     </div>
@@ -68,64 +46,55 @@ const a = zoneAccents[zone] ?? zoneAccents['project-track']
 </Base>
 
 <style>
-  /* Zone shell fills the page-shell offset */
   .zone-shell {
     position: relative;
     min-height: 100vh;
   }
 
-  /* Scene sits fixed behind — pointer events off */
+  /* Scene: fixed, full viewport, sharp and unobscured */
   .zone-scene {
     position: fixed;
-    inset: 0 0 0 52px;  /* rail offset */
+    inset: 0 0 0 52px;
     z-index: 0;
     pointer-events: none;
+    /* No blur, no overlay — the scene renders at full opacity */
   }
 
   @media (max-width: 768px) {
-    .zone-scene { inset: 52px 0 0 0; }  /* topbar offset */
+    .zone-scene { inset: 52px 0 0 0; }
   }
 
   /*
-    Content layer — sits above scene.
-    Semi-transparent bg gradient so scene shows through
-    subtly at top, becomes more opaque as content builds.
+    Spacer: one viewport height of transparent space so the scene
+    is visible before content begins. As you scroll, content
+    slides up from below the fold over the scene.
+  */
+  .zone-spacer {
+    height: 60vh;
+    pointer-events: none;
+  }
+
+  /*
+    Content: solid background — no gradient fog, no see-through.
+    The scene is visible above it (in the spacer zone), not through it.
+    Sharp edge where content meets scene.
   */
   .zone-content {
     position: relative;
     z-index: 10;
-    background: linear-gradient(
-      to bottom,
-      transparent                        0%,
-      rgba(var(--bg-primary-rgb), 0.55) 15%,
-      rgba(var(--bg-primary-rgb), 0.82) 35%,
-      var(--bg-primary)                 60%
-    );
+    background: var(--bg-primary);
+    /* Top edge is a crisp cut — add a 1px cinnabar-dim rule at the boundary */
+    border-top: 1px solid var(--zone-accent-dim);
     min-height: 100vh;
     padding-bottom: 8rem;
   }
 
-  /*
-    bg-primary as RGB for rgba() blending.
-    Woodblock dark: 42,26,10
-    Red Lacquer: 245,237,224
-  */
+  /* Zone accent application */
+  .zone-shell .eyebrow { color: var(--zone-accent); opacity: 0.8; }
+  .zone-shell .card-accent { border-left-color: var(--zone-accent); }
+
+  /* RGB values for dark/light theme */
   :root,
   [data-theme="dark"]  { --bg-primary-rgb: 42,26,10;    }
   [data-theme="light"] { --bg-primary-rgb: 245,237,224; }
-
-  /*
-    Zone accent application —
-    active rail link, card borders, headings reference --zone-accent
-  */
-  .zone-shell .rail-link--active,
-  .zone-shell .rail-link--active .rail-link__kanji,
-  .zone-shell .rail-link--active .rail-link__label {
-    color: var(--zone-accent) !important;
-    border-left-color: var(--zone-accent) !important;
-  }
-
-  .zone-shell .card-accent { border-left-color: var(--zone-accent); }
-
-  .zone-shell .eyebrow { color: var(--zone-accent); opacity: 0.7; }
 </style>

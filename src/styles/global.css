@@ -36,7 +36,7 @@
   --sil-near:        #E34234;
   --sil-fg:          #0f0804;
   --sil-window:      #E8A020;
-  --nav-bg:          rgba(42,26,10,0.96);
+  --nav-bg:          rgba(42,26,10,0.98);
   --card-hover:      #5c3820;
   --btn-primary-bg:  #E34234;
   --btn-primary-txt: #0f0804;
@@ -74,7 +74,7 @@
   --sil-near:        #E34234;
   --sil-fg:          #1a0a05;
   --sil-window:      #b87333;
-  --nav-bg:          rgba(245,237,224,0.96);
+  --nav-bg:          rgba(245,237,224,0.98);
   --card-hover:      #e0d0b8;
   --btn-primary-bg:  #E34234;
   --btn-primary-txt: #f5ede0;
@@ -121,18 +121,7 @@ body {
   transition: background-color 0.35s ease, color 0.35s ease;
 }
 
-/* Grain texture */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0.35;
-}
-
-/* Smooth theme transitions */
+/* Smooth theme transitions — exclude transforms so parallax stays snappy */
 *, *::before, *::after {
   transition:
     background-color 0.35s ease,
@@ -222,8 +211,7 @@ body::after {
   border: none;
   cursor: pointer;
 }
-.btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
-
+.btn-primary:hover { opacity: 0.88; }
 .btn-ghost {
   display: inline-block;
   background: transparent;
@@ -237,7 +225,7 @@ body::after {
   border: 1px solid var(--btn-ghost-border);
   cursor: pointer;
 }
-.btn-ghost:hover { border-color: var(--cinnabar); transform: translateY(-1px); }
+.btn-ghost:hover { border-color: var(--cinnabar); }
 
 hr.rule { border: none; height: 1px; background: var(--border); margin: 1.5rem 0; }
 
