@@ -3,31 +3,34 @@ title: "Markov Chains — Overview"
 branch: "markov-chains"
 order: 0
 montessoriNode: "branches/markov-chains"
-description: "Stochastic composition using probability. How to make music that sounds improvised but follows character rules."
+description: "Stochastic composition using probability. How structured randomness produces music that sounds alive rather than mechanical, and why probability tables are character development."
 draft: false
 ---
 
 A Markov chain is a system where the next state depends only on the current state, according to a set of probabilities. In music: the next note depends on the current note, and how likely each possible next note is.
 
-This is not randomness. It is *structured randomness* — chaos with rules. The output is unpredictable in detail but predictable in character.
+This is not randomness. It is *structured randomness* — chaos with rules. The output is unpredictable in detail but predictable in character. Run it twice and you get two different sequences of notes. Both sequences will sound unmistakably like the same voice.
 
-## Why This Branch Exists
+## The Problem Markov Chains Solve
 
-Several things in *Jus Pulsus* need to feel improvised without being arbitrary:
+Programmatic music with multiple characters faces a specific compositional tension: characters who sound mechanical. A live_loop with a fixed sequence repeats identically every cycle. After a few iterations, the listener stops hearing a character and starts hearing a pattern.
 
-- The Bell's sparse appearances in Act I — accidental-seeming but following an internal logic
-- The African Drumming's response to other characters — reactive, alive, never mechanical
-- The Three Fates' commentary — they seem to be listening and responding, not reading a script
-- The Protagonist's searching melodic behavior — following a thought, not a pattern
+Full real-time improvisation solves this but introduces its own difficulties. It requires live performance, can produce material inconsistent with the character's established identity, and is unreliable across long durations.
 
-Markov chains give you the tool to make something sound alive without having to improvise in real time or compose every note explicitly.
+Markov chains offer a middle path. The character's *tendencies* — their personality expressed as probability — are encoded in a table. Those tendencies drive their note-to-note decisions. The output is different every performance but always sounds like the same character, because the probability table is the character.
 
 ## Three Lessons
 
-1. **First-order chains**: Each note chooses the next based on a probability table
-2. **Weighted random in Sonic Pi**: `choose`, `wrand`, and `ring` as practical tools
-3. **Higher-order chains and memory**: When the next note depends on the last two — more sophisticated behavior, longer-range coherence
+1. **First-order chains**: Each note chooses the next based on a probability table. The simplest implementation, sufficient for most characters.
+
+2. **Higher-order chains and memory**: When the next note depends on the last two or three — longer-range coherence, phrase-level direction, and the impression of intention rather than wandering.
+
+3. **Weighted random in Sonic Pi**: The practical implementation tools — `wrand`, weighted arrays, `choose` — and how to build complete character voices using them.
 
 ## The Deeper Principle
 
-Composing a Markov chain for a character is an act of character development. The Bell does not know what note it will play next — but it has tendencies. It is more likely to stay in the pentatonic range. It is less likely to leap a major seventh. Those tendencies are its personality encoded as probability.
+Composing a Markov chain for a character is an act of character development. Before writing the probability table, you must answer: what does this character *tend toward*? What intervals do they favour? Do they seek resolution or evade it? How do they feel about silence? Do they prefer leaps or steps? Are they erratic or consistent?
+
+Answering those questions in terms of probability weights forces a level of specificity that purely analytical description rarely achieves. The table is the personality encoded as mathematics.
+
+*Project connection: Any programmatic work where characters need to sound alive across long durations — responsive rather than mechanical, searching rather than merely looping — can use Markov chains as the primary tool for character behaviour. The probability table is not a technical implementation detail. It is the character's psychology.*

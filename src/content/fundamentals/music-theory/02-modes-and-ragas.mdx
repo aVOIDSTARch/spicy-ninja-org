@@ -3,67 +3,87 @@ title: "Modes and Ragas: Harmonic Containers"
 branch: "music-theory"
 order: 2
 montessoriNode: "branches/music-theory"
-description: "What modes and ragas are, how they differ from scales, and which ones are load-bearing for Jus Pulsus."
+description: "What modes and ragas are, how they differ from scales, and how the choice of harmonic container shapes character, emotional register, and the specific texture of world music intrusions."
 draft: false
 ---
 
-A scale is a set of pitches. A mode is a scale with rules about how you move through it. A raga is a mode with additional rules about which pitches you emphasize, how you approach and leave certain notes, what time of day it belongs to, and what emotional state it is designed to produce.
+A scale is a set of pitches. A mode is a scale with rules about how you move through it. A raga is a mode with additional rules about which pitches you emphasise, how you approach and leave certain notes, what time of day it belongs to, and what emotional state it is designed to produce.
 
 Knowing a scale tells you which notes are available. Knowing a mode or raga tells you how a character thinks.
 
-## The Western Modes
+## The Seven Western Modes
 
-All generated from the same pitches (white keys on a piano) but starting on different notes:
+All seven modes are generated from the same set of pitches (the white keys on a piano) but starting on different notes. Starting note determines the pattern of whole and half steps, which determines the emotional character.
 
-| Mode | Start | Character |
-|---|---|---|
-| Ionian | C | Major — bright, conclusive, Western default |
-| **Dorian** | D | Minor with raised 6th — searching, bittersweet |
-| Phrygian | E | Minor with flattened 2nd — Spanish, ancient |
-| **Lydian** | F | Major with raised 4th — floating, otherworldly |
-| Mixolydian | G | Major with flattened 7th — unresolved, rock/folk |
-| Aeolian | A | Natural minor — sad, inward |
-| Locrian | B | Diminished — unstable, maximum dissonance |
+| Mode | Start | Half-step positions | Character |
+|---|---|---|---|
+| Ionian | C | 3–4, 7–8 | Major — bright, conclusive, Western tonal default |
+| **Dorian** | D | 2–3, 6–7 | Minor with raised 6th — searching, bittersweet, jazz and folk |
+| **Phrygian** | E | 1–2, 5–6 | Minor with flattened 2nd — Spanish, ancient, severe |
+| **Lydian** | F | 4–5, 7–8 | Major with raised 4th — floating, otherworldly, unresolved brightness |
+| Mixolydian | G | 3–4, 6–7 | Major with flattened 7th — folk, rock, warmly unresolved |
+| Aeolian | A | 2–3, 5–6 | Natural minor — inward, familiar darkness |
+| Locrian | B | 1–2, 4–5 | Diminished — unstable, almost unusable as a tonal home |
 
-**For Jus Pulsus**: Dorian is the Protagonist's home territory — minor but not hopeless, searching but not lost. Lydian is a candidate for the Bell's floating, raised-fourth quality. Phrygian is the Indian intrusion's Western analog.
+The modes most useful for programmatic work are Dorian (searching, capable of resolution but uncompelled by it), Lydian (dreamlike floating), and Phrygian (severe, ancient, foreign-sounding to Western ears).
 
 In Sonic Pi:
 
 ```ruby
-play_pattern_timed scale(:d3, :dorian), [0.5, 0.5, 0.5, 0.5, 1, 1]
-play_pattern_timed scale(:f3, :lydian), [0.25, 0.25, 0.5, 0.5, 0.5, 0.5, 1]
+# The modes have direct Sonic Pi equivalents
+play_pattern_timed scale(:d3, :dorian),    [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1.0]
+play_pattern_timed scale(:f3, :lydian),    [0.25, 0.25, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+play_pattern_timed scale(:e3, :phrygian),  [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1.0]
 ```
+
+## The Mode as Character Decision
+
+The mode a character inhabits is a character decision, not a harmonic convenience. Dorian sounds like someone who has lived in minor keys but found unexpected light in them. Phrygian sounds like something that predates the Western tonal tradition. Lydian sounds like someone who exists slightly outside normal gravity.
+
+The most generative question is not "what mode should this character be in?" but "when something disrupts this character, which mode do they briefly adopt — and why does that mode feel *wrong* for them?" The answer defines the character's world music intrusion moment with harmonic precision.
+
+A Dorian character pushed briefly into Phrygian sounds like someone having their familiar certainties disturbed by something older and more severe. A Lydian character pushed into Aeolian sounds like something ethereal suddenly becoming heavy. The friction between the character's natural mode and the intrusion mode is the musical expression of the disruption.
 
 ## Raga Bhairav
 
-The Indian raga most relevant to the Indian intrusion moment. Uses a flattened second and sixth:
+Raga Bhairav is one of the most immediately striking ragas for Western ears encountering Indian classical music. It uses a flattened second and sixth:
 
 - Scale degrees: 1, ♭2, 3, 4, 5, ♭6, 7
 - In C: C, D♭, E, F, G, A♭, B
-- Character: simultaneously ancient, meditative, and emotionally raw — something from before music had a genre
+- Traditional time: early morning
+- Character: simultaneously ancient, meditative, and emotionally raw — something that sounds like it predates genre
 
-In Sonic Pi (built manually from semitone intervals):
+The flattened second (the half-step between root and second degree) is shared with the Western Phrygian mode — which is why Bhairav sounds both foreign and familiar to Western ears simultaneously. But the approach and departure rules differ from simply playing the scale: in Bhairav, the D♭ has specific ornamental treatments, specific ways of arriving and leaving. The raga is not just the pitches — it is the grammar of movement through them.
+
+In Sonic Pi:
 
 ```ruby
+# Raga Bhairav from root C3, built from semitone offsets
 root = :c3
 bhairav_offsets = [0, 1, 4, 5, 7, 8, 11]
 bhairav = bhairav_offsets.map { |i| root.to_i + i }
 
-# The Indian intrusion
-live_loop :indian_intrusion do
-  sleep 64  # wait for the right moment
+# Ascending phrase with appropriate rubato feel
+live_loop :bhairav_ascent do
   bhairav.each do |p|
-    play p, sustain: rrand(0.5, 2.0), amp: rrand(0.3, 0.6)
-    sleep rrand(0.5, 1.5)
+    play p,
+      sustain: rrand(0.4, 1.5),
+      amp:     rrand(0.3, 0.6)
+    sleep rrand(0.35, 1.0)
   end
 end
 ```
 
-## Choosing a Mode Per Character
+## Building Your Mode Vocabulary
 
-The mode decision is a character decision. Ask:
-- Does this character seek resolution (Ionian/Aeolian) or evade it (Dorian/Lydian)?
-- Does it sound ancient (Phrygian) or contemporary (Mixolydian)?
-- When the Rhythm Antagonist touches it, which mode does it briefly adopt — and why does that mode feel foreign to its natural habitat?
+The minimum modes worth internalizing for programmatic work:
 
-That last question defines the world music intrusion moment with precision.
+**For searching, bittersweet characters**: Dorian. The raised 6th creates an unexpected brightness in what would otherwise be pure minor — hope that doesn't quite dominate the sadness.
+
+**For floating, otherworldly characters**: Lydian. The raised 4th creates a slightly wrong brightness — the major scale with one note slightly too high, never quite settling.
+
+**For ancient, severe, foreign-sounding intrusions**: Phrygian or Bhairav. Both are defined by the half-step between root and second degree — the most tense interval in Western harmony, but when used as a mode rather than as a neighbour note, it sounds less anxious and more primordial.
+
+**For warmly unresolved characters**: Mixolydian. The flattened 7th prevents complete tonal closure — the character always has somewhere to go but never seems urgently compelled to go there.
+
+*Project connection: In a programmatic work that incorporates world music elements, the raga and mode system provides the harmonic vocabulary for each intrusion moment. The specific mode or raga chosen is not an aesthetic preference — it determines the emotional register of the intrusion, what tradition it evokes, and how the character sounds in their disrupted state.*

@@ -3,80 +3,123 @@ title: "Higher-Order Chains and Musical Memory"
 branch: "markov-chains"
 order: 2
 montessoriNode: "branches/markov-chains"
-description: "When the next note depends on the last two or three. How memory creates the impression of intention."
+description: "When the next note depends on the last two or three. Phrase-level coherence, momentum, and event-triggered probability shifts."
 draft: false
 ---
 
 A first-order chain has no memory beyond the immediately previous note. A second-order chain remembers the last two. A third-order chain remembers the last three.
 
-First-order chains produce note-to-note coherence. Higher-order chains produce phrase-level coherence — the music starts to sound like it is going somewhere over a span of 4–8 notes, not just making local decisions.
+The musical difference is significant: first-order chains produce note-to-note coherence. Higher-order chains produce *phrase-level* coherence — the music starts to feel like it is going somewhere over a span of 4–8 notes, not just making local decisions. This is the difference between a character who wanders and a character who searches.
 
 ## Why Memory Matters
 
-The Protagonist *searches*. Searching is not random — it involves moving toward something, backing off, trying another direction. That behavior requires memory. A first-order chain doesn't search; it wanders. A second-order chain can search.
+Consider the musical behaviour of searching: moving toward something, backing off, trying a different approach, eventually arriving. That behaviour requires memory. A first-order chain doesn't search — it simply moves to the most probable next note given where it is. A second-order chain can search, because it can weight its choices based on the *direction* it was already moving.
 
-The Third Fate (the archivist) *quotes* past material. That behavior requires a form of memory — not just what note came last, but what happened earlier.
+If a voice has been moving up for the last two notes, a second-order chain can make it more likely to either continue upward (momentum) or reverse direction (retreat). If it has been moving down, the probabilities shift accordingly. This is the difference between a random walk and a directed search.
 
 ## Second-Order Chain in Sonic Pi
 
 ```ruby
 # Track the last two notes
-last_two = [:e4, :g4]
+last_two = [:e4, :g4]  # seed values to start
 
-define :next_note do |prev_two|
+define :choose_next do |prev_two|
   a, b = prev_two
-  interval = (note(b) - note(a))  # direction of last move
+  interval = note(b) - note(a)   # positive = was moving up, negative = was moving down
 
   if interval > 0
-    # Was moving up: slightly more likely to continue up or reverse
-    candidates = [:c4,:d4,:e4,:f4,:g4,:a4,:b4,:c5,:d5,:e5]
-    weights    = [1,  2,  3,  2,  4,  4,  3,  3,  2,  2]
+    # Was moving up: more likely to continue up, or stop, less likely to drop steeply
+    candidates = [:c4, :d4, :e4, :f4, :g4, :a4, :b4, :c5, :d5, :e5]
+    weights    = [  1,   2,   3,   2,   4,   4,   3,   3,   2,   2]
+  elsif interval < 0
+    # Was moving down: more likely to continue down or turn around
+    candidates = [:c4, :d4, :e4, :f4, :g4, :a4, :b4, :c5, :d5, :e5]
+    weights    = [  2,   2,   4,   3,   4,   3,   2,   2,   1,   1]
   else
-    # Was moving down: slightly more likely to continue down or reverse
-    candidates = [:c4,:d4,:e4,:f4,:g4,:a4,:b4,:c5,:d5,:e5]
-    weights    = [2,  2,  4,  3,  4,  3,  2,  2,  1,  1]
+    # Was stationary: equal likelihood of moving either way
+    candidates = [:c4, :d4, :e4, :f4, :g4, :a4, :b4, :c5]
+    weights    = [  2,   2,   3,   3,   3,   2,   2,   1]
   end
 
   candidates.wrand(weights)
 end
 
-live_loop :protagonist do
-  n = next_note(last_two)
-  play n, sustain: 0.4, amp: 0.6
-  last_two = [last_two[1], n]
+live_loop :searching_voice do
+  n = choose_next(last_two)
+  play n, sustain: rrand(0.3, 0.8), amp: rrand(0.4, 0.7)
+  last_two = [last_two[1], n]  # shift window forward
   sleep rrand(0.3, 0.8)
 end
 ```
 
-Now the Protagonist tends to continue a direction it was already moving — but not always. It searches with momentum.
+Now the voice tends to continue in the direction it was already moving — but not always. It searches with momentum, occasionally reverting.
 
-## Cued Memory: Responding to Events
+## Third-Order: Phrase Shapes
 
-The most powerful form of memory is event-triggered behavior. A character can remember specific narrative events and alter its probability table in response:
+A third-order chain can encode complete phrase shapes. If the last three notes were all rising, the voice might tend to peak and begin falling. If the last three were all falling, it might tend to bottom out and reverse. This produces the sense of genuine melodic phrasing rather than stepwise wandering.
 
 ```ruby
-$kintsugi_wound_has_occurred = false
+last_three = [:e4, :g4, :b4]
 
-live_loop :fates do
-  if $kintsugi_wound_has_occurred
-    # After the wound: First Fate's minor seconds dominate
-    pitches = [:e5, :f5, :e5, :eb5]
-    pitches.each do |p|
-      play p, sustain: 0.8, amp: rrand(0.3, 0.5)
-      sleep 1
-    end
+define :phrase_next do |prev_three|
+  a, b, c = prev_three
+  trend = (note(c) - note(a))  # overall direction over last 3 notes
+
+  if trend > 4
+    # Strongly ascending: likely to peak and turn
+    [:a3, :b3, :c4, :d4, :e4, :f4, :g4].wrand([1, 2, 3, 4, 3, 2, 1])
+  elsif trend < -4
+    # Strongly descending: likely to bottom and turn
+    [:c4, :d4, :e4, :f4, :g4, :a4, :b4].wrand([1, 2, 3, 4, 3, 2, 1])
   else
-    # Before: normal Fates behavior
-    play choose([:g5, :a5, :b5, :d6]), sustain: rrand(0.3, 0.8)
-    sleep rrand(0.5, 1.5)
+    # In mid-range: continue with mild momentum
+    [:c4, :d4, :e4, :f4, :g4, :a4, :b4, :c5].wrand([2, 2, 3, 3, 3, 2, 2, 1])
   end
 end
 ```
 
-The Fates literally change their probability distribution when the wound occurs. They are *responding* to the narrative, not running their pattern.
+## Event-Triggered Probability Shifts
 
-## The Character Design Implication
+The most powerful application of Markov memory is event-triggered table switching — a character whose probability distribution changes permanently when a narrative event occurs:
 
-Higher-order chains and event-triggered memory let characters have what sounds like emotional continuity — behavior that reflects what has happened to them. This is how you make a character sound traumatized, or joyful, or distracted, without writing out every note explicitly.
+```ruby
+# Global event state
+$structural_event_occurred = false
 
-The wound changes the table. That is the kintsugi, encoded as mathematics.
+# Character voice with two probability states
+live_loop :event_sensitive_voice do
+  scale_notes = $structural_event_occurred ?
+    # After the event: more erratic, more silence, narrower range
+    [:e4, :e4, :f4, :r,  :r,  :e4, :d4] :
+    # Before the event: flowing, searching, active
+    [:e4, :g4, :a4, :b4, :g4, :f#4, :e4]
+
+  n = scale_notes.choose
+  unless n == :r
+    play n, sustain: rrand(0.3, 1.0), amp: rrand(0.4, 0.7)
+  end
+  sleep rrand(0.4, 1.2)
+end
+
+# Trigger the event at the appropriate moment in the composition
+live_loop :event_trigger do
+  sleep 3600  # 60 minutes into performance
+  $structural_event_occurred = true
+  stop
+end
+```
+
+The character literally becomes statistically different after the event. The same voice, a different psychology. This is how you encode irreversible narrative events in the probability tables — not by writing new material, but by changing the weights.
+
+## When to Use Which Order
+
+| Order | Use when... |
+|---|---|
+| First | Character needs note-to-note consistency but no directional tendency |
+| Second | Character searches, has momentum, moves with purpose |
+| Third | Character has distinct phrase shapes — peaks, valleys, arcs |
+| Event-triggered | Character needs to change permanently after a narrative event |
+
+Most characters need first or second order. Third order is for characters with particularly expressive melodic arcs. Event-triggered switching is for any character whose psychology changes across the work's structure.
+
+*Project connection: Characters who are altered by the central structural event of the work need their probability tables to change at that moment. The pre-event and post-event states are different characters in statistical terms, even though they share pitch vocabulary and timbral identity. The wound changes the table. That is how permanence is encoded in stochastic music.*

@@ -3,11 +3,11 @@ title: "The Harmonic Series: Why Instruments Sound Like Themselves"
 branch: "music-theory"
 order: 3
 montessoriNode: "branches/music-theory"
-description: "The overtone series as the physics underlying timbre, consonance, and Pulsus's gravitational pull. Why a French horn sounds like authority."
+description: "The overtone series as the physical basis for timbre, consonance, and why instrumental casting in programmatic music is physics as much as aesthetics."
 draft: false
 ---
 
-Every pitched sound — a plucked string, a blown horn, a struck bell — is not a single frequency. It is a fundamental frequency plus a series of higher frequencies (overtones) occurring simultaneously, each at a specific mathematical ratio to the fundamental. This series is not a cultural construction. It is a physical fact. And it is the reason instruments have timbral personalities.
+Every pitched sound — a plucked string, a blown horn, a struck bell — is not a single frequency. It is a fundamental frequency plus a series of higher frequencies (overtones) occurring simultaneously, each at a specific mathematical ratio to the fundamental. This series is a physical fact, not a cultural construction. And it is the reason instruments have timbral personalities.
 
 ## The Series Itself
 
@@ -24,47 +24,63 @@ If the fundamental is C2 (65 Hz), the harmonic series ascending from it produces
 | 7th | 7:6 | B♭4 (slightly flat) | Minor seventh |
 | 8th | 8:7 | C5 | Octave |
 
-The first six harmonics produce the major chord. The major chord is not a cultural invention — it is the natural resonance pattern of vibrating matter. When you hear something "feel resolved" on a major chord, you are responding to a physical phenomenon older than music.
+The first six harmonics produce the major chord. The major chord is not a cultural invention — it is the natural resonance pattern of vibrating matter. When you hear something resolve on a major chord, you are responding to a physical phenomenon older than music.
 
 ## Why This Matters for Timbre
 
-Instruments differ not in which harmonics are present but in *which harmonics are loud*. A clarinet emphasises odd-numbered harmonics and suppresses even ones — which is why it sounds hollow. A French horn has strong upper harmonics that give it authority and carrying power. A viola emphasizes the lower-middle harmonics, producing warmth and slight melancholy.
+Instruments differ not in which harmonics are present but in *which harmonics are loud*. A clarinet emphasises odd-numbered harmonics and suppresses even ones — which is why it sounds hollow and pure. A French horn has strong upper harmonics that give it authority and carrying power. A viola emphasises the lower-middle harmonics, producing warmth and a slight introspective quality. An oboe has a nasal, slightly reedy character because of a specific emphasis in the mid-upper harmonics.
 
-**This is why the instrumental casting of Jus Pulsus is not arbitrary.** The French horn is Pulsus because its harmonic profile is dominant — it fills acoustic space in a way that is physically unavoidable. The viola is the Cosmos's searching voice because its harmonic warmth feels like reaching. The double bass is the Ground because its fundamental resonates in the body before the mind processes it.
+**This means instrumental casting is not aesthetic preference — it is physics.** An instrument's role in a programmatic work should be determined in part by what its harmonic profile communicates, not just by what register it occupies or what tradition it belongs to.
+
+A French horn's authority is not a cultural association built up over centuries of horn-playing in orchestras. It is a consequence of a harmonic profile that projects dominance in acoustic space — the upper harmonics carry further and fill a room in a way that is physically unavoidable. A viola's warmth is the acoustic result of emphasized lower-middle harmonics. A double bass produces fundamental frequencies in the range where pitch perception begins to dissolve into tactile sensation — the note is felt before it is heard.
+
+When casting is right — when the instrument's physical harmonic profile matches the character's narrative personality — the casting feels not chosen but discovered.
 
 ## Consonance and Dissonance as Physics
 
-Intervals that appear early in the harmonic series sound consonant because they occur naturally together in physical resonance. The octave (2:1) and perfect fifth (3:2) are the most consonant intervals. The minor second (16:15) is deeply dissonant because the ratio is complex and the two frequencies interfere with each other rather than reinforcing.
+Intervals that appear early in the harmonic series sound consonant because they occur naturally together in physical resonance. The octave (2:1) and perfect fifth (3:2) are the most consonant intervals because they share the most harmonic frequencies.
 
-Pulsus's signature interval — the minor second pressure — is dissonant because the physics of vibration says it should be. When Pulsus presses a half-step against a character, you feel that tension not as an aesthetic response but as a physical one. The sound waves are fighting each other. Your nervous system registers the fight before you understand it.
+The minor second (approximately 16:15) is deeply dissonant because the ratio is complex and the two frequencies create interference patterns — the waveforms fight each other rather than reinforcing. This is not a cultural rule. The physics of wave superposition produces the perception of roughness and tension between closely spaced frequencies.
+
+When you use a specific dissonant interval deliberately as a tension device — a half-step pressure between two simultaneous voices — you are working with wave interference physics. The listener's nervous system registers the interference before the conscious mind processes the harmonic content.
 
 ## The Harmonic Series in Sonic Pi
 
 ```ruby
-# Build a chord from the harmonic series above C
+# Build a chord from the harmonic series above C2
+# This is what the C2 fundamental "actually sounds like" — its harmonic content made visible
 fundamental = :c2
-harmonic_series = [
-  fundamental,
-  :c3,   # 2nd harmonic — octave
-  :g3,   # 3rd harmonic — fifth
-  :c4,   # 4th harmonic
-  :e4,   # 5th harmonic — major third
-  :g4,   # 6th harmonic
-]
+harmonic_series = [fundamental, :c3, :g3, :c4, :e4, :g4]
 
-# Play all harmonics simultaneously — this is the physics of a C2 tone made explicit
-live_loop :harmonic_ground do
-  harmonic_series.each do |h|
-    play h, amp: 1.0 / harmonic_series.index(h).next, sustain: 4, release: 1
+# Amplitude decreases with harmonic number — approximating natural physics
+live_loop :harmonic_demonstration do
+  harmonic_series.each_with_index do |h, i|
+    play h,
+      amp:     1.0 / (i + 1),   # each harmonic quieter than the last
+      sustain: 4,
+      release: 1
   end
   sleep 6
 end
 ```
 
-The amplitude division (`1.0 / index`) approximates the natural decay of upper harmonics — lower harmonics are louder, upper harmonics are quieter. This is how a physical instrument actually sounds.
+Run this and listen. You are hearing the physics of a single low C — its full harmonic content spread out and made individually audible. A real instrument playing C2 produces exactly this, with the harmonics blended into a single perceived timbre.
 
-## La Monte Young and Pulsus
+## Beating and Sustained Tension
 
-La Monte Young's drone works (see Project Track W14) use held tones from the harmonic series and allow the interference patterns between them to be the music. When two tones near each other in the harmonic series are held simultaneously, they produce beating — a slow amplitude oscillation whose frequency equals the difference between the two tones' frequencies.
+When two tones near each other in frequency are held simultaneously, they produce beating — a slow amplitude oscillation whose frequency equals the difference between the two tones. At 440 Hz and 444 Hz, the beating is 4 Hz — four oscillations per second, clearly audible.
 
-This beating is Pulsus's physical mechanism. When Pulsus presses close to a character, the interval between them is small enough that the beating becomes audible. The character feels the pressure as a physical vibration. The closer Pulsus gets, the faster the beating. When Pulsus coincides exactly with a character's frequency — when the look happens — the beating stops. Complete consonance. Complete loss.
+La Monte Young's drone works (see Project Track W14) use this phenomenon deliberately: sustained tones from the harmonic series, held long enough for the interference patterns between them to become the music. The beating IS the music. It changes in character as overtone relationships shift.
+
+In practical composition, beating creates a specific kind of sustained physical tension between two voices — not melodic tension, not rhythmic tension, but acoustic tension in the body. Two sustained voices a minor second apart beat against each other at a rate the nervous system registers as urgency.
+
+```ruby
+# Two voices a minor second apart — the beating is audible and physical
+live_loop :tension_demonstration do
+  play :e4, sustain: 8, amp: 0.5
+  play :f4, sustain: 8, amp: 0.5
+  sleep 8
+end
+```
+
+*Project connection: The harmonic series explains why certain instrumental castings in programmatic work feel physically inevitable rather than chosen. When an instrument's harmonic profile matches a character's emotional register — dominant, searching, grounding, ancient — the casting has physics behind it. The instrument doesn't represent the character; it physically produces the same qualities.*

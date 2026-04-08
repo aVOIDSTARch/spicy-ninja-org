@@ -3,78 +3,105 @@ title: "First-Order Chains: Personality as Probability"
 branch: "markov-chains"
 order: 1
 montessoriNode: "branches/markov-chains"
-description: "Building a probability table for a character's melodic decisions. Weights encode personality."
+description: "Building a probability table for a character's melodic decisions. How weights encode personality, and how to implement the simplest Markov voice in Sonic Pi."
 draft: false
 ---
 
 A first-order Markov chain: you are currently on note X. You have a table of probabilities for where to go next. You roll weighted dice. The weights are the character's personality encoded mathematically.
 
-## Building a Table for the Bell
+The probability table is built by asking: given that this character is *currently* on this note, how likely are they to move to each possible next note? The answer differs by character. A sparse, patient character might stay on the same note frequently and rest often. A searching character might favour stepwise motion. A relentless character might prefer specific half-step pressures.
 
-The Bell has a pentatonic tendency and favors the *yun* principle — sparse, weighted toward silence and repetition:
+## Building a Probability Table
 
-| Current | Stay | Step up | Leap up | Step down | Rest |
-|---|---|---|---|---|---|
-| Low C | 10% | 40% | 15% | 5% | 30% |
-| Mid E | 15% | 25% | 10% | 25% | 25% |
-| High G | 20% | 5% | 5% | 35% | 35% |
+Before writing any code, design the table in plain terms. For a sparse, high, pentatonic character:
 
-This table encodes: the Bell is more likely to rest than a typical melodic instrument; it has a preference for stepwise motion; it is comfortable with long silences.
+| Currently on | Most likely next | Somewhat likely | Less likely | Rare |
+|---|---|---|---|---|
+| Root (C) | Step up (E) | Stay (C) | Rest | Leap up (G) |
+| Mid (E) | Step down (C) | Step up (G) | Stay (E) | Rest |
+| High (G) | Step down (E) | Stay (G) | Rest | Root (C) |
 
-## In Sonic Pi: `wrand`
+This encodes: prefers stepwise motion, comfortable staying in place, occasionally rests, rarely leaps. Every design decision here is a character decision.
 
-`wrand` picks from a list with weights — higher weight means more likely:
+Contrast this with a dense, insistent character who favours the minor second pressure:
+
+| Currently on | Most likely | Somewhat likely | Less likely | Rare |
+|---|---|---|---|---|
+| E4 | E4 (stay) | F4 (half step up) | D4 (step down) | Rest |
+| F4 | E4 (resolve down) | F4 (stay) | G4 (step up) | Rest |
+
+This character presses against half-steps, stays in place, rarely rests, and almost never makes large leaps. Completely different personality.
+
+## In Sonic Pi: Weighted Arrays
+
+Sonic Pi doesn't have a built-in weighted random function, but the pattern is straightforward — put items into an array proportional to their desired probability, then use `.choose`:
 
 ```ruby
-bell_pitches = [:c5, :e5, :g5, :a5, :c6]
+# Weighted pentatonic voice: root most common, high G least common
+pentatonic_weighted = [
+  :c5, :c5, :c5, :c5,   # 4/12 = 33%
+  :e5, :e5, :e5,         # 3/12 = 25%
+  :g5, :g5,              # 2/12 = 17%
+  :a5, :a5,              # 2/12 = 17%
+  :c6                    # 1/12 =  8%
+]
 
-# Weights: g5 and a5 most common (weight 4 and 3)
-live_loop :bell do
-  next_pitch = bell_pitches.wrand([1, 3, 4, 3, 1])
+live_loop :sparse_voice do
+  pitch = pentatonic_weighted.choose
+  gap   = [0.5, 1.0, 1.5, 2.0, 3.0].choose
 
-  # Sparse timing: weighted toward longer gaps
-  gap = [0.5, 1.0, 1.5, 2.0, 3.0].wrand([1, 2, 4, 3, 2])
-
-  play next_pitch,
-       attack:  0.01,
-       decay:   0.1,
-       sustain: 0.3,
-       release: gap * 0.7,
-       amp: rrand(0.3, 0.6)
+  play pitch,
+    attack:  0.01,
+    sustain: 0.2,
+    release: gap * 0.8,
+    amp:     rrand(0.25, 0.55)
 
   sleep gap
 end
 ```
 
-This Bell sounds different every run. But it always sounds like itself — sparse, high, pentatonic. The weights are the character.
+This voice will sound different every time. But it will always sound sparse, high, and pentatonic — because the weights enforce those tendencies even as the specific note sequence varies.
 
-## Building a Table for the Protagonist
+## A Full Transition Table
 
-The Protagonist is searching, harmonically wide, drawn to resolution but capable of delay. Its table would have higher weights on stepwise motion, lower weights on rests, and include the full Dorian scale rather than just pentatonic notes:
+For true Markov behaviour, the weights change depending on the *current* note:
 
 ```ruby
-protagonist_scale = scale(:d3, :dorian).to_a
+# Transition table: current note → weighted array of next notes
+transitions = {
+  :c5 => [:c5, :c5, :e5, :e5, :e5, :g5, :a5],          # from root: likely step up
+  :e5 => [:c5, :c5, :e5, :g5, :g5, :a5, :c6],           # from mid: can go either way
+  :g5 => [:e5, :e5, :e5, :g5, :a5, :c5, :c6],           # from high mid: likely step down
+  :a5 => [:g5, :g5, :e5, :a5, :a5, :c6, :c5],           # from 6th: gravitates to fifth
+  :c6 => [:a5, :a5, :g5, :g5, :e5, :c5, :c6],           # from top: pulls strongly downward
+}
 
-live_loop :protagonist do
-  # Weight middle of the scale more than extremes
-  weights = protagonist_scale.length.times.map do |i|
-    mid = protagonist_scale.length / 2.0
-    4 - (i - mid).abs.round  # bell curve centered on middle
-  end.map { |w| [w, 1].max }
+live_loop :markov_voice do
+  current_note ||= :c5
 
-  n = protagonist_scale.wrand(weights)
-  play n, sustain: rrand(0.3, 1.2), amp: rrand(0.4, 0.8)
-  sleep rrand(0.25, 1.5)
+  play current_note,
+    sustain: rrand(0.3, 1.2),
+    amp:     rrand(0.3, 0.6)
+
+  sleep rrand(0.5, 2.5)
+
+  options = transitions[current_note] || transitions.values.sample
+  current_note = options.choose
 end
 ```
 
+The `||=` initialises `current_note` to `:c5` on the first iteration only. Every subsequent iteration it already has a value from the previous choice.
+
 ## The Character Design Questions
 
-Before writing a Markov table:
-- What notes does this character favor? (Pitch weights)
-- Does it like to stay in place or move? (Repetition weight)
-- Does it prefer steps or leaps? (Interval weights)
-- How does it feel about silence? (Rest weight)
-- Does it resolve or evade? (Direction toward or away from tonic)
+Before writing any probability table, answer these for the character in question:
 
-Answering these in terms of probabilities forces decisions specific enough to produce a distinct sonic personality.
+- What notes does this character favour? (Pitch weights — which pitches appear more often in the weighted arrays)
+- Does it like to stay in place or move? (Repetition weight — how often the current note appears as a next-note option)
+- Does it prefer steps or leaps? (Interval weights — are adjacent pitches weighted higher than distant ones?)
+- How does it feel about silence? (Rest weight — include `:r` as a possible "note" with a frequency that matches the character)
+- Does it resolve toward a tonal centre or evade it? (Direction weights — does the table pull toward the root or away from it?)
+
+The answers to these questions produce a table. The table produces a voice. The voice is the character.
+
+*Project connection: In a work with many simultaneous characters, Markov chains allow each character to have a distinct behavioural identity that persists through live performance — not just a distinct pitch set, but a distinct decision-making style. The sparse character rests in ways the insistent character never would. That difference is the personality.*
