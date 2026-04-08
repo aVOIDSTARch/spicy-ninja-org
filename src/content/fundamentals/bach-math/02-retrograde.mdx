@@ -3,64 +3,114 @@ title: "Retrograde: The Theme Played Backwards"
 branch: "bach-math"
 order: 2
 montessoriNode: "branches/bach-math"
-description: "Reversing a musical theme as a compositional operation. What retrograde sounds like and how to implement it in Sonic Pi."
+description: "Reversing a musical theme as a compositional operation. What it sounds like, what it means narratively, and how to implement it in Sonic Pi."
 draft: false
 ---
 
-Retrograde is the simplest Bach Math operation: play the notes of a theme in reverse order. The last note becomes first. The rhythm reverses too — if the original is long-short-short, the retrograde is short-short-long.
+Retrograde is the simplest Bach Math operation: play the notes of a theme in reverse order. The last note becomes first. The first becomes last. The rhythm reverses too — if the original is long-short-short, the retrograde is short-short-long.
 
-## Why It Matters
+## What Retrograde Sounds Like
 
-Retrograde makes a theme sound like the same identity moving in the opposite direction through time. A character walking toward the camera, then the same character walking away. Same person, reversed trajectory.
+A retrograded theme sounds like the same character moving in the opposite direction through time. The intervals are all familiar — the listener has heard every one of them in the original — but the direction of travel has reversed. It sounds like viewing a journey from its destination looking backward, rather than from the origin looking forward.
 
-For *Jus Pulsus*: the Cosmos' theme played backwards in Act IV is not a new theme. It is the Cosmos having passed through the wound — the same identity, but time is now working differently for it.
+This is different from simply feeling "backwards." Bach's retrograde subjects sound strange and familiar simultaneously. The ear recognises the pitch material but cannot immediately place it. Recognition arrives slightly delayed. That slight delay is compositionally useful — it creates a flicker of uncertainty before resolution.
+
+In Contrapunctus VII of the *Art of Fugue*, the subject appears simultaneously in original and retrograde form. One voice is arriving as another is departing. The effect is not confusion but depth — the same musical thought is present at multiple points in its own timeline at once.
+
+## What Retrograde Means Compositionally
+
+Retrograde is most naturally used when a theme needs to represent:
+
+- **Return to origin** — a character who has made a complete circuit and now moves back toward where they started, but from the other direction
+- **Temporal reversal** — a character whose relationship to cause and effect has changed; things that used to be results now feel like causes
+- **Structural closure** — the end of a work that is literally moving toward its own beginning
+- **A character seen from behind** — the same identity, but the perspective has shifted from "going" to "arriving"
 
 ## In Sonic Pi
 
 ```ruby
-# Store the theme as [pitch, duration] pairs
-theme = [[:e4, 0.5], [:g4, 0.25], [:a4, 0.25], [:b4, 1.0]]
+# Using the theme from Lesson 1
+theme = [
+  [:e4, 0.5], [:b4, 1.0], [:g4, 0.25], [:g4, 0.25],
+  [:a4, 0.5], [:f#4, 1.5]
+]
 
-# Retrograde: reverse the array
+# Retrograde: reverse the array of [pitch, duration] pairs
 theme_retro = theme.reverse
-# → [[:b4, 1.0], [:a4, 0.25], [:g4, 0.25], [:e4, 0.5]]
+# → [[:f#4, 1.5], [:a4, 0.5], [:g4, 0.25], [:g4, 0.25], [:b4, 1.0], [:e4, 0.5]]
 
-define :play_theme do |t|
-  t.each do |pitch, dur|
-    play pitch, sustain: dur * 0.9
-    sleep dur
+define :play_theme do |t, amp: 0.7|
+  t.each do |p, d|
+    play p, sustain: d * 0.85, amp: amp
+    sleep d
   end
 end
 
-live_loop :original do
+# Hear original and retrograde in sequence
+live_loop :comparison do
   play_theme theme
-  sleep 0.5
-end
-
-live_loop :retrograde do
-  sleep 8
-  play_theme theme_retro
-  sleep 0.5
+  sleep 1
+  play_theme theme_retro, amp: 0.55
+  sleep 1
 end
 ```
 
-## Rhythm-Only Retrograde
+## Pitch-Only Retrograde vs. Full Retrograde
 
-You can also retrograde just the rhythm while keeping the pitches:
+You can retrograde only the pitch sequence while keeping the original rhythm:
 
 ```ruby
-pitches   = [:e4, :g4, :a4, :b4]
-durations = [0.5, 0.25, 0.25, 1.0]
-retro_durs = durations.reverse   # → [1.0, 0.25, 0.25, 0.5]
+pitches   = theme.map { |p, _| p }
+durations = theme.map { |_, d| d }
 
-retro_durs.each_with_index do |dur, i|
-  play pitches[i], sustain: dur * 0.9
-  sleep dur
+retro_pitches = pitches.reverse
+# Durations stay the same — same rhythmic feel, reversed pitch contour
+
+retro_pitches.zip(durations).each do |p, d|
+  play p, sustain: d * 0.85
+  sleep d
 end
 ```
 
-Same pitches, reversed time feel — useful for a character in a changed emotional state without altering their harmonic vocabulary.
+Or retrograde only the rhythm while keeping the original pitches:
 
-## Exercise
+```ruby
+retro_durs = durations.reverse
+pitches.zip(retro_durs).each do |p, d|
+  play p, sustain: d * 0.85
+  sleep d
+end
+```
 
-Play your Cosmos theme forward, then backwards. Does the retrograde feel like the Cosmos going somewhere, or arriving from somewhere? Does it feel like the future or the past? Could it represent the Cosmos in Act IV — moving toward resolution from the other direction?
+Each variant has a different character. Full retrograde reverses everything. Pitch-only retrograde keeps the rhythmic identity while inverting the melodic direction. Duration-only retrograde changes the time feel while preserving the pitch contour. All three are useful in different contexts.
+
+## Hearing the Relationship
+
+```ruby
+# Play all four variants in sequence to hear the family resemblance
+live_loop :retrograde_study do
+  puts "Original"
+  play_theme theme
+
+  sleep 0.5
+
+  puts "Full retrograde"
+  play_theme theme.reverse
+
+  sleep 0.5
+
+  puts "Pitch retrograde, original rhythm"
+  pitches   = theme.map { |p, _| p }
+  durations = theme.map { |_, d| d }
+  pitches.reverse.zip(durations).each { |p, d| play p, sustain: d*0.85; sleep d }
+
+  sleep 0.5
+
+  puts "Original pitch, duration retrograde"
+  pitches.zip(durations.reverse).each { |p, d| play p, sustain: d*0.85; sleep d }
+
+  sleep 2
+end
+```
+
+*Project connection: In a four-act programmatic work, retrograde most naturally appears in Act IV, where material returns toward its origin. A character whose Act IV theme is the retrograde of their Act I theme has made a complete arc — not repetition, but return transformed by the journey.*

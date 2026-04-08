@@ -3,61 +3,117 @@ title: "Augmentation and Diminution"
 branch: "bach-math"
 order: 4
 montessoriNode: "branches/bach-math"
-description: "Stretching and compressing a theme's duration. The character moving through time at different speeds."
+description: "Stretching and compressing a theme's duration. What it sounds like to inhabit a different timescale, variable scaling, and how to combine temporal operations with pitch operations."
 draft: false
 ---
 
-Augmentation doubles all note durations. The same theme, at half speed. Diminution halves all durations: double speed, compressed, urgent. The pitches don't change. The intervals don't change. Only time changes.
+Augmentation doubles all note durations. The same theme at half speed. Diminution halves all durations: double speed, compressed, urgent. Pitches don't change. Intervals don't change. Only time changes.
 
-## What This Sounds Like
+These are the simplest operations to implement and among the most emotionally powerful.
 
-Augmentation makes a theme sound weighty, inevitable, geological. A melody that felt quick and searching becomes monumental when stretched to twice its length. Diminution suggests a character under pressure — the same ideas moving twice as fast.
+## What They Sound Like
 
-## For Jus Pulsus
+**Augmentation** makes a theme sound weighty, monumental, and inevitable. A phrase that felt quick and searching becomes geological when stretched to twice its length. This is not simply "the same music slower" — it is the same musical thought inhabiting a completely different temporal scale. The listener tracks the familiar intervals and rhythm, but experiences them at the pace of a larger, older thing.
 
-Pulsus is the BPM — the rhythmic grid itself. Augmentation represents Pulsus exerting steady gravitational pressure. Diminution is Pulsus pressing hard — the ecstatic tempest approaching, the BPM at maximum force.
+Bach uses augmentation in his most dense contrapuntal passages to create a specific effect: one voice states the subject at half speed while other voices race through it at full speed. The slow voice sounds ancient and certain surrounded by rapid movement. The two timescales make each other more vivid by contrast.
 
-The Cosmos' theme augmented in Act IV: the same identity, but inhabiting a different timescale. The wound has made everything slower, larger, more deliberate.
+**Diminution** makes a theme sound urgent, compressed, agitated. Double speed suggests a character under pressure — running, panicking, thinking too fast. The same pitches and intervals at compressed durations feel like the theme fighting against its own natural pace.
+
+## What They Mean Compositionally
+
+Augmentation is most useful when a character needs to feel larger than their normal scale — when what they represent has expanded beyond its original compass, or when they need to underpin rapid movement in other voices without competing with them.
+
+Diminution is most useful when a character is under pressure, when a theme needs to appear as an agitated background texture while another voice states it fully, or when a climactic build requires the same material at progressively faster speeds.
+
+The combination of augmentation in one voice and diminution in another is one of the most effective ways to represent two characters in radically different states simultaneously — both recognisably the same character, inhabiting opposite extremes of the temporal spectrum.
 
 ## In Sonic Pi
 
 ```ruby
-pitches   = [:e4, :g4, :a4, :b4, :d5]
-durations = [0.5, 0.5, 0.25, 0.25, 1.0]
+theme = [
+  [:e4, 0.5], [:b4, 1.0], [:g4, 0.25], [:g4, 0.25],
+  [:a4, 0.5], [:f#4, 1.5]
+]
 
-aug_durations = durations.map { |d| d * 2 }    # half speed
-dim_durations = durations.map { |d| d / 2.0 }  # double speed
+pitches   = theme.map { |p, _| p }
+durations = theme.map { |_, d| d }
 
-define :play_with_durs do |pitches, durs|
-  pitches.zip(durs).each do |p, d|
-    play p, sustain: d * 0.85
+# Augmentation: multiply all durations
+aug_2x = durations.map { |d| d * 2 }
+aug_3x = durations.map { |d| d * 3 }
+
+# Diminution: divide all durations
+dim_half = durations.map { |d| d / 2.0 }
+dim_qtr  = durations.map { |d| d / 4.0 }
+
+define :play_theme do |ps, ds, amp: 0.7|
+  ps.zip(ds).each do |p, d|
+    play p, sustain: d * 0.85, amp: amp
     sleep d
   end
 end
 
-live_loop :original do
-  play_with_durs pitches, durations
-  sleep 2
-end
+# Hear all five variants in sequence
+live_loop :temporal_study do
+  puts "Original (1×)"
+  play_theme pitches, durations
 
-live_loop :augmented do
-  sleep 8
-  play_with_durs pitches, aug_durations
-  sleep 2
-end
+  sleep 0.5
 
-live_loop :diminished do
-  sleep 22
-  play_with_durs pitches, dim_durations
-  sleep 2
+  puts "Diminution (½×) — double speed"
+  play_theme pitches, dim_half, amp: 0.6
+
+  sleep 0.5
+
+  puts "Augmentation (2×) — half speed"
+  play_theme pitches, aug_2x, amp: 0.65
+
+  sleep 1
 end
 ```
 
-## Variable Augmentation
+## Variable Scaling
 
-Any multiplier works. 1.5× for 50% slower. 3× for maximum gravity. The Cosmos under maximum Pulsus pressure might be at 4× diminution — its theme recognizable but compressed beyond what feels natural, distorted by the force pressing on it.
+Augmentation and diminution are not restricted to exact doubling or halving. Any multiplier works:
 
 ```ruby
+# 1.5× augmentation: 50% slower — still recognisably related, less extreme
 partial_aug = durations.map { |d| d * 1.5 }
-heavy_aug   = durations.map { |d| d * 3 }
+
+# 0.75× diminution: 25% faster — subtle urgency
+mild_dim = durations.map { |d| d * 0.75 }
 ```
+
+Variable scaling is useful for gradual transformation — a character who becomes progressively more compressed as external pressure increases, rather than switching suddenly between timescales.
+
+## Combining Temporal and Pitch Operations
+
+All Bach Math operations compose — they can be applied simultaneously:
+
+```ruby
+# Augmented inversion: upside down and at half speed
+midi      = pitches.map { |p| note(p) }
+root      = midi.first
+inv_midi  = midi.map { |m| root - (m - root) }
+aug_durs  = durations.map { |d| d * 2 }
+
+# Retrograde diminution: backwards at double speed
+retro_pitches  = pitches.reverse
+dim_retro_durs = durations.reverse.map { |d| d / 2.0 }
+
+live_loop :combined_study do
+  puts "Augmented inversion"
+  play_theme inv_midi, aug_durs
+
+  sleep 0.5
+
+  puts "Retrograde diminution"
+  play_theme retro_pitches, dim_retro_durs
+
+  sleep 1
+end
+```
+
+Each combination produces a different emotional register. Augmented inversion sounds like the original heard from a great height. Retrograde diminution sounds like a memory replaying at accelerated speed.
+
+*Project connection: In a programmatic work, augmentation most naturally represents a character carrying enormous weight — slowed not by hesitation but by the scale of what they hold. The combination of augmentation in one voice and diminution in another, both from the same original theme, creates a sense of two states of the same identity occupying the same moment.*

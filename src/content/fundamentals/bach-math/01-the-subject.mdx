@@ -1,52 +1,99 @@
 ---
-title: "The Subject: Building a Leitmotif That Can Be Transformed"
+title: "The Subject: Building a Theme That Can Be Transformed"
 branch: "bach-math"
 order: 1
 montessoriNode: "branches/bach-math"
-description: "What makes a theme mathematically workable. Interval structure, rhythm, and why some themes survive transformation while others collapse."
+description: "What makes a theme mathematically workable. Interval structure, rhythmic identity, and why some themes survive transformation while others collapse."
 draft: false
 ---
 
 A fugue subject is not just a catchy melody. It is a mathematical object designed to survive transformation. Not every theme can be inverted and still sound like itself. Not every theme can run backwards and produce something beautiful. Bach's subjects are carefully constructed so that their transformations are as interesting as the originals.
 
-Before you can apply Bach Math to your leitmotifs, you need to understand what makes a theme transformation-ready.
+Before applying any Bach Math operation, you need to understand what makes a theme transformation-ready — and how to store it in Sonic Pi so transformations can be computed automatically.
 
 ## Interval Structure Is the Foundation
 
-A leitmotif is defined by its **interval structure** — the distances between its notes — more than by its specific pitches. When you invert a theme, the specific pitches change but the interval relationships transform predictably. When you play it backwards, the pitches play in reverse but the rhythm reverses too.
+A theme is defined by its **interval structure** — the distances between successive notes in semitones — more than by its specific pitches. When you invert a theme, the specific pitches change but the interval relationships transform predictably: every positive interval becomes negative, every negative becomes positive.
 
-A theme with strong interval character — a distinctive rising fourth, a falling minor second, a leap followed by stepwise motion — survives transformation with its identity intact. A theme that is mostly stepwise and rhythmically bland will transform into something unrecognizable.
+A theme with strong interval character — a distinctive rising fourth, a falling minor second, a leap followed by stepwise motion — survives transformation with its identity intact. The distinctive intervals remain distinctive in their transformed forms. A theme that is mostly stepwise in a single direction will invert into something equally bland, and its identity will be lost.
 
-**For Jus Pulsus**: Each character's leitmotif needs at least one strong interval anchor. The Cosmos' viola theme should have a distinctive interval (a perfect fifth? a major seventh?) that survives inversion and remains recognizable. The Pulsus brass motif should have a rhythmic signature that persists through augmentation — it should sound like Pulsus moving slowly, not like a different character entirely.
+The *Art of Fugue* subject: D — A — F — D — C# — D. Intervals: +7, -4, -3, -1, +1. A large ascending fifth followed by descending thirds and a half-step resolution. Inverted: D — G — B♭ — D — E♭ — D. The large fifth now falls, the thirds now rise. Still distinctive. Still unmistakably related to the original. Still Bach.
 
 ## Rhythm Is the Other Axis
 
-Interval structure handles the pitch dimension. Rhythm handles the time dimension. When you augment a theme (double all durations), the rhythm becomes the main carrier of identity — the pitches are the same, the relationships are the same, but everything breathes more slowly.
+Interval structure handles the pitch dimension. Rhythm handles the time dimension.
 
-A theme with a strong rhythmic identity — a distinctive dotted rhythm, an unexpected rest, a syncopation — survives augmentation recognizably. The Pulsus motif, for example, might open with a short-short-long pattern. Augmented, that becomes long-long-very-long. Still recognizably Pulsus: still arriving late, still insisting on its own time.
+When you augment a theme (double all durations), rhythm becomes the primary carrier of identity — pitches are the same, intervals are the same, but everything breathes more slowly. A theme with a generic rhythm (all equal note values) will become equally generic when augmented. You will not be able to hear the connection to the original.
 
-## In Sonic Pi: Storing a Theme
+A theme with a strong rhythmic identity — a distinctive dotted rhythm, an unexpected rest, a syncopation at an unusual point in the bar — survives augmentation recognisably. The rhythm's personality persists at the new scale.
 
-Before you can transform a theme, you need to store it as data:
+The most transformation-resistant themes have both a distinctive interval sequence and a distinctive rhythm. Bach's *Art of Fugue* subject has both: the descending third at the end of the first phrase is both an interval choice and a rhythmic marker.
+
+## Storing a Theme in Sonic Pi
+
+Before any transformation can be computed, the theme must be stored as structured data:
 
 ```ruby
-# Store the theme as an array of [pitch, duration] pairs
-pulsus_theme = [
-  [:e4, 0.25], [:e4, 0.25], [:b4, 0.5],
-  [:d4, 0.25], [:c4, 0.75]
+# Theme as an array of [pitch, duration] pairs
+theme = [
+  [:d4, 1.0], [:a4, 0.5], [:f4, 0.5],
+  [:d4, 0.5], [:c#4, 0.5], [:d4, 1.0]
 ]
 
-# Extract pitches only
-pitches = pulsus_theme.map { |note| note[0] }
+# Extract pitches for pitch operations
+pitches = theme.map { |p, _| p }
+# → [:d4, :a4, :f4, :d4, :c#4, :d4]
 
-# Extract durations only  
-durations = pulsus_theme.map { |note| note[1] }
+# Extract durations for time operations
+durations = theme.map { |_, d| d }
+# → [1.0, 0.5, 0.5, 0.5, 0.5, 1.0]
+
+# Convert pitches to MIDI integers for arithmetic
+midi = pitches.map { |p| note(p) }
+# → [62, 69, 65, 62, 61, 62]
+
+# Compute interval sequence (semitone distances)
+intervals = midi.each_cons(2).map { |a, b| b - a }
+# → [7, -4, -3, -1, 1]
 ```
 
-Once a theme is stored this way, every Bach Math operation becomes a transformation on these arrays. The next lessons build on this structure.
+Once stored this way, every subsequent Bach Math operation is a transformation on `pitches`, `durations`, or `midi` — no retyping, no transcription errors.
 
-## Exercise
+## What Makes an Interval Sequence Transformation-Ready
 
-Take the Cosmos' viola theme (or any fragment you have sketched). Write down its interval sequence: the distance in semitones between each successive note. A rising minor third is +3. A falling perfect fifth is -7.
+Write down the interval sequence for any theme you want to work with. Ask:
 
-Now answer: if this theme were inverted (every interval flipped in direction), what would the first few notes be? Does it still feel like the Cosmos, or does it feel like something else? If it feels like something else, that is compositionally useful — inversion can represent the Cosmos *seen from Pulsus's perspective*, which is not the same Cosmos at all.
+**Is it asymmetric?** A sequence like `[7, -4, -3, -1, 1]` has large intervals mixed with small ones, and changes direction multiple times. Inverted: `[-7, 4, 3, 1, -1]`. The profile is different but equally distinctive. If the original is `[2, 2, 2, 2, 2]` (all whole steps), the inversion is `[-2, -2, -2, -2, -2]` — recognisably related but equally undistinguished.
+
+**Does it have at least one large interval?** Leaps of a fourth or more survive transformation visibly — they remain landmarks in the inverted or retrograded form.
+
+**Does the rhythm have personality?** Long notes, rests, and syncopations give the theme something to preserve across augmentation and diminution.
+
+## A Playable Example
+
+```ruby
+# A theme designed for transformation: asymmetric intervals, distinctive rhythm
+theme = [
+  [:e4, 0.5], [:b4, 1.0], [:g4, 0.25], [:g4, 0.25],
+  [:a4, 0.5], [:f#4, 1.5]
+]
+
+# Intervals: +7 (fifth up), -4 (third down), 0 (repeated), +2 (step up), -3 (third down)
+# Rhythm: short — long — short short — medium — long
+
+define :play_theme do |t, amp: 0.7|
+  t.each do |p, d|
+    play p, sustain: d * 0.85, amp: amp
+    sleep d
+  end
+end
+
+live_loop :theme_original do
+  play_theme theme
+  sleep 1
+end
+```
+
+Run this. Listen to the intervals and the rhythm. Now each subsequent lesson applies one operation to it, and you hear the relationship between the original and the transformation.
+
+*Project connection: In a programmatic work with multiple characters, every character's leitmotif needs to pass this test before any transformation is applied. A theme built for development can carry a four-act structure. A theme built only for initial impact cannot.*

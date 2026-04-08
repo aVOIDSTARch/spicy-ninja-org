@@ -1,76 +1,116 @@
 ---
-title: "Stretto and Counterpoint: Voices in Overlap"
+title: "Stretto and Counterpoint"
 branch: "bach-math"
 order: 5
 montessoriNode: "branches/bach-math"
-description: "Stretto as the mechanism for the ecstatic tempest. Overlapping voices and the emergent third thing."
+description: "Overlapping a theme with itself before the first statement completes. Two independent themes in simultaneous dialogue. The emergent third thing."
 draft: false
 ---
 
-In a fugue, stretto occurs when a second voice enters with the subject before the first voice has finished. The voices overlap — the theme is being stated simultaneously at different points in its own timeline.
+Stretto is what happens when a second voice enters with the subject before the first voice has finished stating it. The voices overlap. The theme is simultaneously in multiple stages of its own statement — beginning in one voice, middle in another, end in a third.
 
-This creates extreme density. In Bach's most intense fugues, stretto with three or four voices produces an almost unbearable sense of compression and urgency. The voices are pursuing each other.
+This is the culmination of Bach Math. Every previous operation transformed a theme in isolation. Stretto combines the theme with itself in time.
 
-## This Is Your Ecstatic Tempest
+## What Stretto Sounds Like
 
-The ecstatic tempest in *Jus Pulsus* is stretto at cosmological scale. Every character's theme entering before the previous character's theme has completed. Six or seven themes in simultaneous mid-statement. The music in multiple places at once.
+Stretto does not sound like chaos. Each voice is doing exactly the same thing as every other voice — stating the same theme in the same order. The compression comes from the overlap, not from disorder.
 
-## In Sonic Pi
+The listener hears multiple simultaneous states of the same identity: one near its beginning, one near its middle, one near its end. It sounds like crisis: the same thing is happening to a character at multiple points in its lifecycle simultaneously. Time is no longer sequential.
+
+Bach uses stretto at the climax of his most intense fugues. Contrapunctus X of the *Art of Fugue* introduces stretto with the subject in augmentation in one voice while diminished versions appear in the others — three timescales simultaneously, all the same material.
+
+## In Sonic Pi: Basic Stretto
 
 ```ruby
-pitches   = [:e4, :g4, :a4, :b4, :d5]
-durations = [0.5, 0.5, 0.25, 0.25, 1.0]
+theme = [
+  [:e4, 0.5], [:b4, 1.0], [:g4, 0.25], [:g4, 0.25],
+  [:a4, 0.5], [:f#4, 1.5]
+]
 
-define :play_theme do
-  pitches.zip(durations).each do |p, d|
-    play p, sustain: d * 0.85, amp: 0.7
+define :play_theme do |amp: 0.7|
+  theme.each do |p, d|
+    play p, sustain: d * 0.85, amp: amp
     sleep d
   end
 end
 
-# Three voices in stretto — each enters 1 beat after the last
+total_dur = theme.sum { |_, d| d }  # 4.0 beats
+
+# Three voices in stretto — each enters before the previous completes
 live_loop :voice_1 do
-  play_theme
-  sleep 0.5
+  play_theme amp: 0.7
+  sleep total_dur
 end
 
 live_loop :voice_2 do
-  sleep 1.0  # enters 1 beat late
-  play_theme
-  sleep 0.5
+  sleep 1.0  # enters 1 beat after voice_1
+  play_theme amp: 0.6
+  sleep total_dur
 end
 
 live_loop :voice_3 do
-  sleep 2.0  # enters 2 beats late — tighter
-  play_theme
-  sleep 0.5
+  sleep 2.0  # enters 2 beats after voice_1
+  play_theme amp: 0.5
+  sleep total_dur
 end
 ```
 
-## Counterpoint: Independent Voices Together
+Adjust the offset (the `sleep` before each voice) to control the density. Tighter offsets produce more compression. At very tight intervals the voices blur — individual statements become hard to follow and the total mass takes over.
 
-Stretto is one kind of counterpoint. But counterpoint also means fully independent themes running together. In Act III, the Cosmos' string theme and Pulsus' brass theme run simultaneously. They were written independently. Together they produce a third thing neither of them is.
+## Stretto with Transformed Forms
+
+The most powerful stretto combines original and transformed forms simultaneously:
 
 ```ruby
-cosmos_pitches = [:b3, :d4, :f#4, :a4]
-cosmos_durs    = [1.0, 0.5, 0.5, 2.0]
+pitches   = theme.map { |p, _| p }
+durations = theme.map { |_, d| d }
+midi      = pitches.map { |p| note(p) }
+root      = midi.first
+inv_midi  = midi.map { |m| root - (m - root) }
+aug_durs  = durations.map { |d| d * 2 }
 
-pulsus_pitches = [:e2, :e2, :b2, :g#2]
-pulsus_durs    = [0.5, 0.5, 1.0, 2.0]
-
-live_loop :cosmos do
-  cosmos_pitches.zip(cosmos_durs).each do |p, d|
-    play p, sustain: d * 0.9, amp: 0.6
-    sleep d
-  end
+# Voice 1: Original
+live_loop :stretto_o do
+  pitches.zip(durations).each { |p, d| play p, sustain: d*0.85, amp: 0.7; sleep d }
 end
 
-live_loop :pulsus do
-  pulsus_pitches.zip(pulsus_durs).each do |p, d|
-    play p, sustain: d * 0.9, amp: 0.8
-    sleep d
-  end
+# Voice 2: Inversion, offset
+live_loop :stretto_i do
+  sleep 1.5
+  inv_midi.zip(durations).each { |p, d| play p, sustain: d*0.85, amp: 0.6; sleep d }
+end
+
+# Voice 3: Augmentation, offset further
+live_loop :stretto_aug do
+  sleep 2.5
+  pitches.zip(aug_durs).each { |p, d| play p, sustain: d*0.85, amp: 0.5; sleep d }
 end
 ```
 
-Listen for what neither of them contains — the harmonies created at their intersections, the rhythmic interplay. That emergent third thing is not written anywhere in your code. It arises from the mathematics of the combination. This is the fugue. This is your piece.
+Now the density carries three timescales and two pitch forms simultaneously. The harmonic relationships between the voices produce intervals that neither voice contains alone. This is the emergent third.
+
+## Counterpoint: Independent Themes Together
+
+Stretto is counterpoint applied to a single theme. Counterpoint in the broader sense — two independent themes running simultaneously — is the same principle applied across characters.
+
+When two distinct themes play together, they produce a third thing: the harmonies at their intersections, the rhythmic interplay between their events, the emotional relationship between their characters. Neither voice plays this third thing. It arises from the mathematics of their combination.
+
+```ruby
+# Two independent themes
+theme_a = [[:b3, 1.0], [:d4, 0.5], [:f#4, 0.5], [:a4, 2.0]]
+theme_b = [[:e2, 0.5], [:g#2, 0.5], [:b2, 1.0],  [:e3, 2.0]]
+
+live_loop :voice_a do
+  theme_a.each { |p, d| play p, sustain: d*0.9, amp: 0.65; sleep d }
+end
+
+live_loop :voice_b do
+  theme_b.each { |p, d| play p, sustain: d*0.9, amp: 0.75; sleep d }
+end
+```
+
+Listen for what neither of them contains. The harmonies at their intersection points. The moments when their rhythms align versus when they diverge. The emergent third thing is not written anywhere in your code. It arises from the mathematics of the combination.
+
+This is Bach. This is counterpoint. Two complete voices producing a third result that neither voice is. The combination produces more than the sum.
+
+*Project connection: The climactic section of any programmatic work with multiple characters is almost always contrapuntal — all characters simultaneously present, each stating their own material, the emergent combination exceeding what any individual character contributes. Stretto and counterpoint are the mechanical preparation for that moment.*

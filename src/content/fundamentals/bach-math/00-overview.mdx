@@ -3,33 +3,32 @@ title: "Bach Math — Overview"
 branch: "bach-math"
 order: 0
 montessoriNode: "branches/bach-math"
-description: "Mathematical operations on musical material. Counterpoint as the oldest emergence engine. How fugue structure maps directly onto Jus Pulsus."
+description: "Mathematical operations on musical material. How Bach generated infinite variation from a single subject, and how those operations translate directly to Sonic Pi."
 draft: false
 ---
 
 Bach Math is not music history. It is a toolkit.
 
-The six lessons in this branch teach you to perform mathematical operations on musical material — the same operations Bach used to generate 14 complete fugues and 4 canons from a single subject. These operations translate directly to Sonic Pi code. When you understand them, you can derive infinite variation from any single leitmotif through transformation rather than invention.
+The six lessons in this branch teach you to perform mathematical operations on musical material — the same operations Bach used to generate 14 complete fugues and 4 canons from a single subject. Every operation translates directly to Sonic Pi code. When you understand them, you can derive infinite variation from any single theme through transformation rather than invention.
 
-## Why This Branch Exists
+## What Mathematical Operations on Music Means
 
-Jus Pulsus is built on a structural insight: each character has a leitmotif, and those leitmotifs develop by transformation across the four acts. The Cosmos' string theme in Act IV is not a new theme — it is the Act I theme that has passed through the kintsugi wound. Pulsus' brass pattern in the ecstatic tempest is not chaos — it is the opening pattern augmented, inverted, pressed into extreme density.
+A musical theme is a sequence of pitches and durations. Like any sequence, it can be reversed, reflected, scaled, and combined with overlapping copies of itself. These are not metaphors — they are literal mathematical operations on arrays of data.
 
-Bach figured out how to do this systematically. You are going to learn his method and apply it to electronic music.
+**Retrograde** plays the theme backwards. **Inversion** flips every interval upside down. **Retrograde inversion** does both. **Augmentation** doubles every duration. **Diminution** halves every duration. **Stretto** overlaps the theme with itself before the first statement has finished.
 
-## What You Will Be Able to Do
+Each operation produces a recognisably related variant. The retrograde sounds like the same identity moving in the opposite direction through time. The inversion sounds like the same character seen from the other side of a relationship. Augmentation sounds like the character inhabiting a different, slower timescale. They are not different themes — they are the same theme in different states.
 
-After completing this branch, you can take any leitmotif and produce:
+## Why This Matters for Programmatic Music
 
-- Its retrograde (backwards)
-- Its inversion (upside down)
-- Its retrograde inversion (both)
-- Its augmentation (half speed)
-- Its diminution (double speed)
-- A stretto version (overlapping voices entering before the previous completes)
+In any programmatic work where characters have leitmotifs that develop across acts, Bach Math is the primary toolkit for motivated transformation. A theme that begins as one thing and arrives as something different has almost always passed through some subset of these operations. The transformation feels motivated — caused by events — precisely because the mathematical relationship to the original is preserved even as the character of the result changes.
 
-And you will be able to combine these transformations to create the sense that a character has been changed by events — without abandoning the identity that makes them recognizable.
+Bach discovered this systematically. The *Art of Fugue* (1740–50) is the most extreme demonstration: 14 complete fugues and 4 canons derived from a single subject through these operations, combined simultaneously in every configuration the mathematics permits. The last fugue breaks off unfinished. His son added a note to the manuscript: "The author died here."
 
 ## The Sonic Pi Connection
 
-Every Bach operation has a direct Sonic Pi equivalent. This branch teaches both simultaneously. You are not learning music theory for its own sake. You are learning compositional tools that run in your actual environment.
+Every Bach operation has a direct Sonic Pi equivalent using array transformations. `.reverse` for retrograde. Interval arithmetic with `.map` for inversion. Duration scaling with `.map` for augmentation and diminution. Offset `live_loop` timing for stretto. This branch teaches both the compositional concept and its Sonic Pi implementation simultaneously.
+
+You are not learning music theory for its own sake. You are learning compositional tools that run in your actual environment.
+
+*Project connection: In any programmatic work with a large cast, leitmotif transformation is the difference between themes that feel decoratively varied and themes that feel like characters who have been through something. This branch is the mechanical foundation for that.*

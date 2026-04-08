@@ -3,65 +3,113 @@ title: "Inversion: The Theme Turned Upside Down"
 branch: "bach-math"
 order: 3
 montessoriNode: "branches/bach-math"
-description: "Flipping a theme's intervals to produce its mirror image. The Cosmos seen from Pulsus's perspective."
+description: "Flipping a theme's intervals to produce its mirror image. What inversion sounds like, the four combinatorial forms, and how to compute them in Sonic Pi."
 draft: false
 ---
 
-Inversion flips every interval: a rising step becomes a falling step, a leap upward becomes a leap downward. The theme reflects around a central axis pitch — everything that went up now goes down.
+Inversion flips every interval in a theme: a rising step becomes a falling step, a leap upward becomes a leap downward. If the original moves +7 then -4 then -3, the inversion moves -7 then +4 then +3. The theme is reflected around a central axis pitch — everything that went up now goes down.
 
-If the original theme moves +3 semitones, then -5, then +1, the inversion moves -3, then +5, then -1.
+## What Inversion Sounds Like
 
-## The Narrative Meaning
+An inverted theme sounds like the same character with a reversed emotional direction. Rising intervals convey aspiration, arrival, reaching. Falling intervals convey descent, acceptance, return. Inversion doesn't change which intervals are present — it changes their direction.
 
-A theme that originally rises — forward-looking, searching — inverted becomes a theme that falls. The same intervals, same rhythm, but the emotional direction reversed.
+A theme that originally rises — forward-looking, searching — inverted becomes a theme that falls. Same interval sizes, same rhythm, same note-to-note distances, but the emotional trajectory reversed. It sounds like the original character seen from the other side of their relationship with someone.
 
-For *Jus Pulsus*: the Cosmos' viola theme inverted is not a new character. It is the Cosmos from Pulsus's vantage point. Or: the Cosmos after grief — what used to rise now falls.
+This is what makes inversion more musically interesting than retrograde for most melodic material: where retrograde reverses the *order* of events, inversion reverses the *direction* of each event. The result is simultaneously familiar and tonally altered.
 
-## In Sonic Pi
+## Why Bach Uses Inversion
+
+In fugue, inversion creates the countersubject — the melodic companion that runs against the main subject. Because its intervals are mirror images of the subject's, the two voices tend to produce stable intervals (thirds, sixths) when combined, rather than collisions. The mathematics of the mirror relationship produces natural harmonic compatibility.
+
+This is not accident. Bach designed his subjects specifically so that the inversion would be harmonically compatible with the original. In the *Art of Fugue*, subjects and inversions are combined simultaneously throughout — two voices at once, one the mirror of the other.
+
+## In Sonic Pi: Computing Inversion
 
 ```ruby
-root = 64  # :e4 in MIDI
-intervals = [0, 3, 5, 7, 10]   # semitone offsets
+theme = [
+  [:e4, 0.5], [:b4, 1.0], [:g4, 0.25], [:g4, 0.25],
+  [:a4, 0.5], [:f#4, 1.5]
+]
 
-original_pitches = intervals.map { |i| root + i }
-inverted_pitches = intervals.map { |i| root - i }
-# → [64, 61, 59, 57, 54]  i.e. e4, db4, b3, a3, f#3
+pitches   = theme.map { |p, _| p }
+durations = theme.map { |_, d| d }
 
-durations = [0.5, 0.5, 0.5, 0.5, 1.0]
+# Convert to MIDI integers for arithmetic
+midi = pitches.map { |p| note(p) }
+# → [64, 71, 67, 67, 69, 66]
 
-live_loop :original do
-  original_pitches.zip(durations).each do |pitch, dur|
-    play pitch, sustain: dur * 0.9
-    sleep dur
+# Inversion: negate each interval from the first note
+root = midi.first
+inverted_midi = midi.map { |m| root - (m - root) }
+# → [64, 57, 61, 61, 59, 62]
+# E4, A3, Db4, Db4, B3, D4
+
+inverted_pitches = inverted_midi.map { |m| m.to_sym rescue m }
+
+define :play_theme do |p_arr, d_arr, amp: 0.7|
+  p_arr.zip(d_arr).each do |p, d|
+    play p, sustain: d * 0.85, amp: amp
+    sleep d
   end
-  sleep 1
 end
 
-live_loop :inverted do
-  sleep 12
-  inverted_pitches.zip(durations).each do |pitch, dur|
-    play pitch, sustain: dur * 0.9
-    sleep dur
-  end
+live_loop :inversion_study do
+  puts "Original"
+  play_theme pitches, durations
+  sleep 0.5
+  puts "Inversion"
+  play_theme inverted_midi, durations, amp: 0.55
   sleep 1
 end
 ```
 
-## Retrograde Inversion
+## The Four Combinatorial Forms
 
-Backwards AND upside down — the theme's full mirror:
+Any theme now has four forms available:
+
+| Form | Operation | Description |
+|---|---|---|
+| **O** (Original) | — | As written |
+| **R** (Retrograde) | Reverse the array | Played backwards |
+| **I** (Inversion) | Negate intervals from root | Upside down |
+| **RI** (Retrograde Inversion) | Invert, then reverse | Backwards and upside down |
 
 ```ruby
-retro_inversion = inverted_pitches.reverse
-retro_durs      = durations.reverse
+# Generate all four forms
+original         = pitches.zip(durations)
+retrograde       = original.reverse
+inversion        = inverted_midi.zip(durations)
+retro_inversion  = inversion.reverse
+
+# Play all four
+[
+  ["O",  pitches,         durations],
+  ["R",  pitches.reverse, durations.reverse],
+  ["I",  inverted_midi,   durations],
+  ["RI", inverted_midi.reverse, durations.reverse]
+].each do |label, ps, ds|
+  puts label
+  play_theme ps, ds
+  sleep 0.5
+end
 ```
 
-## The Four Forms
+Retrograde inversion sounds like the original heard from very far away, or very long after — still related, but transformed by maximum distance.
 
-Any theme now has four forms:
-1. **Original** — as written
-2. **Retrograde** — backwards
-3. **Inversion** — upside down
-4. **Retrograde Inversion** — backwards and upside down
+## Combining O and I Simultaneously (Counterpoint)
 
-These four forms are the complete toolkit. Bach's 14 fugues use all four. Your leitmotifs can use all four across Acts I–IV, each form representing a different emotional state of the character.
+The payoff of inversion is running O and I simultaneously:
+
+```ruby
+live_loop :voice_o do
+  play_theme pitches, durations, amp: 0.7
+end
+
+live_loop :voice_i do
+  play_theme inverted_midi, durations, amp: 0.6
+end
+```
+
+Listen to the harmonies at each intersection. They tend toward thirds and sixths because the intervals are mirror images — the very property that makes them sound related also makes them stack stably. This is Bach's contrapuntal engine in its simplest form.
+
+*Project connection: In a programmatic work with paired characters, inversion is the natural operation for representing one character's experience of the other. The original form is the character as they experience themselves. The inversion is the character as their counterpart experiences them — same material, reversed perspective.*
