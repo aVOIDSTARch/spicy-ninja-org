@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bach & Mathematical Music — Jus Pulsus Curriculum</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="header-title">
+        <span class="header-prefix">Bespoke Journey</span>
+        <span class="header-main">Bach &amp; Mathematical Music</span>
+      </div>
+      <span class="header-note">Jus Pulsus Curriculum</span>
+    </div>
+  </header>
+
+  <div class="layout">
+
+
+<nav class="side-nav" id="sideNav">
+  <button class="nav-item active" data-target="intro">
+    <span class="nav-icon">◈</span><span class="nav-label">Overview</span>
+  </button>
+  <button class="nav-item" data-target="number-alphabet">
+    <span class="nav-icon">∑</span><span class="nav-label">Number Alphabet</span>
+  </button>
+  <button class="nav-item" data-target="fugue">
+    <span class="nav-icon">≡</span><span class="nav-label">Fugue</span>
+  </button>
+  <button class="nav-item" data-target="counterpoint">
+    <span class="nav-icon">⊕</span><span class="nav-label">Counterpoint</span>
+  </button>
+  <button class="nav-item" data-target="transformations">
+    <span class="nav-icon">↺</span><span class="nav-label">Transformations</span>
+  </button>
+  <button class="nav-item" data-target="golden-ratio">
+    <span class="nav-icon">φ</span><span class="nav-label">φ Proportion</span>
+  </button>
+  <button class="nav-item" data-target="analysis">
+    <span class="nav-icon">⊗</span><span class="nav-label">Analysis</span>
+  </button>
+</nav>
+
+<main class="main-content">
+
+  <!-- INTRO -->
+  <section id="intro">
+    <div class="concept-block intro-block">
+      <div class="intro-header">
+        <div class="bach-portrait">
+          <div class="bach-initials">JSB</div>
+          <div class="bach-years">1685 – 1750</div>
+        </div>
+        <div class="intro-text">
+          <h2 class="intro-title">Johann Sebastian Bach</h2>
+          <h3 class="intro-subtitle">A Bespoke Course in Mathematical Music</h3>
+          <p>Bach is not the safest or most accessible entry point into classical music. He is the deepest. What you are studying here is not ornamentation or historical curiosity — it is a system of compositional thought that generates structural complexity from minimal initial conditions. That description should sound familiar.</p>
+        </div>
+      </div>
+
+      <div class="module-map">
+        <div class="module-chip" data-target="number-alphabet">
+          <span class="module-icon">∑</span>
+          <div>
+            <div class="module-name">Number Alphabet</div>
+            <div class="module-desc">How Bach encoded his own name into scores as devotional signature</div>
+          </div>
+        </div>
+        <div class="module-chip" data-target="fugue">
+          <span class="module-icon">≡</span>
+          <div>
+            <div class="module-name">Fugue Architecture</div>
+            <div class="module-desc">Subject, answer, countersubject, stretto — the structural engine</div>
+          </div>
+        </div>
+        <div class="module-chip" data-target="counterpoint">
+          <span class="module-icon">⊕</span>
+          <div>
+            <div class="module-name">Counterpoint</div>
+            <div class="module-desc">The rules governing independent voices — and how to violate them</div>
+          </div>
+        </div>
+        <div class="module-chip" data-target="transformations">
+          <span class="module-icon">↺</span>
+          <div>
+            <div class="module-name">The Four Transformations</div>
+            <div class="module-desc">P, I, R, RI — the group structure underlying all polyphony</div>
+          </div>
+        </div>
+        <div class="module-chip" data-target="golden-ratio">
+          <span class="module-icon">φ</span>
+          <div>
+            <div class="module-name">Proportional Architecture</div>
+            <div class="module-desc">How φ = 1.618… appears in structural proportions</div>
+          </div>
+        </div>
+        <div class="module-chip" data-target="analysis">
+          <span class="module-icon">⊗</span>
+          <div>
+            <div class="module-name">Analysis Exercises</div>
+            <div class="module-desc">Applied listening — score in hand, ear trained</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="how-to-use">
+        <h4 class="sub-heading">How to use this module</h4>
+        <p>Each section contains interactive audio demonstrations — use them. The mathematics is abstract until you hear it. Every play button demonstrates the concept in sound via your browser's Web Audio engine.</p>
+        <p>When you have completed Module Four of the Music Theory track, return to the Analysis Exercises and work through them with a score. The exercises are sequenced: do not jump to Intermediate before Entry lands in your body. This is not a history lesson. You are being trained to <em>hear structure</em> — the same skill you are developing as a composer.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- NUMBER ALPHABET -->
+  <section id="number-alphabet">
+    <div class="concept-block">
+      <h3 class="concept-title">The Number Alphabet <span class="em-gold">( Gematria )</span></h3>
+      <p class="concept-body">In Baroque Germany, letters carried numerical values — a tradition inherited from Hebrew gematria and practiced openly in theological music. Bach encoded his own name into compositions as a signature and a devotional act simultaneously. It is not conjecture: musicologists have documented hundreds of instances across the oeuvre.</p>
+
+      <div class="alphabet-grid" id="alphabetGrid"></div>
+
+      <div class="calculator-area">
+        <label class="input-label">Calculate any name or word</label>
+        <input class="gematria-input" id="gematriaInput" value="BACH" maxlength="20" placeholder="Type a word…" />
+        <div class="calc-result" id="calcResult"></div>
+      </div>
+
+      <div class="examples-row" id="examplesRow"></div>
+
+      <div class="insight-box">
+        <strong>Key insight:</strong> BACH = B(2) + A(1) + C(3) + H(8) = <strong>14</strong>. The number 14 appears in the final unfinished contrapunctus of <em>Art of Fugue</em> — the subject spells B-A-C-H just as Bach dies, leaving the fugue with 14 entries. Whether accident or design, it functions as a sealed door.
+      </div>
+
+      <button class="play-btn" id="playBachMotif">▶ Hear the B-A-C-H Motif</button>
+      <p class="btn-caption">B♭ – A – C – B♮ &nbsp;(German pitch names: B = B♭, H = B♮)</p>
+    </div>
+  </section>
+
+  <!-- FUGUE -->
+  <section id="fugue">
+    <div class="concept-block">
+      <h3 class="concept-title">Fugue Architecture</h3>
+      <p class="concept-body">A fugue is not a form in the way a sonata is a form — it is a <em>texture</em>, a set of compositional procedures. The mathematical interest is that it operates on a single idea (the subject) through systematic transformation. The complexity is generated, not composed independently.</p>
+
+      <div class="fugue-diagram" id="fugueDiagram">
+        <div class="fugue-voices">
+          <div class="voice-row"><span class="voice-label">Soprano</span><div class="voice-track" id="vt0"></div></div>
+          <div class="voice-row"><span class="voice-label">Alto</span><div class="voice-track" id="vt1"></div></div>
+          <div class="voice-row"><span class="voice-label">Tenor</span><div class="voice-track" id="vt2"></div></div>
+          <div class="voice-row"><span class="voice-label">Bass</span><div class="voice-track" id="vt3"></div></div>
+        </div>
+      </div>
+
+      <div class="phase-buttons" id="phaseButtons"></div>
+
+      <div class="insight-box">
+        <strong>Mathematical structure:</strong> The four standard fugal transformations form a mathematical <em>group</em> under composition — Original (P), Inversion (I), Retrograde (R), Retrograde Inversion (RI). P∘P = P, P∘I = I, etc. The same group structure underlies the twelve-tone rows Schoenberg invented two centuries later. Bach was doing group theory before the mathematics existed.
+      </div>
+    </div>
+  </section>
+
+  <!-- COUNTERPOINT -->
+  <section id="counterpoint">
+    <div class="concept-block">
+      <h3 class="concept-title">The Interval System <span class="em-gold">( Consonance &amp; Dissonance )</span></h3>
+      <p class="concept-body">Baroque counterpoint is governed by a codified hierarchy of intervals. The rules are not arbitrary — they map to the physics of the overtone series. Perfect consonances appear early in the harmonic series; dissonances appear later or not at all. Bach's mastery was knowing exactly when to violate the rules and why.</p>
+
+      <div class="interval-lab">
+        <div class="note-selectors">
+          <div class="selector-col">
+            <label>Lower voice</label>
+            <div class="note-buttons" id="lowerVoice"></div>
+          </div>
+          <div class="interval-display">
+            <div class="interval-badge" id="intervalBadge">
+              <div class="interval-name" id="intervalName">Perfect 5th</div>
+              <div class="interval-semitones" id="intervalSemitones">7 semitones</div>
+              <div class="interval-type-label" id="intervalType">perfect</div>
+            </div>
+          </div>
+          <div class="selector-col">
+            <label>Upper voice</label>
+            <div class="note-buttons" id="upperVoice"></div>
+          </div>
+        </div>
+        <p class="interval-desc" id="intervalDesc">Open, stable, the harmonic foundation</p>
+        <div class="play-row">
+          <button class="play-btn" id="playHarmonic">▶ Harmonic (together)</button>
+          <button class="play-btn" id="playMelodic">▶ Melodic (sequential)</button>
+        </div>
+      </div>
+
+      <div class="species-section">
+        <h4 class="sub-heading">The Six Rules of First Species Counterpoint</h4>
+        <p class="concept-body small">First species is note-against-note. These rules created the harmonic vocabulary Bach worked within — and creatively violated.</p>
+        <div id="rulesList"></div>
+      </div>
+
+      <div class="insight-box">
+        <strong>Invertible counterpoint:</strong> Bach frequently wrote counterpoint designed so the upper and lower voices can be swapped and the result remains musically correct. This requires that every interval between the voices also be valid when inverted. A 3rd inverts to a 6th (3+6=9); a 5th inverts to a 4th. This is a severe constraint Bach treated as a design challenge.
+      </div>
+    </div>
+  </section>
+
+  <!-- TRANSFORMATIONS -->
+  <section id="transformations">
+    <div class="concept-block">
+      <h3 class="concept-title">The Four Transformations <span class="em-gold">( The Group )</span></h3>
+      <p class="concept-body">Bach's compositional transformations are not ornamental — they are the engine. Every fugue subject can be subjected to four operations that together form a mathematical group (closure, associativity, identity, inverses). This is the same abstract structure as a rectangle's symmetries. Bach intuited group theory two hundred years before Galois formalized it.</p>
+
+      <div class="transform-grid" id="transformGrid"></div>
+
+      <div class="motif-display">
+        <div class="motif-cells" id="motifCells"></div>
+        <div class="motif-caption" id="motifCaption">Original (P) — The subject as stated</div>
+      </div>
+
+      <div class="group-table">
+        <h4 class="sub-heading">Composition Table (how transformations combine)</h4>
+        <table class="ct-table">
+          <thead><tr><th>∘</th><th>P</th><th>I</th><th>R</th><th>RI</th></tr></thead>
+          <tbody>
+            <tr><td class="header-cell">P</td><td class="identity-cell">P</td><td>I</td><td>R</td><td>RI</td></tr>
+            <tr><td class="header-cell">I</td><td>I</td><td class="identity-cell">P</td><td>RI</td><td>R</td></tr>
+            <tr><td class="header-cell">R</td><td>R</td><td>RI</td><td class="identity-cell">P</td><td>I</td></tr>
+            <tr><td class="header-cell">RI</td><td>RI</td><td>R</td><td>I</td><td class="identity-cell">P</td></tr>
+          </tbody>
+        </table>
+        <p class="table-caption">Every combination of two transformations yields another in the set. P is the identity element.</p>
+      </div>
+
+      <div class="insight-box">
+        <strong>Crab canon (Canon cancrizans):</strong> The ultimate case — a piece that sounds identical when played backwards. Bach included one in the <em>Musical Offering</em> (BWV 1079). The notation itself forms a visual palindrome. He sent it to Frederick the Great as a demonstration that a single theme could generate infinite music.
+      </div>
+    </div>
+  </section>
+
+  <!-- GOLDEN RATIO -->
+  <section id="golden-ratio">
+    <div class="concept-block">
+      <h3 class="concept-title">Proportional Architecture <span class="em-gold">( φ = 1.618… )</span></h3>
+      <p class="concept-body">The golden ratio φ is the proportion where A/B = (A+B)/A = 1.618… It arises from the Fibonacci sequence — each term divided by the previous approaches φ. Whether Bach consciously deployed this proportion or whether it emerges from his structural intuition is genuinely debated. The occurrences are too frequent to dismiss.</p>
+
+      <div class="phi-visual">
+        <div class="phi-bar">
+          <div class="phi-major"><span>1/φ ≈ 0.618</span></div>
+          <div class="phi-minor"><span>0.382</span></div>
+        </div>
+        <div class="phi-label">The golden section of a unit length</div>
+      </div>
+
+      <h4 class="sub-heading">Fibonacci Sequence → φ</h4>
+      <div class="fib-cells" id="fibCells"></div>
+      <p class="fib-caption">Ratios converge on φ = 1.61803…</p>
+
+      <div id="workProportions"></div>
+
+      <div class="insight-box">
+        <strong>For your own work:</strong> In a 90-minute suite, the golden section falls at approximately 55:37 — 55 minutes in. If the supernova (the look, the wound) falls at or near that point, you are building on the same proportional architecture. This is not prescriptive — it is a lens for interrogating your own structural instincts.
+      </div>
+    </div>
+  </section>
+
+  <!-- ANALYSIS -->
+  <section id="analysis">
+    <div class="concept-block">
+      <h3 class="concept-title">Analysis Exercises</h3>
+      <p class="concept-body">These exercises are sequenced to build on each other. Do not skip the entry-level ones — their apparent simplicity conceals the analytical muscles they build. You want to hear the structure <em>while</em> it's happening, not reconstruct it afterwards. These require a score alongside the audio — IMSLP has every one of these for free.</p>
+
+      <a class="imslp-link" href="https://imslp.org" target="_blank">→ IMSLP: Free public domain Bach scores</a>
+
+      <div class="exercises-list" id="exercisesList"></div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <p>Jus Pulsus / hecarrieswater.com — Bespoke Journey: Bach &amp; Mathematical Music</p>
+    <p class="footer-note">Audio generated via Web Audio API. All demonstrations are illustrative approximations.</p>
+  </footer>
+
+</main>
+
+
+  </div>
+
+  <script src="app.js"></script>
+
+</body>
+</html>
