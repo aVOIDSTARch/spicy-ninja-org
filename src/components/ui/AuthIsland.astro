@@ -227,9 +227,9 @@ function logout() {
   document.getElementById('sn-admin-bar')?.classList.remove('open')
 }
 
-// Ctrl+Alt+K — no browser or OS conflicts
+// Ctrl+Alt+Shift+\ — obscure triple-modifier combo, no known system conflicts
 document.addEventListener('keydown', e => {
-  if ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === 'k') {
+  if ((e.ctrlKey || e.metaKey) && e.altKey && e.shiftKey && e.key === '\\') {
     e.preventDefault()
     authed()
       ? document.getElementById('sn-admin-bar')?.classList.toggle('open')
