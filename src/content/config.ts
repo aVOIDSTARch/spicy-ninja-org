@@ -83,7 +83,7 @@ const fundamentals = defineCollection({
   schema: z.object({
     title:          z.string(),
     branch:         z.enum(['bach-math', 'markov-chains', 'music-theory', 'composition', 'characters']),
-    order:          z.number().int().positive(),
+    order:          z.number().int().min(0),
     montessoriNode: z.string().optional(),  // links back to tree node slug
     description:    z.string().optional(),
     draft:          z.boolean().default(true),
@@ -139,7 +139,7 @@ const project = defineCollection({
   type: 'content',
   schema: z.object({
     title:       z.string(),
-    order:       z.number().int().positive(),
+    order:       z.number().int().min(0),
     status:      projectStatusEnum.optional(),
     description: z.string().optional(),
     draft:       z.boolean().default(true),

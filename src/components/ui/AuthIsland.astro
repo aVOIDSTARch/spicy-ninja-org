@@ -2,14 +2,13 @@
 /**
  * AuthIsland.astro
  *
- * Outputs zero visible markup for logged-out visitors.
- * Ctrl+Shift+/ (or ⌘+Shift+/ on Mac) fires the modal.
+ * Zero visible output for logged-out visitors.
+ * Ctrl+Alt+K fires the modal. No visible hint anywhere.
  *
  * Set PUBLIC_AUTH_PASSPHRASE_HASH in .env:
  *   node -e "const c=require('crypto');console.log(c.createHash('sha256').update('YOUR_PASS').digest('hex'))"
  */
 
-// Bake hash into page at build time — safe to expose (it's a hash, not the secret)
 const HASH = import.meta.env.PUBLIC_AUTH_PASSPHRASE_HASH ?? ''
 ---
 
@@ -38,15 +37,6 @@ const HASH = import.meta.env.PUBLIC_AUTH_PASSPHRASE_HASH ?? ''
   animation: sn-appear 0.2s ease;
 }
 
-.sn-modal-eyebrow {
-  font-family: var(--font-mono, 'JetBrains Mono', monospace);
-  font-size: 0.52rem;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--cinnabar, #E34234);
-  margin-bottom: 1.2rem;
-}
-
 .sn-modal-input {
   width: 100%;
   background: var(--bg-primary, #2a1a0a);
@@ -63,30 +53,18 @@ const HASH = import.meta.env.PUBLIC_AUTH_PASSPHRASE_HASH ?? ''
 .sn-modal-input:focus { border-color: rgba(227,66,52,0.5); }
 .sn-modal-input.sn-shake { animation: sn-shake 0.35s ease; }
 
-.sn-modal-sub {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 0.6rem;
-}
-.sn-modal-hint {
-  font-family: var(--font-mono, monospace);
-  font-size: 0.5rem;
-  letter-spacing: 0.15em;
-  color: var(--text-ghost, #6a4828);
-}
 .sn-modal-err {
   font-family: var(--font-mono, monospace);
   font-size: 0.58rem;
   color: #d4204a;
   min-height: 1em;
+  margin-top: 0.5rem;
 }
 .sn-modal-close {
   position: absolute; top: 0.8rem; right: 1rem;
   background: none; border: none;
   font-family: var(--font-mono, monospace);
-  font-size: 0.55rem;
-  letter-spacing: 0.1em;
+  font-size: 0.55rem; letter-spacing: 0.1em;
   color: var(--text-ghost, #6a4828);
   cursor: pointer; text-transform: uppercase;
 }
@@ -108,44 +86,21 @@ const HASH = import.meta.env.PUBLIC_AUTH_PASSPHRASE_HASH ?? ''
 }
 #sn-admin-bar.open { display: flex; }
 
-.sn-bar-pill {
-  font-family: var(--font-mono, monospace);
-  font-size: 0.5rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--cinnabar, #E34234);
-  margin-right: 1.5rem;
-  opacity: 0.7;
-}
 .sn-bar-link {
   font-family: var(--font-mono, monospace);
-  font-size: 0.6rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-muted, #a08060);
-  text-decoration: none;
-  padding: 0.2rem 0.8rem;
-  border: 1px solid transparent;
-  margin-right: 0.25rem;
+  font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text-muted, #a08060); text-decoration: none;
+  padding: 0.2rem 0.8rem; border: 1px solid transparent; margin-right: 0.25rem;
   transition: color 0.15s, border-color 0.15s;
 }
 .sn-bar-link:hover { color: var(--text-primary, #F0E8D0); border-color: rgba(240,232,208,0.12); }
-.sn-bar-link.here { color: var(--cinnabar, #E34234); border-color: rgba(227,66,52,0.3); }
+.sn-bar-link.here  { color: var(--cinnabar, #E34234); border-color: rgba(227,66,52,0.3); }
 
 .sn-bar-spacer { flex: 1; }
 
-.sn-bar-hint {
-  font-family: var(--font-mono, monospace);
-  font-size: 0.48rem;
-  letter-spacing: 0.1em;
-  color: var(--text-ghost, #6a4828);
-  margin-right: 1.5rem;
-}
 .sn-bar-logout {
   font-family: var(--font-mono, monospace);
-  font-size: 0.52rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-size: 0.52rem; letter-spacing: 0.12em; text-transform: uppercase;
   color: var(--text-ghost, #6a4828);
   background: none; border: none; cursor: pointer; padding: 0.2rem 0.4rem;
 }
@@ -177,12 +132,10 @@ body.sn-authed { padding-bottom: 42px; }
 </style>
 
 <script define:vars={{ HASH }}>
-// ── Constants ─────────────────────────────────────────────────────────────────
 const STORAGE_KEY  = 'sn-auth'
-const TOKEN_TTL_MS = 1000 * 60 * 60 * 24 * 30  // 30 days
-const BAKED_HASH   = HASH                        // injected from Astro at build
+const TOKEN_TTL_MS = 1000 * 60 * 60 * 24 * 30
+const BAKED_HASH   = HASH
 
-// ── Crypto ────────────────────────────────────────────────────────────────────
 async function sha256(input) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input))
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('')
@@ -190,11 +143,9 @@ async function sha256(input) {
 
 async function verify(passphrase) {
   if (!BAKED_HASH || BAKED_HASH === 'REPLACE_WITH_YOUR_HASH') return false
-  const hashed = await sha256(passphrase.trim())
-  return hashed === BAKED_HASH.toLowerCase()
+  return (await sha256(passphrase.trim())) === BAKED_HASH.toLowerCase()
 }
 
-// ── Token ─────────────────────────────────────────────────────────────────────
 function writeToken() {
   const now = Date.now()
   localStorage.setItem(STORAGE_KEY, btoa(JSON.stringify({ issued: now, expires: now + TOKEN_TTL_MS, v: 1 })))
@@ -202,29 +153,21 @@ function writeToken() {
 function clearToken() { localStorage.removeItem(STORAGE_KEY) }
 function authed() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return false
-    const t = JSON.parse(atob(raw))
+    const t = JSON.parse(atob(localStorage.getItem(STORAGE_KEY) || ''))
     return t.v === 1 && Date.now() < t.expires
   } catch { return false }
 }
 
-// ── DOM Builders ──────────────────────────────────────────────────────────────
 function buildModal() {
   const el = Object.assign(document.createElement('div'), { id: 'sn-auth-modal' })
   el.innerHTML = `
     <div class="sn-modal-box">
       <button class="sn-modal-close" id="snmc">✕</button>
-      <div class="sn-modal-eyebrow">Admin access</div>
       <input class="sn-modal-input" id="snmi" type="password"
         placeholder="passphrase" autocomplete="current-password" spellcheck="false"/>
-      <div class="sn-modal-sub">
-        <div class="sn-modal-err" id="snme"></div>
-        <div class="sn-modal-hint">esc or ctrl+shift+/ to close</div>
-      </div>
+      <div class="sn-modal-err" id="snme"></div>
     </div>`
   document.body.appendChild(el)
-
   document.getElementById('snmc')?.addEventListener('click', closeModal)
   el.addEventListener('click', e => { if (e.target === el) closeModal() })
   document.getElementById('snmi')?.addEventListener('keydown', async e => {
@@ -234,23 +177,20 @@ function buildModal() {
 
 function buildBar() {
   const pages = [
-    { href: '/journal/new',   label: 'New Journal Entry' },
-    { href: '/blog/compose',  label: 'New Blog Post'     },
-    { href: '/journal',       label: 'Journal'           },
-    { href: '/blog',          label: 'Blog'              },
+    { href: '/journal/new',  label: 'New Journal Entry' },
+    { href: '/blog/compose', label: 'New Blog Post'     },
+    { href: '/journal',      label: 'Journal'           },
+    { href: '/blog',         label: 'Blog'              },
   ]
   const el = Object.assign(document.createElement('div'), { id: 'sn-admin-bar' })
   el.innerHTML = `
-    <span class="sn-bar-pill">admin</span>
     ${pages.map(p => `<a class="sn-bar-link${window.location.pathname===p.href?' here':''}" href="${p.href}">${p.label}</a>`).join('')}
     <div class="sn-bar-spacer"></div>
-    <span class="sn-bar-hint">ctrl+shift+/ to toggle</span>
     <button class="sn-bar-logout" id="snbl">Logout</button>`
   document.body.appendChild(el)
   document.getElementById('snbl')?.addEventListener('click', logout)
 }
 
-// ── State ─────────────────────────────────────────────────────────────────────
 function applyState(showBar) {
   const isIn = authed()
   document.body.classList.toggle('sn-authed', isIn)
@@ -273,11 +213,8 @@ function closeModal() {
 async function tryLogin(passphrase) {
   const inp = document.getElementById('snmi')
   const err = document.getElementById('snme')
-  const ok  = await verify(passphrase)
-  if (ok) {
-    writeToken()
-    closeModal()
-    applyState(true)
+  if (await verify(passphrase)) {
+    writeToken(); closeModal(); applyState(true)
   } else {
     if (inp) { inp.value = ''; inp.classList.add('sn-shake'); setTimeout(()=>inp.classList.remove('sn-shake'),400) }
     if (err) err.textContent = 'incorrect'
@@ -290,23 +227,18 @@ function logout() {
   document.getElementById('sn-admin-bar')?.classList.remove('open')
 }
 
-// ── Keystroke ─────────────────────────────────────────────────────────────────
+// Ctrl+Alt+K — no browser or OS conflicts
 document.addEventListener('keydown', e => {
-  const combo = (e.ctrlKey || e.metaKey) && e.shiftKey && e.key === '/'
-  if (!combo) return
-  e.preventDefault()
-  if (authed()) {
-    document.getElementById('sn-admin-bar')?.classList.toggle('open')
-  } else {
-    openModal()
+  if ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === 'k') {
+    e.preventDefault()
+    authed()
+      ? document.getElementById('sn-admin-bar')?.classList.toggle('open')
+      : openModal()
   }
-})
-document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeModal()
 })
 
-// ── Boot ──────────────────────────────────────────────────────────────────────
 buildModal()
 buildBar()
-applyState(authed())  // show bar immediately if already logged in
+applyState(authed())
 </script>

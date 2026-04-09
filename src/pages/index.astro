@@ -6,40 +6,199 @@ import SceneDojo from '../components/scenes/SceneDojo.astro'
 <ZoneLayout zone="project-track" title="spicyninja.org">
   <SceneDojo slot="scene" />
 
-  <!-- Enough content to scroll and see parallax working -->
-  <div style="padding: 12vh 4rem 0; max-width: 760px;">
+  <div class="home-shell">
 
-    <p class="eyebrow">the education of a composer in public</p>
+    <!-- HERO -->
+    <div class="home-hero">
+      <p class="eyebrow">the education of a composer in public</p>
+      <h1 class="hero-heading home-title">
+        spicy<span style="color:var(--cinnabar)">ninja</span>.org
+      </h1>
+      <p class="home-sub">
+        A 90-minute programmatic electronic suite is being made from scratch.
+        This site documents every step — the listening, the theory, the decisions,
+        the failures, the arrivals. In public, from the beginning.
+      </p>
+    </div>
 
-    <h1 class="hero-heading" style="margin-bottom: 1rem;">
-      spicy<span style="color:var(--zone-accent)">ninja</span>.org
-    </h1>
+    <!-- THREE PATHS -->
+    <div class="home-paths">
 
-    <p style="font-family:var(--font-mono); font-size:0.72rem; letter-spacing:0.25em;
-              text-transform:uppercase; color:var(--zone-accent); margin-bottom:3rem;">
-      scaffold running ✦ parallax active
-    </p>
-
-    <p style="font-family:var(--font-body); font-size:1.05rem; color:var(--text-secondary);
-              max-width:560px; line-height:1.85; margin-bottom:2rem;">
-      Scroll down to see the dojo scene parallax in action.
-      Far layer (shoji screens) moves slowest. Foreground ninja moves fastest.
-      Toggle the lantern (bottom right) to switch between Woodblock dark and Red Lacquer light.
-    </p>
-
-    <!-- Spacer content to allow scrolling -->
-    {Array.from({ length: 6 }).map((_, i) => (
-      <div style="margin-bottom:4rem; padding:2rem; background:var(--bg-card);
-                  border:1px solid var(--border); border-left:3px solid var(--zone-accent);">
-        <p class="eyebrow">section {i + 1}</p>
-        <h2 class="section-heading">Scroll to test parallax depth</h2>
-        <p style="color:var(--text-muted); font-size:0.95rem; line-height:1.8; margin-top:0.8rem;">
-          As you scroll, watch the shoji screens (far), lanterns and weapons rack (mid),
-          tatami and pillars (near), and the training ninja (foreground) move
-          at different rates. The scene has four independent depth layers.
+      <a href="/project-track" class="path-card path-card--primary">
+        <span class="path-card__num">01</span>
+        <span class="path-card__label">Project Track</span>
+        <h2 class="path-card__title">The Syllabus</h2>
+        <p class="path-card__body">
+          Twenty-two works across five modules. Each chosen because it teaches
+          something irreplaceable for making <em>Jus Pulsus</em>.
+          Prokofiev. Olatunji. Ligeti. Riley. Coltrane.
         </p>
+        <span class="path-card__cta">Begin →</span>
+      </a>
+
+      <a href="/fundamentals" class="path-card path-card--secondary">
+        <span class="path-card__num">02</span>
+        <span class="path-card__label">Fundamentals</span>
+        <h2 class="path-card__title">The Theory</h2>
+        <p class="path-card__body">
+          Bach math. Markov chains. Intervals. Leitmotif construction.
+          Counterpoint. Emergence. Five branches of technique taught
+          through Sonic Pi code.
+        </p>
+        <span class="path-card__cta">Explore →</span>
+      </a>
+
+      <a href="/tracks" class="path-card path-card--tertiary">
+        <span class="path-card__num">03</span>
+        <span class="path-card__label">All Tracks</span>
+        <h2 class="path-card__title">The Map</h2>
+        <p class="path-card__body">
+          Three ways through the material — Project Track, Montessori
+          Experience Tree, and Fundamentals courses. Different starting
+          points, the same destination.
+        </p>
+        <span class="path-card__cta">See all →</span>
+      </a>
+
+    </div>
+
+    <!-- WHAT THIS IS -->
+    <div class="home-about">
+      <div class="home-about__text">
+        <p class="eyebrow">what this is</p>
+        <p class="home-about__body">
+          <em>Jus Pulsus: A Cosmogony in Four Movements</em> — a creation myth,
+          a history of music, and an ontological love story. The allegorical
+          spine is Orpheus and Eurydice. The philosophical engine is Octavia
+          Butler's Earthseed. The method is Prokofiev's. The language is
+          electronic music with roots in 90s EDM and branches in Indian classical,
+          West African drumming, Sufi devotional music, and Chinese classical
+          aesthetics.
+        </p>
+        <p class="home-about__body">
+          This is not a genre exercise. It is a first act of genuine composition
+          from someone who has been composing in their head for twenty-five years
+          and is now doing it out loud, in public, with full documentation.
+        </p>
+        <a href="/about" class="btn-ghost home-about__link">About the project →</a>
       </div>
-    ))}
+    </div>
 
   </div>
 </ZoneLayout>
+
+<style>
+  .home-shell {
+    padding: 0 3.5rem 8rem;
+    max-width: 900px;
+  }
+
+  /* ── HERO ── */
+  .home-hero {
+    padding-top: 8vh;
+    margin-bottom: 5rem;
+  }
+  .home-title { margin-bottom: 2rem; }
+  .home-sub {
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    max-width: 580px;
+    line-height: 1.85;
+  }
+
+  /* ── THREE PATHS ── */
+  .home-paths {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    margin-bottom: 6rem;
+  }
+
+  .path-card {
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 1.8rem;
+    background: var(--bg-card);
+    text-decoration: none;
+    border-top: 3px solid transparent;
+    transition: background 0.2s ease;
+  }
+  .path-card:hover { background: var(--bg-raised); }
+
+  .path-card--primary   { border-top-color: var(--cinnabar); }
+  .path-card--secondary { border-top-color: var(--cinnabar-warm); }
+  .path-card--tertiary  { border-top-color: var(--text-ghost); }
+
+  .path-card__num {
+    font-family: var(--font-mono);
+    font-size: 0.52rem;
+    letter-spacing: 0.25em;
+    color: var(--text-ghost);
+    margin-bottom: 0.4rem;
+  }
+  .path-card__label {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cinnabar);
+    margin-bottom: 0.8rem;
+  }
+  .path-card--secondary .path-card__label { color: var(--cinnabar-warm); }
+  .path-card--tertiary  .path-card__label { color: var(--text-muted); }
+
+  .path-card__title {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.6rem;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+  .path-card__body {
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.75;
+    flex: 1;
+    margin-bottom: 1.5rem;
+  }
+  .path-card__body em { color: var(--text-secondary); font-style: italic; }
+  .path-card__cta {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--cinnabar);
+    align-self: flex-start;
+  }
+  .path-card--secondary .path-card__cta { color: var(--cinnabar-warm); }
+  .path-card--tertiary  .path-card__cta { color: var(--text-muted); }
+
+  /* ── ABOUT STRIP ── */
+  .home-about {
+    border-top: 1px solid var(--border);
+    padding-top: 3rem;
+  }
+  .home-about__body {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.85;
+    max-width: 640px;
+    margin-bottom: 1.2rem;
+  }
+  .home-about__body em { color: var(--text-primary); font-style: italic; }
+  .home-about__link {
+    margin-top: 1rem;
+    display: inline-block;
+  }
+
+  @media (max-width: 768px) {
+    .home-shell { padding: 0 1.5rem 5rem; }
+    .home-paths { grid-template-columns: 1fr; }
+    .home-hero { padding-top: 4vh; }
+  }
+</style>

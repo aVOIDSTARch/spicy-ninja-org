@@ -169,13 +169,15 @@ const { slug, courseTitle = 'Course' } = Astro.props
 /* Trigger button */
 .notes-trigger {
   position: fixed; bottom: 5.5rem; right: 1.5rem;
-  display: flex; align-items: center; gap: 0.5rem;
+  display: none;
+  align-items: center; gap: 0.5rem;
   background: var(--bg-secondary); border: 1px solid var(--border);
   color: var(--text-ghost); font-family: var(--font-mono);
   font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase;
   padding: 0.5rem 0.9rem; cursor: pointer; z-index: 100;
   transition: border-color 0.2s, color 0.2s;
 }
+body.sn-authed .notes-trigger { display: flex; }
 .notes-trigger:hover { border-color: var(--cinnabar); color: var(--cinnabar); }
 .notes-trigger__icon { font-size: 0.85rem; line-height: 1; }
 
