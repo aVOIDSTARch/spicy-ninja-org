@@ -167,6 +167,16 @@ import SceneGarden from '../../components/scenes/SceneGarden.astro'
 </style>
 
 <script>
+// Auth gate — redirect if not logged in
+;(function() {
+  try {
+    const raw = localStorage.getItem('sn-auth')
+    if (!raw) { window.location.replace('/'); return }
+    const t = JSON.parse(atob(raw))
+    if (t.v !== 1 || Date.now() >= t.expires) { window.location.replace('/'); return }
+  } catch { window.location.replace('/') }
+})()
+
 const STORAGE_PREFIX = 'sn-journal:';
 const fields = {
   work:       document.getElementById('jl-work'),

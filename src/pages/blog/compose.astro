@@ -124,3 +124,408 @@ import SceneVillage from '../../components/scenes/SceneVillage.astro'
   </div>
 </ZoneLayout>
 
+
+<style>
+  .bc-shell {
+    padding: 8vh 3.5rem 6rem;
+    max-width: 760px;
+  }
+
+  .bc-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 3rem;
+  }
+
+  /* Sections */
+  .bc-section {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .bc-section-title {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--text-ghost);
+    margin-bottom: 0.8rem;
+  }
+  .bc-section-desc {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  /* Format picker */
+  .bc-formats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+  }
+  .bc-format-btn {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 1rem 1.1rem;
+    background: var(--bg-card);
+    border: none;
+    border-top: 2px solid transparent;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .bc-format-btn:hover { background: var(--bg-raised); }
+  .bc-format-btn.selected {
+    background: var(--bg-raised);
+    border-top-color: var(--fmt-accent);
+  }
+  .bc-format-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    display: block;
+  }
+  .bc-format-btn.selected .bc-format-label { color: var(--fmt-accent); }
+  .bc-format-desc {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    color: var(--text-ghost);
+    display: block;
+    line-height: 1.4;
+  }
+
+  /* Fields */
+  .bc-meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem 1.2rem;
+  }
+  .bc-field { display: flex; flex-direction: column; gap: 0.3rem; }
+  .bc-field--full { grid-column: 1 / -1; }
+  .bc-label {
+    font-family: var(--font-mono);
+    font-size: 0.52rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-ghost);
+  }
+  .bc-input {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    padding: 0.55rem 0.8rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .bc-input:focus { border-color: var(--border-hi); }
+
+  .bc-body-field { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.8rem; }
+  .bc-textarea {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    line-height: 1.7;
+    padding: 0.9rem 1rem;
+    resize: vertical;
+    outline: none;
+    min-height: 260px;
+    transition: border-color 0.2s;
+  }
+  .bc-textarea:focus { border-color: var(--border-hi); }
+
+  /* Actions */
+  .bc-actions-section { border-bottom: none; }
+  .bc-actions { display: flex; gap: 0.6rem; margin-bottom: 1rem; flex-wrap: wrap; }
+  .bc-btn {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 0.55rem 1.2rem;
+    border: 1px solid var(--border);
+    background: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .bc-btn--save:hover   { border-color: var(--cinnabar-warm); color: var(--cinnabar-warm); }
+  .bc-btn--export:hover { border-color: var(--cinnabar); color: var(--cinnabar); }
+  .bc-btn--clear:hover  { border-color: #d4204a; color: #d4204a; }
+
+  .bc-hint {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    color: var(--text-ghost);
+    line-height: 1.7;
+  }
+  .bc-hint code {
+    color: var(--text-muted);
+    background: var(--bg-raised);
+    padding: 0.1em 0.3em;
+  }
+
+  /* Drafts list */
+  .bc-draft-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.7rem 1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    margin-bottom: 0.4rem;
+  }
+  .bc-draft-info {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+  .bc-draft-info strong { color: var(--text-secondary); display: block; }
+  .bc-draft-actions { display: flex; gap: 0.3rem; }
+  .bc-draft-btn {
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.6rem;
+    border: 1px solid var(--border);
+    background: none;
+    color: var(--text-ghost);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .bc-draft-btn:hover     { border-color: var(--cinnabar-warm); color: var(--cinnabar-warm); }
+  .bc-draft-btn--del:hover { border-color: #d4204a; color: #d4204a; }
+
+  @media (max-width: 680px) {
+    .bc-shell { padding: 6vh 1.5rem 4rem; }
+    .bc-formats { grid-template-columns: 1fr 1fr; }
+    .bc-meta-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+// Auth gate — redirect if not logged in
+;(function() {
+  try {
+    const raw = localStorage.getItem('sn-auth')
+    if (!raw) { window.location.replace('/'); return }
+    const t = JSON.parse(atob(raw))
+    if (t.v !== 1 || Date.now() >= t.expires) { window.location.replace('/'); return }
+  } catch { window.location.replace('/') }
+})()
+
+const STORAGE_PREFIX = 'sn-blog-draft:'
+const AUTOSAVE_MS   = 900
+const TODAY = new Date().toISOString().slice(0, 10)
+
+let selectedFormat = ''
+let autosaveTimer  = null
+let currentDraftId = `draft-${Date.now()}`
+
+// ── Format picker ─────────────────────────────────────────────
+const formatHints = {
+  'reflection':  'Long-form. Let the argument develop. Pull quote optional.',
+  'session-log': 'Chronological. What happened, what changed, what remains open.',
+  'breakthrough':'State the realisation in one sentence up top. Then unpack.',
+  'question':    'The question is the whole post. Resist answering it.',
+  'reference':   'Source first, then why it matters to this project specifically.',
+  'sketch':      'Fragments allowed. Incomplete thoughts are valid.',
+}
+
+document.querySelectorAll('.bc-format-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.bc-format-btn').forEach(b => b.classList.remove('selected'))
+    btn.classList.add('selected')
+    selectedFormat = btn.dataset.format
+    const hint = document.getElementById('bc-content-hint')
+    if (hint) hint.textContent = formatHints[selectedFormat] || ''
+    document.querySelectorAll('.bc-extra').forEach(el => {
+      el.style.display = el.dataset.for === selectedFormat ? 'flex' : 'none'
+    })
+    autosave()
+  })
+})
+
+// ── Field helpers ─────────────────────────────────────────────
+function val(id) { return (document.getElementById(id)?.value || '').trim() }
+function set(id, v) { const el = document.getElementById(id); if (el) el.value = v }
+
+function collectState() {
+  return {
+    format:      selectedFormat,
+    title:       val('bc-title'),
+    desc:        val('bc-desc'),
+    date:        val('bc-date') || TODAY,
+    derived:     val('bc-derived'),
+    body:        val('bc-body'),
+    pullQuote:   val('bc-pull-quote'),
+    statement:   val('bc-statement'),
+    question:    val('bc-question'),
+    refSource:   val('bc-ref-source'),
+    refUrl:      val('bc-ref-url'),
+    savedAt:     new Date().toISOString(),
+  }
+}
+
+function applyState(s) {
+  if (s.format) {
+    const btn = document.querySelector(`.bc-format-btn[data-format="${s.format}"]`)
+    btn?.click()
+  }
+  set('bc-title', s.title || '')
+  set('bc-desc', s.desc || '')
+  set('bc-date', s.date || TODAY)
+  set('bc-derived', s.derived || '')
+  set('bc-body', s.body || '')
+  set('bc-pull-quote', s.pullQuote || '')
+  set('bc-statement', s.statement || '')
+  set('bc-question', s.question || '')
+  set('bc-ref-source', s.refSource || '')
+  set('bc-ref-url', s.refUrl || '')
+}
+
+// ── Autosave ──────────────────────────────────────────────────
+function autosave() {
+  clearTimeout(autosaveTimer)
+  autosaveTimer = setTimeout(() => {
+    const s = collectState()
+    if (!s.title && !s.body) return
+    localStorage.setItem(STORAGE_PREFIX + currentDraftId, JSON.stringify(s))
+    renderDraftsList()
+  }, AUTOSAVE_MS)
+}
+
+document.querySelectorAll('.bc-input, .bc-textarea').forEach(el => {
+  el.addEventListener('input', autosave)
+})
+
+// ── Save button ───────────────────────────────────────────────
+document.getElementById('bc-save')?.addEventListener('click', () => {
+  const s = collectState()
+  localStorage.setItem(STORAGE_PREFIX + currentDraftId, JSON.stringify(s))
+  renderDraftsList()
+  const btn = document.getElementById('bc-save')
+  if (btn) { btn.textContent = 'Saved ✓'; setTimeout(() => { btn.textContent = 'Save draft' }, 1500) }
+})
+
+// ── Export ────────────────────────────────────────────────────
+document.getElementById('bc-export')?.addEventListener('click', () => {
+  const s = collectState()
+  if (!s.title) { alert('Add a title before exporting.'); return }
+  if (!s.format) { alert('Select a format before exporting.'); return }
+
+  const slug = s.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+  const filename = `${s.date}-${slug}.mdx`
+
+  // Extra frontmatter per format
+  const extras = []
+  if (s.format === 'reflection' && s.pullQuote)
+    extras.push(`pullQuote: "${s.pullQuote.replace(/"/g, '\\"')}"`)
+  if (s.format === 'breakthrough' && s.statement)
+    extras.push(`statement: "${s.statement.replace(/"/g, '\\"')}"`)
+  if (s.format === 'question' && s.question)
+    extras.push(`question: "${s.question.replace(/"/g, '\\"')}"`)
+  if (s.format === 'reference') {
+    if (s.refSource) extras.push(`refSource: "${s.refSource.replace(/"/g, '\\"')}"`)
+    if (s.refUrl)    extras.push(`refUrl: "${s.refUrl}"`)
+  }
+
+  const fm = [
+    '---',
+    `title: "${s.title.replace(/"/g, '\\"')}"`,
+    `date: ${s.date}`,
+    `description: "${s.desc.replace(/"/g, '\\"')}"`,
+    `format: ${s.format}`,
+    s.derived ? `derivedFromJournal: "${s.derived}"` : 'derivedFromJournal: null',
+    ...extras,
+    'commentsEnabled: false',
+    'commentsPublic: false',
+    'draft: true',
+    '---',
+    '',
+  ].join('\n')
+
+  const content = fm + (s.body || '')
+  const url = URL.createObjectURL(new Blob([content], { type: 'text/plain' }))
+  const a = Object.assign(document.createElement('a'), { href: url, download: filename })
+  a.click(); URL.revokeObjectURL(url)
+})
+
+// ── Clear ─────────────────────────────────────────────────────
+document.getElementById('bc-clear')?.addEventListener('click', () => {
+  if (!confirm('Clear this form? Unsaved changes will be lost.')) return
+  document.querySelectorAll('.bc-format-btn').forEach(b => b.classList.remove('selected'))
+  selectedFormat = ''
+  document.querySelectorAll('.bc-extra').forEach(el => { el.style.display = 'none' })
+  const hint = document.getElementById('bc-content-hint')
+  if (hint) hint.textContent = 'Select a format above to see guidance.'
+  ;['bc-title','bc-desc','bc-date','bc-derived','bc-body',
+    'bc-pull-quote','bc-statement','bc-question','bc-ref-source','bc-ref-url'
+  ].forEach(id => set(id, ''))
+  currentDraftId = `draft-${Date.now()}`
+})
+
+// ── Drafts list ───────────────────────────────────────────────
+function getAllDrafts() {
+  return Object.keys(localStorage)
+    .filter(k => k.startsWith(STORAGE_PREFIX))
+    .map(k => ({ id: k.replace(STORAGE_PREFIX, ''), ...JSON.parse(localStorage.getItem(k) || '{}') }))
+    .sort((a, b) => (b.savedAt || '').localeCompare(a.savedAt || ''))
+}
+
+function renderDraftsList() {
+  const listEl = document.getElementById('bc-drafts-list')
+  if (!listEl) return
+  const drafts = getAllDrafts()
+  if (!drafts.length) {
+    listEl.innerHTML = '<p style="font-family:var(--font-mono);font-size:0.6rem;color:var(--text-ghost)">No saved drafts.</p>'
+    return
+  }
+  listEl.innerHTML = drafts.map(d => `
+    <div class="bc-draft-item">
+      <div class="bc-draft-info">
+        <strong>${d.title || '(untitled)'}</strong>
+        ${d.date || ''} · ${d.format || ''}
+      </div>
+      <div class="bc-draft-actions">
+        <button class="bc-draft-btn" data-load="${d.id}">Load</button>
+        <button class="bc-draft-btn bc-draft-btn--del" data-del="${d.id}">Delete</button>
+      </div>
+    </div>`).join('')
+
+  listEl.querySelectorAll('[data-load]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const raw = localStorage.getItem(STORAGE_PREFIX + btn.dataset.load)
+      if (!raw) return
+      currentDraftId = btn.dataset.load
+      applyState(JSON.parse(raw))
+    })
+  })
+  listEl.querySelectorAll('[data-del]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (!confirm('Delete this draft?')) return
+      localStorage.removeItem(STORAGE_PREFIX + btn.dataset.del)
+      renderDraftsList()
+    })
+  })
+}
+
+// ── Init ──────────────────────────────────────────────────────
+const bcDate = document.getElementById('bc-date')
+if (bcDate && !bcDate.value) bcDate.value = TODAY
+renderDraftsList()
+</script>
