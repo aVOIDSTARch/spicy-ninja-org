@@ -1,29 +1,525 @@
 ---
 import ZoneLayout from '../../layouts/ZoneLayout.astro'
 import SceneForest from '../../components/scenes/SceneForest.astro'
+import { getCollection } from 'astro:content'
+
+const nodes = await getCollection('montessori', ({ data }) => !data.draft)
+
+// Build node map keyed by slug (filename without extension, without subdir)
+// slugs are the file basename: rhythm-as-cosmos, african-drumming, etc.
+const nodeMap = Object.fromEntries(
+  nodes.map(n => {
+    const slug = n.id.split('/').pop()?.replace('.mdx', '') ?? n.id
+    return [slug, { ...n.data, slug }]
+  })
+)
+
+// Serialise to JSON for client-side use
+const nodeMapJSON = JSON.stringify(nodeMap)
+
+// Layout coordinates for the SVG tree [slug]: {x, y}
+// Canvas: 900 x 560. Roots at top, branches below, leaves at bottom.
+const coords: Record<string, {x: number; y: number}> = {
+  // Roots — row 1 (y=80)
+  'rhythm-as-cosmos':      { x: 200, y: 80  },
+  'sound-as-mathematics':  { x: 450, y: 80  },
+  'voice-and-instrument':  { x: 700, y: 80  },
+  // Branches — row 2 (y=240)
+  'african-drumming':      { x: 110, y: 240 },
+  'electronic-lineage':    { x: 310, y: 240 },
+  'fugue-and-counterpoint':{ x: 460, y: 240 },
+  'markov-and-emergence':  { x: 600, y: 240 },
+  'sufi-mathematics':      { x: 740, y: 240 },
+  'indian-classical':      { x: 830, y: 240 },
+}
+
+// Connection pairs [from, to]
+const connections: [string, string][] = [
+  ['rhythm-as-cosmos',     'african-drumming'],
+  ['rhythm-as-cosmos',     'electronic-lineage'],
+  ['voice-and-instrument', 'electronic-lineage'],
+  ['sound-as-mathematics', 'fugue-and-counterpoint'],
+  ['sound-as-mathematics', 'markov-and-emergence'],
+  ['sound-as-mathematics', 'sufi-mathematics'],
+  ['voice-and-instrument', 'indian-classical'],
+]
+
+const coordsJSON = JSON.stringify(coords)
+const connectionsJSON = JSON.stringify(connections)
 ---
 
-<ZoneLayout zone="montessori" title="Montessori — spicyninja.org">
+<ZoneLayout zone="montessori" title="Montessori Experience Tree — spicyninja.org">
   <SceneForest slot="scene" />
 
-  <div style="padding: 14vh 4rem 6rem; max-width: 820px;">
-    <p class="eyebrow">experience track</p>
-    <h1 class="hero-heading" style="margin-bottom:1rem;">Montessori</h1>
-    <p style="font-family:var(--font-body); font-size:1.05rem; color:var(--text-secondary);
-              max-width:560px; line-height:1.85; margin-top:1.5rem; margin-bottom:3rem;">
-      An infinitely branching knowledge tree. Nodes unlock nodes. Follow curiosity rather
-      than sequence. Roots lead to branches lead to Bespoke Journey Courses.
-    </p>
-    <div style="border:1px solid var(--border); border-left:3px solid #c8922a;
-                padding:2rem; background:var(--bg-card);">
-      <p style="font-family:var(--font-mono); font-size:0.6rem; letter-spacing:0.2em;
-                 text-transform:uppercase; color:#c8922a; margin-bottom:0.6rem;">
-        In development
+  <div class="mt-shell">
+    <header class="mt-header">
+      <p class="eyebrow">experience track</p>
+      <h1 class="hero-heading mt-title">Knowledge Tree</h1>
+      <p class="mt-desc">
+        Follow curiosity rather than sequence. Roots unlock branches unlock journeys.
+        Your progress lives in this browser.
       </p>
-      <p style="font-family:var(--font-body); color:var(--text-muted); font-size:0.9rem; line-height:1.7;">
-        The visual node map — with locked, available, and completed states — is the next
-        major build phase. The tree structure and node content are being designed in parallel.
-      </p>
+      <div class="mt-legend">
+        <span class="mt-legend-item mt-legend-item--locked">🔒 Locked</span>
+        <span class="mt-legend-item mt-legend-item--available">◎ Available</span>
+        <span class="mt-legend-item mt-legend-item--complete">✦ Completed</span>
+      </div>
+    </header>
+
+    <!-- Tree map -->
+    <div class="mt-map-wrap">
+      <svg id="mt-svg" viewBox="0 0 900 380" class="mt-svg" aria-label="Montessori knowledge tree">
+        <defs>
+          <filter id="glow-complete">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="glow-available">
+            <feGaussianBlur stdDeviation="2" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <!-- Connection lines — rendered by JS -->
+        <g id="mt-lines"></g>
+
+        <!-- Nodes — rendered by JS -->
+        <g id="mt-nodes"></g>
+      </svg>
+    </div>
+
+    <!-- Node detail panel (opens on click) -->
+    <div class="mt-panel" id="mt-panel" aria-hidden="true">
+      <button class="mt-panel__close" id="mt-panel-close">✕</button>
+      <div class="mt-panel__inner" id="mt-panel-inner"></div>
     </div>
   </div>
 </ZoneLayout>
+
+<style>
+  .mt-shell {
+    padding: 8vh 3rem 8rem;
+    max-width: 980px;
+  }
+
+  .mt-header { margin-bottom: 3rem; }
+  .mt-title { margin-bottom: 1.2rem; }
+  .mt-desc {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--text-secondary);
+    max-width: 520px;
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Legend */
+  .mt-legend {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .mt-legend-item {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--border);
+  }
+  .mt-legend-item--locked   { color: var(--text-ghost); }
+  .mt-legend-item--available { color: var(--text-secondary); border-color: var(--text-muted); }
+  .mt-legend-item--complete  { color: var(--cinnabar-warm); border-color: var(--cinnabar-warm); }
+
+  /* SVG map */
+  .mt-map-wrap {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--cinnabar-warm);
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+  .mt-svg {
+    width: 100%;
+    display: block;
+    min-height: 300px;
+    cursor: default;
+  }
+
+  /* Panel */
+  .mt-panel {
+    position: fixed;
+    top: 0; right: 0;
+    width: min(440px, 100vw);
+    height: 100vh;
+    background: var(--bg-secondary);
+    border-left: 1px solid var(--border);
+    border-top: 2px solid var(--cinnabar-warm);
+    z-index: 300;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+  .mt-panel[aria-hidden="false"] { transform: translateX(0); }
+  .mt-panel__close {
+    position: sticky; top: 0;
+    float: right;
+    background: var(--bg-secondary); border: none;
+    color: var(--text-ghost); cursor: pointer;
+    font-size: 0.9rem; padding: 1rem 1.2rem;
+    z-index: 1;
+  }
+  .mt-panel__close:hover { color: var(--text-primary); }
+  .mt-panel__inner { padding: 1.5rem 1.8rem 3rem; clear: both; }
+
+  /* Panel content classes (set by JS) */
+  .mp-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .mp-eyebrow--available { color: var(--text-muted); }
+  .mp-eyebrow--complete  { color: var(--cinnabar-warm); }
+  .mp-eyebrow--locked    { color: var(--text-ghost); }
+
+  .mp-title {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.8rem;
+    color: var(--text-primary);
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+  .mp-desc {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.75;
+    margin-bottom: 1.5rem;
+  }
+  .mp-locked-msg {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--text-ghost);
+    line-height: 1.6;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+  }
+  .mp-prereq-list {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: var(--text-ghost);
+    margin-top: 0.5rem;
+    list-style: none;
+    padding: 0;
+  }
+  .mp-prereq-list li::before { content: '→ '; color: var(--cinnabar); }
+
+  .mp-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 1rem; }
+  .mp-btn {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.5rem 1.1rem;
+    border: 1px solid var(--border);
+    background: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .mp-btn--primary { border-color: var(--cinnabar); color: var(--cinnabar); }
+  .mp-btn--primary:hover { background: rgba(227,66,52,0.08); }
+  .mp-btn--done { border-color: var(--cinnabar-warm); color: var(--cinnabar-warm); }
+  .mp-btn--done:hover { background: rgba(232,160,32,0.08); }
+  .mp-btn--undone:hover { border-color: var(--text-muted); color: var(--text-primary); }
+
+  .mp-fundlink {
+    display: inline-block;
+    margin-top: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    color: var(--cinnabar-warm);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(232,160,32,0.3);
+  }
+  .mp-fundlink:hover { border-bottom-color: var(--cinnabar-warm); }
+
+  .mp-unlocks {
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
+  }
+  .mp-unlocks-label {
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-ghost);
+    margin-bottom: 0.5rem;
+  }
+  .mp-unlock-item {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    padding: 0.25rem 0;
+  }
+  .mp-unlock-item::before { content: '✦ '; color: var(--cinnabar-warm); opacity: 0.5; }
+
+  @media (max-width: 640px) {
+    .mt-shell { padding: 5vh 1.2rem 5rem; }
+    .mt-panel { width: 100vw; }
+  }
+</style>
+
+<script define:vars={{ nodeMapJSON, coordsJSON, connectionsJSON }}>
+// ── Data ─────────────────────────────────────────────────────────
+const NODES       = JSON.parse(nodeMapJSON)
+const COORDS      = JSON.parse(coordsJSON)
+const CONNECTIONS = JSON.parse(connectionsJSON)
+const STORAGE_KEY = 'sn-montessori-visited'
+
+// ── Progress storage ──────────────────────────────────────────────
+function getVisited() {
+  try { return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')) }
+  catch { return new Set() }
+}
+function saveVisited(set) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([...set]))
+}
+function markComplete(slug) {
+  const v = getVisited(); v.add(slug); saveVisited(v); renderAll()
+}
+function markIncomplete(slug) {
+  const v = getVisited(); v.delete(slug); saveVisited(v); renderAll()
+}
+
+// ── State resolution ──────────────────────────────────────────────
+// locked = prereqs not met; available = prereqs met; complete = in visited set
+function nodeState(slug) {
+  const visited = getVisited()
+  if (visited.has(slug)) return 'complete'
+  const node = NODES[slug]
+  if (!node) return 'locked'
+  const prereqsMet = (node.prerequisites || []).every(p => visited.has(p))
+  return prereqsMet ? 'available' : 'locked'
+}
+
+// ── Color tokens ──────────────────────────────────────────────────
+const COLORS = {
+  locked:    { fill: '#2a1a0a', stroke: '#3d2510', text: '#6a4828', glyph: '🔒' },
+  available: { fill: '#3d2510', stroke: '#c8b490', text: '#c8b490', glyph: '◎'  },
+  complete:  { fill: '#3d2510', stroke: '#E8A020', text: '#E8A020', glyph: '✦'  },
+}
+const TYPE_LABEL = { root: 'Root', branch: 'Branch', leaf: 'Leaf', seed: 'Seed' }
+
+// ── SVG helpers ───────────────────────────────────────────────────
+const SVG_NS = 'http://www.w3.org/2000/svg'
+function el(tag, attrs = {}, text = '') {
+  const e = document.createElementNS(SVG_NS, tag)
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v)
+  if (text) e.textContent = text
+  return e
+}
+
+// ── Render lines ──────────────────────────────────────────────────
+function renderLines() {
+  const g = document.getElementById('mt-lines')
+  g.innerHTML = ''
+  const visited = getVisited()
+
+  for (const [from, to] of CONNECTIONS) {
+    const a = COORDS[from], b = COORDS[to]
+    if (!a || !b) continue
+    const bothComplete = visited.has(from) && visited.has(to)
+    const toAvailable  = nodeState(to) !== 'locked'
+    const stroke = bothComplete ? '#E8A020' : toAvailable ? '#5c3820' : '#2a1a0a'
+    const opacity = bothComplete ? '0.7' : toAvailable ? '0.4' : '0.15'
+
+    // Curved line via cubic bezier midpoint
+    const mx = (a.x + b.x) / 2
+    const my = (a.y + b.y) / 2 + 20
+    g.appendChild(el('path', {
+      d: `M ${a.x} ${a.y} Q ${mx} ${my} ${b.x} ${b.y}`,
+      stroke, 'stroke-width': bothComplete ? '1.5' : '1',
+      fill: 'none', opacity,
+      'stroke-dasharray': bothComplete ? 'none' : '4 3',
+    }))
+  }
+}
+
+// ── Render nodes ──────────────────────────────────────────────────
+const NODE_R = 28  // radius of node circle
+
+function renderNodes() {
+  const g = document.getElementById('mt-nodes')
+  g.innerHTML = ''
+
+  for (const [slug, pos] of Object.entries(COORDS)) {
+    const node = NODES[slug]
+    if (!node) continue
+    const state  = nodeState(slug)
+    const colors = COLORS[state]
+
+    const group = el('g', {
+      class: `mt-node mt-node--${state}`,
+      'data-slug': slug,
+      style: 'cursor:pointer',
+      role: 'button',
+      'aria-label': node.title,
+    })
+
+    // Glow ring for complete / available
+    if (state === 'complete') {
+      group.appendChild(el('circle', {
+        cx: pos.x, cy: pos.y, r: NODE_R + 6,
+        fill: 'none', stroke: '#E8A020',
+        'stroke-width': '1', opacity: '0.35',
+        filter: 'url(#glow-complete)',
+        class: 'node-glow-ring',
+      }))
+    } else if (state === 'available') {
+      group.appendChild(el('circle', {
+        cx: pos.x, cy: pos.y, r: NODE_R + 4,
+        fill: 'none', stroke: '#c8b490',
+        'stroke-width': '0.5', opacity: '0.3',
+      }))
+    }
+
+    // Main circle
+    group.appendChild(el('circle', {
+      cx: pos.x, cy: pos.y, r: NODE_R,
+      fill: colors.fill, stroke: colors.stroke,
+      'stroke-width': state === 'complete' ? '1.5' : '1',
+    }))
+
+    // Glyph
+    group.appendChild(el('text', {
+      x: pos.x, y: pos.y - 5,
+      'text-anchor': 'middle', 'dominant-baseline': 'middle',
+      fill: colors.text, 'font-size': '11',
+      'font-family': 'JetBrains Mono, monospace',
+    }, colors.glyph))
+
+    // Type label
+    group.appendChild(el('text', {
+      x: pos.x, y: pos.y + 10,
+      'text-anchor': 'middle', 'dominant-baseline': 'middle',
+      fill: colors.text, 'font-size': '7',
+      'font-family': 'JetBrains Mono, monospace',
+      'letter-spacing': '0.08em',
+      opacity: '0.7',
+    }, (TYPE_LABEL[node.type] || '').toUpperCase()))
+
+    // Name below circle
+    // Word-wrap at ~16 chars
+    const words = node.title.split(' ')
+    let lines = [], line = ''
+    for (const w of words) {
+      const test = line ? line + ' ' + w : w
+      if (test.length > 14 && line) { lines.push(line); line = w }
+      else line = test
+    }
+    if (line) lines.push(line)
+    lines.forEach((l, i) => {
+      group.appendChild(el('text', {
+        x: pos.x, y: pos.y + NODE_R + 14 + i * 11,
+        'text-anchor': 'middle',
+        fill: colors.text, 'font-size': '8.5',
+        'font-family': 'JetBrains Mono, monospace',
+        'letter-spacing': '0.03em',
+      }, l))
+    })
+
+    group.addEventListener('click', () => openPanel(slug))
+    g.appendChild(group)
+  }
+}
+
+function renderAll() { renderLines(); renderNodes() }
+
+// ── Panel ─────────────────────────────────────────────────────────
+const panel     = document.getElementById('mt-panel')
+const panelInner = document.getElementById('mt-panel-inner')
+
+function openPanel(slug) {
+  const node  = NODES[slug]
+  if (!node) return
+  const state = nodeState(slug)
+  const visited = getVisited()
+
+  // Build HTML
+  let html = `<div class="mp-eyebrow mp-eyebrow--${state}">${TYPE_LABEL[node.type] || ''} — ${state}</div>`
+  html += `<h2 class="mp-title">${node.title}</h2>`
+  if (node.description) html += `<p class="mp-desc">${node.description}</p>`
+
+  if (state === 'locked') {
+    const prereqNames = (node.prerequisites || [])
+      .map(p => NODES[p]?.title || p)
+    html += `<div class="mp-locked-msg">Complete prerequisites to unlock this node.`
+    if (prereqNames.length) {
+      html += `<ul class="mp-prereq-list">${prereqNames.map(n => `<li>${n}</li>`).join('')}</ul>`
+    }
+    html += `</div>`
+  } else {
+    // Action buttons
+    html += `<div class="mp-actions">`
+    html += `<a class="mp-btn mp-btn--primary" href="/montessori/${slug}">Open →</a>`
+    if (state === 'available') {
+      html += `<button class="mp-btn mp-btn--done" data-mark-done="${slug}">Mark complete ✦</button>`
+    } else {
+      html += `<button class="mp-btn mp-btn--undone" data-mark-undone="${slug}">Mark incomplete</button>`
+    }
+    html += `</div>`
+
+    // Fundamentals link
+    if (node.fundamentalsBranch) {
+      html += `<a class="mp-fundlink" href="/fundamentals/${node.fundamentalsBranch}">→ Fundamentals: ${node.fundamentalsBranch}</a>`
+    }
+
+    // Unlocks
+    if (node.unlocks?.length) {
+      const unlockNames = node.unlocks.map(u => NODES[u]?.title || u)
+      html += `<div class="mp-unlocks"><div class="mp-unlocks-label">Unlocks</div>`
+      html += unlockNames.map(n => `<div class="mp-unlock-item">${n}</div>`).join('')
+      html += `</div>`
+    }
+  }
+
+  panelInner.innerHTML = html
+
+  // Wire buttons
+  panelInner.querySelector('[data-mark-done]')?.addEventListener('click', e => {
+    markComplete(e.target.dataset.markDone); openPanel(slug)
+  })
+  panelInner.querySelector('[data-mark-undone]')?.addEventListener('click', e => {
+    markIncomplete(e.target.dataset.markUndone); openPanel(slug)
+  })
+
+  panel.setAttribute('aria-hidden', 'false')
+}
+
+function closePanel() { panel.setAttribute('aria-hidden', 'true') }
+
+document.getElementById('mt-panel-close').addEventListener('click', closePanel)
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel() })
+
+// ── Boot ──────────────────────────────────────────────────────────
+renderAll()
+
+// Animate complete node glow rings
+setInterval(() => {
+  document.querySelectorAll('.node-glow-ring').forEach((ring, i) => {
+    const t = Date.now() / 1000
+    const s = 0.28 + 0.12 * Math.sin(t * 1.2 + i * 1.5)
+    ring.setAttribute('opacity', String(s))
+  })
+}, 80)
+</script>

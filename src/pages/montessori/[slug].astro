@@ -1,0 +1,108 @@
+---
+import ZoneLayout from '../../layouts/ZoneLayout.astro'
+import SceneForest from '../../components/scenes/SceneForest.astro'
+import { getCollection, render } from 'astro:content'
+
+export async function getStaticPaths() {
+  const nodes = await getCollection('montessori', ({ data }) => !data.draft)
+  return nodes.map(node => {
+    const slug = node.id.split('/').pop()?.replace('.mdx', '') ?? node.id
+    return { params: { slug }, props: { node } }
+  })
+}
+
+const { slug } = Astro.params
+const { node } = Astro.props
+const { Content } = await render(node)
+
+const typeLabel: Record<string, string> = {
+  root: 'Root', branch: 'Branch', leaf: 'Leaf', seed: 'Journey Seed',
+}
+
+// Build prerequisite and unlocks slugs for display
+const prereqs    = node.data.prerequisites || []
+const unlocks    = node.data.unlocks || []
+const fundBranch = node.data.fundamentalsBranch
+
+const slugJSON = JSON.stringify(slug)
+const prereqsJSON = JSON.stringify(prereqs)
+---
+
+<ZoneLayout zone="montessori" title={`${node.data.title} — Montessori — spicyninja.org`}>
+  <SceneForest slot="scene" />
+
+  <div class="mn-shell">
+
+    <a href="/montessori" class="mn-back">← Knowledge Tree</a>
+
+    <!-- Node state banner (set by JS) -->
+    <div class="mn-state-banner" id="mn-state-banner"></div>
+
+    <header class="mn-header">
+      <p class="mn-eyebrow">
+        {typeLabel[node.data.type] ?? node.data.type}
+      </p>
+      <h1 class="hero-heading mn-title">{node.data.title}</h1>
+      {node.data.description && (
+        <p class="mn-desc">{node.data.description}</p>
+      )}
+    </header>
+
+    <!-- Locked overlay (hidden by JS if available/complete) -->
+    <div class="mn-locked-overlay" id="mn-locked-overlay">
+      <p class="mn-locked-msg">Complete prerequisites to access this node.</p>
+      {prereqs.length > 0 && (
+        <ul class="mn-prereq-list">
+          {prereqs.map(p => (
+            <li><a href={`/montessori/${p}`} class="mn-prereq-link">{p}</a></li>
+          ))}
+        </ul>
+      )}
+    </div>
+
+    <!-- Content (visible when unlocked) -->
+    <div class="mn-content" id="mn-content">
+      <div class="mn-prose">
+        <Content />
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="mn-sidebar">
+
+        {fundBranch && (
+          <div class="mn-sidebar-card">
+            <div class="mn-sidebar-card__label">Fundamentals</div>
+            <a href={`/fundamentals/${fundBranch}`} class="mn-sidebar-card__link">
+              → {fundBranch}
+            </a>
+          </div>
+        )}
+
+        {unlocks.length > 0 && (
+          <div class="mn-sidebar-card">
+            <div class="mn-sidebar-card__label">Unlocks</div>
+            <div class="mn-unlock-list">
+              {unlocks.map(u => (
+                <a href={`/montessori/${u}`} class="mn-unlock-item">{u}</a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {node.data.connectsToProject?.length > 0 && (
+          <div class="mn-sidebar-card">
+            <div class="mn-sidebar-card__label">Project connections</div>
+            {node.data.connectsToProject.map(c => (
+              <div class="mn-project-tag">{c}</div>
+            ))}
+          </div>
+        )}
+
+        <!-- Mark complete/incomplete button -->
+        <div class="mn-progress-card" id="mn-progress-card"></div>
+
+      </aside>
+    </div>
+
+  </div>
+</ZoneLayout>
