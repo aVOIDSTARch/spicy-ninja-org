@@ -597,7 +597,7 @@ const moduleName = moduleNames[work.data.module] ?? ''
   }
 
   handle?.addEventListener('click', () => {
-    collapsed ? expandTOC() : collapseTOC()
+    if (collapsed) { expandTOC() } else { collapseTOC() }
   })
 
   window.addEventListener('scroll', () => {
