@@ -151,6 +151,7 @@ function writeToken() {
   localStorage.setItem(STORAGE_KEY, btoa(JSON.stringify({ issued: now, expires: now + TOKEN_TTL_MS, v: 1 })))
 }
 function clearToken() { localStorage.removeItem(STORAGE_KEY) }
+
 function authed() {
   try {
     const t = JSON.parse(atob(localStorage.getItem(STORAGE_KEY) || ''))
@@ -229,11 +230,9 @@ function logout() {
 
 // Ctrl+Alt+Shift+\ — obscure triple-modifier combo, no known system conflicts
 document.addEventListener('keydown', e => {
-  if ((e.ctrlKey || e.metaKey) && e.altKey && e.shiftKey && e.key === '\\') {
+  if (e.ctrlKey && e.metaKey && e.key === 'n') {
     e.preventDefault()
-    authed()
-      ? document.getElementById('sn-admin-bar')?.classList.toggle('open')
-      : openModal()
+    authed() ? document.getElementById('sn-admin-bar')?.classList.toggle('open') : openModal()
   }
   if (e.key === 'Escape') closeModal()
 })
