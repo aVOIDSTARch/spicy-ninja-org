@@ -1,43 +1,76 @@
-# Astro Starter Kit: Minimal
+# spicyninja.org
 
-```sh
-npm create astro@latest -- --template minimal
+A public education in making *Jus Pulsus: A Cosmogony in Four Movements* —
+a 90-minute programmatic electronic suite currently in pre-composition.
+
+This site documents every step: the listening curriculum, the theory, the
+compositional decisions, and the philosophical ideas that drive the work.
+It is a composer's notebook made public from the beginning.
+
+---
+
+## Development
+
+```bash
+pnpm install
+cp .env.example .env    # then set PUBLIC_AUTH_PASSPHRASE_HASH (see below)
+pnpm dev                # http://localhost:4321
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Build
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+```bash
+pnpm build              # outputs to dist/
+pnpm preview            # serve dist/ locally
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Auth
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+Admin access is via a hidden keystroke combination (not documented here).
+The passphrase hash is set in `.env` as `PUBLIC_AUTH_PASSPHRASE_HASH`.
 
-Any static assets, like images, can be placed in the `public/` directory.
+Generate a hash:
+```bash
+node -e "const c=require('crypto');console.log(c.createHash('sha256').update('YOUR_PASS').digest('hex'))"
+```
 
-## 🧞 Commands
+**Changing the passphrase requires a full rebuild and redeploy.**
 
-All commands are run from the root of the project, from a terminal:
+The hash is baked into the client bundle at build time. This is intentional
+and safe — the hash is not the secret.
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## Deploy
 
-## 👀 Want to learn more?
+See `DEPLOY.md` for homeserver instructions (Nginx + rsync or Docker).
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+## Content authoring
+
+All content lives in `src/content/` as MDX files.
+
+| Collection | Path | How to add |
+|---|---|---|
+| Project Track works | `src/content/project-track/` | Edit existing MDX, set `draft: false` |
+| Montessori nodes | `src/content/montessori/roots/` or `branches/` | Add new MDX matching schema |
+| Fundamentals lessons | `src/content/fundamentals/[branch]/` | Add new MDX |
+| Blog posts | `src/content/blog/` | Use `/blog/compose` → Export → drop file here |
+| Listening journal | `src/content/listening-journal/` | Use `/journal/new` → Export → drop file here |
+| Project docs | `src/content/project/` | Add MDX with title, order, description |
+
+After adding content: `pnpm build` then redeploy `dist/`.
+
+## Stack
+
+- [Astro 6](https://astro.build) — static site generator
+- [Tailwind CSS v4](https://tailwindcss.com) — via Vite plugin
+- [pnpm](https://pnpm.io) — package manager
+- Node ≥ 22.12
+
+## Scripts
+
+| Command | Action |
+|---|---|
+| `pnpm dev` | Dev server at localhost:4321 |
+| `pnpm build` | Production build → `dist/` |
+| `pnpm preview` | Serve built output locally |
+| `pnpm lint` | Run oxlint |
+| `pnpm check` | Type check via vite-plus |
