@@ -277,6 +277,18 @@ const connectionsJSON = JSON.stringify(connections)
     .mt-shell { padding: 5vh 1.2rem 5rem; }
     .mt-panel { width: 100vw; }
   }
+
+  /* Glow ring pulse — CSS animation on SVG elements */
+  @keyframes glowPulse {
+    0%, 100% { opacity: 0.2; }
+    50%       { opacity: 0.45; }
+  }
+  .node-glow-ring {
+    animation: glowPulse 3s ease-in-out infinite;
+  }
+  .mt-node--complete:nth-child(2) .node-glow-ring { animation-delay: -1s; }
+  .mt-node--complete:nth-child(3) .node-glow-ring { animation-delay: -2s; }
+  .mt-node--complete:nth-child(4) .node-glow-ring { animation-delay: -0.5s; }
 </style>
 
 <script define:vars={{ nodeMapJSON, coordsJSON, connectionsJSON }}>
@@ -514,12 +526,5 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel()
 // ── Boot ──────────────────────────────────────────────────────────
 renderAll()
 
-// Animate complete node glow rings
-setInterval(() => {
-  document.querySelectorAll('.node-glow-ring').forEach((ring, i) => {
-    const t = Date.now() / 1000
-    const s = 0.28 + 0.12 * Math.sin(t * 1.2 + i * 1.5)
-    ring.setAttribute('opacity', String(s))
-  })
-}, 80)
+// CSS animation handles glow — nothing needed here
 </script>

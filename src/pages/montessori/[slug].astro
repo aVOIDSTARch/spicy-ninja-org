@@ -106,3 +106,300 @@ const prereqsJSON = JSON.stringify(prereqs)
 
   </div>
 </ZoneLayout>
+
+<style>
+  .mn-shell {
+    padding: 8vh 3.5rem 8rem;
+    max-width: 900px;
+  }
+
+  .mn-back {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    color: var(--text-ghost);
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    transition: color 0.15s;
+  }
+  .mn-back:hover { color: var(--cinnabar-warm); }
+
+  /* State banner */
+  .mn-state-banner {
+    font-family: var(--font-mono);
+    font-size: 0.52rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    padding: 0.35rem 0.8rem;
+    display: inline-block;
+    margin-bottom: 1.2rem;
+    border: 1px solid transparent;
+  }
+  .mn-state-banner--available {
+    color: var(--text-secondary);
+    border-color: var(--text-muted);
+  }
+  .mn-state-banner--complete {
+    color: var(--cinnabar-warm);
+    border-color: var(--cinnabar-warm);
+    background: rgba(232,160,32,0.06);
+  }
+  .mn-state-banner--locked {
+    color: var(--text-ghost);
+    border-color: var(--border);
+  }
+
+  /* Header */
+  .mn-header { margin-bottom: 2.5rem; }
+  .mn-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.52rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--cinnabar-warm);
+    margin-bottom: 0.6rem;
+  }
+  .mn-title { margin-bottom: 1rem; }
+  .mn-desc {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--text-secondary);
+    max-width: 580px;
+    line-height: 1.82;
+  }
+
+  /* Locked overlay */
+  .mn-locked-overlay {
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--text-ghost);
+    padding: 1.5rem 2rem;
+    background: var(--bg-card);
+    margin-bottom: 2rem;
+  }
+  .mn-locked-msg {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--text-ghost);
+    margin-bottom: 0.8rem;
+  }
+  .mn-prereq-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .mn-prereq-link {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--cinnabar);
+    text-decoration: none;
+    letter-spacing: 0.06em;
+  }
+  .mn-prereq-link::before { content: '→ '; }
+  .mn-prereq-link:hover { color: var(--text-primary); }
+
+  /* Content layout */
+  .mn-content {
+    display: grid;
+    grid-template-columns: 1fr 220px;
+    gap: 3rem;
+    align-items: start;
+  }
+
+  /* Prose */
+  .mn-prose {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.82;
+    max-width: 62ch;
+  }
+  .mn-prose h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.4rem;
+    color: var(--text-primary);
+    margin: 2rem 0 0.8rem;
+    line-height: 1.1;
+  }
+  .mn-prose h2::before {
+    content: '';
+    display: block;
+    width: 1.5rem;
+    height: 2px;
+    background: var(--cinnabar-warm);
+    opacity: 0.5;
+    margin-bottom: 0.6rem;
+  }
+  .mn-prose p { margin-bottom: 1.1rem; }
+  .mn-prose em { color: var(--text-primary); font-style: italic; }
+  .mn-prose strong { color: var(--text-primary); font-weight: 500; }
+  .mn-prose a {
+    color: var(--cinnabar-warm);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(232,160,32,0.3);
+  }
+  .mn-prose a:hover { border-bottom-color: var(--cinnabar-warm); }
+
+  /* Sidebar */
+  .mn-sidebar {
+    position: sticky;
+    top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .mn-sidebar-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 1rem 1.2rem;
+  }
+  .mn-sidebar-card__label {
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-ghost);
+    margin-bottom: 0.6rem;
+  }
+  .mn-sidebar-card__link {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    color: var(--cinnabar-warm);
+    text-decoration: none;
+    letter-spacing: 0.06em;
+    display: block;
+  }
+  .mn-sidebar-card__link:hover { color: var(--text-primary); }
+
+  .mn-unlock-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .mn-unlock-item {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+  }
+  .mn-unlock-item::before { content: '✦ '; color: var(--cinnabar-warm); opacity: 0.5; }
+  .mn-unlock-item:hover { color: var(--cinnabar-warm); }
+
+  .mn-project-tag {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    color: var(--text-ghost);
+    letter-spacing: 0.06em;
+    padding: 0.2rem 0;
+  }
+
+  /* Progress card */
+  .mn-progress-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 1rem 1.2rem;
+  }
+  .mn-progress-btn {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid var(--border);
+    background: none;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .mn-progress-btn--complete {
+    color: var(--cinnabar-warm);
+    border-color: var(--cinnabar-warm);
+  }
+  .mn-progress-btn--complete:hover { background: rgba(232,160,32,0.08); }
+  .mn-progress-btn--undo {
+    color: var(--text-ghost);
+    border-color: var(--border);
+  }
+  .mn-progress-btn--undo:hover { border-color: var(--text-muted); color: var(--text-muted); }
+
+  @media (max-width: 720px) {
+    .mn-shell { padding: 5vh 1.5rem 5rem; }
+    .mn-content { grid-template-columns: 1fr; }
+    .mn-sidebar { position: static; }
+  }
+</style>
+
+<script define:vars={{ slugJSON, prereqsJSON }}>
+const SLUG        = JSON.parse(slugJSON)
+const PREREQS     = JSON.parse(prereqsJSON)
+const STORAGE_KEY = 'sn-montessori-visited'
+
+function getVisited() {
+  try { return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')) }
+  catch { return new Set() }
+}
+function saveVisited(set) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([...set]))
+}
+
+function nodeState() {
+  const visited = getVisited()
+  if (visited.has(SLUG)) return 'complete'
+  const prereqsMet = PREREQS.every(p => visited.has(p))
+  return prereqsMet ? 'available' : 'locked'
+}
+
+function markComplete() {
+  const v = getVisited(); v.add(SLUG); saveVisited(v); applyState()
+}
+function markIncomplete() {
+  const v = getVisited(); v.delete(SLUG); saveVisited(v); applyState()
+}
+
+function applyState() {
+  const state  = nodeState()
+  const banner = document.getElementById('mn-state-banner')
+  const overlay = document.getElementById('mn-locked-overlay')
+  const content = document.getElementById('mn-content')
+  const card    = document.getElementById('mn-progress-card')
+
+  // Banner
+  const labels = { locked: '🔒 Locked', available: '◎ Available', complete: '✦ Completed' }
+  banner.textContent = labels[state] || ''
+  banner.className   = `mn-state-banner mn-state-banner--${state}`
+
+  // Show/hide content vs locked overlay
+  if (state === 'locked') {
+    overlay.style.display = 'block'
+    content.style.display = 'none'
+  } else {
+    overlay.style.display = 'none'
+    content.style.display = 'grid'
+  }
+
+  // Progress button
+  if (state === 'available') {
+    card.innerHTML = `<button class="mn-progress-btn mn-progress-btn--complete" id="mn-mark-done">
+      Mark complete ✦
+    </button>`
+    document.getElementById('mn-mark-done')?.addEventListener('click', markComplete)
+  } else if (state === 'complete') {
+    card.innerHTML = `<button class="mn-progress-btn mn-progress-btn--undo" id="mn-mark-undo">
+      Mark incomplete
+    </button>`
+    document.getElementById('mn-mark-undo')?.addEventListener('click', markIncomplete)
+  } else {
+    card.innerHTML = ''
+  }
+}
+
+// Boot — hide content by default (locked), JS reveals when appropriate
+document.getElementById('mn-locked-overlay').style.display = 'none'
+document.getElementById('mn-content').style.display        = 'none'
+applyState()
+</script>
