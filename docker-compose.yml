@@ -1,0 +1,17 @@
+services:
+  spicy-ninja-org:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Hash is baked at build time — not a runtime secret, safe as build arg
+        PUBLIC_AUTH_PASSPHRASE_HASH: ${PUBLIC_AUTH_PASSPHRASE_HASH}
+    container_name: spicy-ninja-org
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    # No volumes needed — fully static, no runtime writes
+
+# Usage:
+#   export PUBLIC_AUTH_PASSPHRASE_HASH=$(grep PUBLIC_AUTH .env | cut -d= -f2)
+#   docker compose up -d --build
