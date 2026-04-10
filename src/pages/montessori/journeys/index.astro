@@ -1,0 +1,116 @@
+---
+import ZoneLayout from '../../../layouts/ZoneLayout.astro'
+import SceneForest from '../../../components/scenes/SceneForest.astro'
+---
+
+<ZoneLayout zone="montessori" title="Bespoke Journeys — spicyninja.org">
+  <SceneForest slot="scene" />
+
+  <div class="jy-shell">
+    <a href="/montessori" class="jy-back">← Knowledge Tree</a>
+
+    <p class="eyebrow">bespoke journey courses</p>
+    <h1 class="hero-heading jy-title">Journeys</h1>
+    <p class="jy-desc">
+      Deep immersive courses — one artist, tradition, or concept at a time.
+      Each journey seeds new branches in the knowledge tree on completion.
+    </p>
+
+    <div class="jy-grid">
+
+      <a href="/montessori/journeys/bjork-bodysuit" class="jy-card">
+        <div class="jy-card__accent"></div>
+        <div class="jy-card__body">
+          <p class="jy-card__label">Inaugural Journey</p>
+          <h2 class="jy-card__title">Björk Bodysuit</h2>
+          <p class="jy-card__desc">
+            Debut through Vespertine. Four albums as a complete study in how
+            a single human voice and electronic music can become indistinguishable
+            from each other. The benchmark for timbral identity in this project.
+          </p>
+          <span class="jy-card__cta">Enter →</span>
+        </div>
+      </a>
+
+    </div>
+
+  </div>
+</ZoneLayout>
+
+<style>
+  .jy-shell {
+    padding: 8vh 3.5rem 8rem;
+    max-width: 820px;
+  }
+  .jy-back {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    color: var(--text-ghost);
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    transition: color 0.15s;
+  }
+  .jy-back:hover { color: var(--cinnabar-warm); }
+  .jy-title { margin-bottom: 1.2rem; }
+  .jy-desc {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--text-secondary);
+    max-width: 520px;
+    line-height: 1.82;
+    margin-bottom: 3rem;
+  }
+  .jy-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1px;
+    background: var(--border);
+    max-width: 600px;
+  }
+  .jy-card {
+    display: grid;
+    grid-template-columns: 3px 1fr;
+    background: var(--bg-card);
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .jy-card:hover { background: var(--bg-raised); }
+  .jy-card__accent { background: var(--cinnabar-warm); }
+  .jy-card__body { padding: 2rem 2.5rem; }
+  .jy-card__label {
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--cinnabar-warm);
+    margin-bottom: 0.5rem;
+  }
+  .jy-card__title {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.8rem;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 0.8rem;
+  }
+  .jy-card__desc {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.75;
+    margin-bottom: 1.2rem;
+    max-width: 480px;
+  }
+  .jy-card__cta {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--cinnabar-warm);
+  }
+  @media (max-width: 640px) {
+    .jy-shell { padding: 5vh 1.5rem 5rem; }
+  }
+</style>

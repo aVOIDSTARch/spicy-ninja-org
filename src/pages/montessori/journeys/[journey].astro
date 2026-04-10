@@ -1,0 +1,179 @@
+---
+import ZoneLayout from '../../../layouts/ZoneLayout.astro'
+import SceneForest from '../../../components/scenes/SceneForest.astro'
+
+export function getStaticPaths() {
+  return [
+    { params: { journey: 'bjork-bodysuit' } },
+  ]
+}
+
+const { journey } = Astro.params
+
+const journeyMeta: Record<string, {
+  title: string
+  eyebrow: string
+  desc: string
+  phases: { num: number; title: string; subjects: string; desc: string }[]
+}> = {
+  'bjork-bodysuit': {
+    title: 'Björk Bodysuit',
+    eyebrow: 'Inaugural Bespoke Journey',
+    desc: 'Four albums as a complete study in how a single human voice and electronic music can become indistinguishable. Debut through Vespertine — not as a discography survey but as a single arc of compositional thinking about what a voice can be and what it can do to sound and to the listener.',
+    phases: [
+      {
+        num: 1,
+        title: 'Debut → Post',
+        subjects: 'Debut (1993), Post (1995)',
+        desc: 'The voice as instrument discovering what electronic music can be its partner. Debut establishes the register — playful, precise, capable of sudden devastation. Post is where the emotional stakes arrive without softening the precision.',
+      },
+      {
+        num: 2,
+        title: 'Homogenic → Vespertine',
+        subjects: 'Homogenic (1997), Vespertine (2001)',
+        desc: 'Homogenic as the most deliberate album — strings and beats as equals, neither decorative. Vespertine as the quietest music that makes the most internal noise. The benchmark for what intimacy means in electronic composition.',
+      },
+    ],
+  },
+}
+
+const meta = journeyMeta[journey]
+---
+
+<ZoneLayout zone="montessori" title={meta ? `${meta.title} — Journeys — spicyninja.org` : 'Journey — spicyninja.org'}>
+  <SceneForest slot="scene" />
+
+  {meta ? (
+    <div class="jd-shell">
+      <a href="/montessori/journeys" class="jd-back">← Journeys</a>
+
+      <p class="eyebrow">{meta.eyebrow}</p>
+      <h1 class="hero-heading jd-title">{meta.title}</h1>
+      <p class="jd-desc">{meta.desc}</p>
+
+      <div class="jd-phases">
+        {meta.phases.map(phase => (
+          <div class="jd-phase">
+            <div class="jd-phase__num">Phase {phase.num}</div>
+            <div class="jd-phase__body">
+              <h2 class="jd-phase__title">{phase.title}</h2>
+              <p class="jd-phase__subjects">{phase.subjects}</p>
+              <p class="jd-phase__desc">{phase.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div class="jd-notice">
+        <p class="jd-notice__text">
+          Full phase content — listening guides, score analysis, and compositional connections
+          to <em>Jus Pulsus</em> — is in development. Check back after the project's
+          listening curriculum is complete.
+        </p>
+      </div>
+    </div>
+  ) : (
+    <div style="padding:8vh 3.5rem; max-width:600px;">
+      <a href="/montessori/journeys" style="font-family:var(--font-mono);font-size:0.6rem;color:var(--text-ghost);text-decoration:none;">← Journeys</a>
+      <h1 class="hero-heading" style="margin-top:1.5rem;">Journey not found</h1>
+    </div>
+  )}
+</ZoneLayout>
+
+<style>
+  .jd-shell {
+    padding: 8vh 3.5rem 8rem;
+    max-width: 820px;
+  }
+  .jd-back {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    color: var(--text-ghost);
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    transition: color 0.15s;
+  }
+  .jd-back:hover { color: var(--cinnabar-warm); }
+  .jd-title { margin-bottom: 1.2rem; }
+  .jd-desc {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--text-secondary);
+    max-width: 580px;
+    line-height: 1.85;
+    margin-bottom: 3rem;
+  }
+  .jd-phases {
+    display: grid;
+    gap: 1px;
+    background: var(--border);
+    margin-bottom: 2.5rem;
+  }
+  .jd-phase {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    background: var(--bg-card);
+  }
+  .jd-phase__num {
+    font-family: var(--font-mono);
+    font-size: 0.52rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--cinnabar-warm);
+    padding: 1.8rem 0 1.8rem 1.5rem;
+    border-right: 1px solid var(--border);
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .jd-phase__body { padding: 1.8rem 2rem; }
+  .jd-phase__title {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.4rem;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+  .jd-phase__subjects {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    color: var(--cinnabar-warm);
+    margin-bottom: 0.8rem;
+  }
+  .jd-phase__desc {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.75;
+  }
+  .jd-notice {
+    border-left: 2px solid var(--border);
+    padding: 1rem 1.5rem;
+    background: var(--bg-card);
+  }
+  .jd-notice__text {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--text-ghost);
+    line-height: 1.65;
+    letter-spacing: 0.03em;
+  }
+  .jd-notice__text em { color: var(--text-muted); font-style: italic; }
+  @media (max-width: 640px) {
+    .jd-shell { padding: 5vh 1.5rem 5rem; }
+    .jd-phase { grid-template-columns: 1fr; }
+    .jd-phase__num {
+      writing-mode: horizontal-tb;
+      transform: none;
+      padding: 1rem 1.5rem 0;
+      justify-content: flex-start;
+    }
+  }
+</style>
