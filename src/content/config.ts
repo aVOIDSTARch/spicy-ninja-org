@@ -30,7 +30,7 @@ const projectTrack = defineCollection({
     composer:     z.string(),
     year:         z.string(),
     module:       moduleEnum,
-    order:        z.number().int().positive(),
+    order:        z.number().int().min(1),
     recording:    z.string().optional(),
     youtubeQuery: z.string(),
     listenFor:    z.array(z.string()).min(1),
@@ -67,7 +67,7 @@ const journeys = defineCollection({
   schema: z.object({
     journey:     z.string(),               // parent journey slug
     title:       z.string(),
-    phase:       z.number().int().positive(),
+    phase:       z.number().int().min(1),
     description: z.string(),
     subjects:    z.array(z.string()),      // artists/works covered
     draft:       z.boolean().default(false),
