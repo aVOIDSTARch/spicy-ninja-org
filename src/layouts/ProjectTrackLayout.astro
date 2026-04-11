@@ -333,11 +333,11 @@ const moduleName = moduleNames[work.data.module] ?? ''
   }
   .pt-toc__item--active .pt-toc__num { color: var(--work-accent); opacity: 0.7; }
 
-  /* TOC handle — visible tab at edge when collapsed */
+  /* TOC handle — fixed to viewport, always visible */
   .pt-toc__handle {
-    position: absolute;
+    position: fixed;
     top: 50%;
-    right: -18px;
+    left: 260px;
     transform: translateY(-50%);
     width: 18px;
     height: 48px;
@@ -350,9 +350,11 @@ const moduleName = moduleNames[work.data.module] ?? ''
     cursor: pointer;
     font-size: 0.6rem;
     color: var(--text-ghost);
-    transition: color 0.2s ease;
+    transition: color 0.2s ease, left 0.4s cubic-bezier(0.4,0,0.2,1);
+    z-index: 30;
   }
   .pt-toc__handle:hover { color: var(--text-primary); }
+  .pt-toc__handle--collapsed { left: 52px; }
 
   /* ── MAIN ── */
   .pt-main {
@@ -586,6 +588,7 @@ const moduleName = moduleNames[work.data.module] ?? ''
   function setCollapsed(state: boolean) {
     collapsed = state
     toc?.classList.toggle('pt-toc--collapsed', collapsed)
+    handle?.classList.toggle('pt-toc__handle--collapsed', collapsed)
   }
 
   handle?.addEventListener('click', (e) => {

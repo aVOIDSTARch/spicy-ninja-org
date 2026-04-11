@@ -128,19 +128,22 @@ const allBranchLessons = (await getCollection('fundamentals', ({ data }) =>
     color: var(--text-ghost); flex-shrink: 0; opacity: 0.5;
   }
 
-  /* Handle — always visible tab on right edge of TOC */
+  /* Handle — fixed to viewport, always visible regardless of TOC state */
   .fl-toc__handle {
-    position: absolute; top: 50%; right: -22px;
+    position: fixed;
+    top: 50%;
+    left: 240px;
     transform: translateY(-50%);
     width: 22px; height: 52px;
     background: var(--bg-secondary);
     border: 1px solid var(--border); border-left: none;
     display: flex; align-items: center; justify-content: center;
     cursor: pointer; color: var(--text-ghost);
-    transition: color 0.2s, background 0.2s;
-    z-index: 21;
+    transition: color 0.2s, background 0.2s, left 0.4s cubic-bezier(0.4,0,0.2,1);
+    z-index: 30;
   }
   .fl-toc__handle:hover { color: var(--branch-accent); background: var(--bg-raised); }
+  .fl-toc__handle--collapsed { left: 52px; }
   .fl-toc__handle-icon {
     font-size: 0.9rem; line-height: 1;
     transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
@@ -237,6 +240,7 @@ const allBranchLessons = (await getCollection('fundamentals', ({ data }) =>
   function setCollapsed(state: boolean) {
     collapsed = state
     toc?.classList.toggle('fl-toc--collapsed', collapsed)
+    handle?.classList.toggle('fl-toc__handle--collapsed', collapsed)
     const icon = document.getElementById('fl-toc-icon')
     if (icon) icon.textContent = collapsed ? '›' : '‹'
   }
