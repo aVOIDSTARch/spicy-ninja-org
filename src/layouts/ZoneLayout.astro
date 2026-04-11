@@ -83,10 +83,10 @@ const a = zoneAccents[zone] ?? zoneAccents['project-track']
     position: relative;
     z-index: 10;
     background: var(--bg-primary);
-    /* Top edge is a crisp cut — add a 1px cinnabar-dim rule at the boundary */
     border-top: 1px solid var(--zone-accent-dim);
     min-height: 100vh;
-    padding-bottom: 8rem;
+    /* No overflow:hidden here — sticky TOC children need the page as scroll context */
+    overflow: visible;
   }
 
   /* Zone accent application */
