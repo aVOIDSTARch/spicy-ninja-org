@@ -241,19 +241,26 @@ const allBranchLessons = (await getCollection('fundamentals', ({ data }) =>
     if (icon) icon.textContent = collapsed ? '›' : '‹'
   }
 
-  // Handle click always toggles
-  handle?.addEventListener('click', () => setCollapsed(!collapsed))
+  // Handle click always toggles — stopPropagation prevents scroll listener interference
+  handle?.addEventListener('click', (e) => {
+    e.stopPropagation()
+    setCollapsed(!collapsed)
+  })
 
-  // Auto-collapse on scroll down — re-open via the handle (single toggle mechanism)
+  // Auto-collapse only after user has meaningfully scrolled — debounced, no eager fire
   let lastY = window.scrollY
-  let collapsedByScroll = false
+  let scrollTimer: ReturnType<typeof setTimeout> | null = null
+
   window.addEventListener('scroll', () => {
-    const y = window.scrollY
-    const scrollingDown = y > lastY
-    lastY = y
-    if (scrollingDown && y > 220 && !collapsed) {
-      setCollapsed(true)
-      collapsedByScroll = true
-    }
+    if (scrollTimer) clearTimeout(scrollTimer)
+    scrollTimer = setTimeout(() => {
+      const y = window.scrollY
+      const scrollingDown = y > lastY
+      lastY = y
+      // Only collapse if scrolled well past the fold and not already collapsed
+      if (scrollingDown && y > 400 && !collapsed) {
+        setCollapsed(true)
+      }
+    }, 150)
   }, { passive: true })
 </script>

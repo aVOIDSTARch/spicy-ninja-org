@@ -581,26 +581,30 @@ const moduleName = moduleNames[work.data.module] ?? ''
 <script>
   const toc = document.getElementById('pt-toc')
   const handle = document.getElementById('pt-toc-handle')
-
-  // Auto-collapse on scroll past threshold
   let collapsed = false
 
-  function collapseTOC() {
-    if (!collapsed) {
-      toc?.classList.add('pt-toc--collapsed')
-      collapsed = true
-    }
-  }
-  function expandTOC() {
-    toc?.classList.remove('pt-toc--collapsed')
-    collapsed = false
+  function setCollapsed(state: boolean) {
+    collapsed = state
+    toc?.classList.toggle('pt-toc--collapsed', collapsed)
   }
 
-  handle?.addEventListener('click', () => {
-    if (collapsed) { expandTOC() } else { collapseTOC() }
+  handle?.addEventListener('click', (e) => {
+    e.stopPropagation()
+    setCollapsed(!collapsed)
   })
 
+  let lastY = window.scrollY
+  let scrollTimer: ReturnType<typeof setTimeout> | null = null
+
   window.addEventListener('scroll', () => {
-    if (window.scrollY > 220 && !collapsed) collapseTOC()
+    if (scrollTimer) clearTimeout(scrollTimer)
+    scrollTimer = setTimeout(() => {
+      const y = window.scrollY
+      const scrollingDown = y > lastY
+      lastY = y
+      if (scrollingDown && y > 400 && !collapsed) {
+        setCollapsed(true)
+      }
+    }, 150)
   }, { passive: true })
 </script>
