@@ -1,14 +1,16 @@
 import { defineConfig } from 'vite-plus';
 
 export default defineConfig({
-  server: {},
+  server: {
+    allowedHosts: ['www.spicyninja.org', 'spicyninja.org']
+  },
   build: {},
-  preview: {},
+  preview: {
+    allowedHosts: ['www.spicyninja.org', 'spicyninja.org']
+  },
 
   test: {},
-  lint: {
-    
-  },
+  lint: {},
   fmt: {},
   run: {},
   pack: {},
